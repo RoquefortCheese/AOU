@@ -1,0 +1,12 @@
+[gd_scene format=3 uid="uid://bywumdx7if63m"]
+
+[ext_resource type="Script" uid="uid://ddoamclbqn0gj" path="res://global.gd" id="1_6q3x5"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_6q3x5"]
+albedo_color = Color(0.2509804, 0.2509804, 0.2509804, 1)
+
+[node name="Global" type="Node" unique_id=1677589215]
+script = ExtResource("1_6q3x5")
+materials = Dictionary[int, Material]({
+1: SubResource("StandardMaterial3D_6q3x5")
+})

@@ -1,0 +1,81 @@
+[gd_scene format=3 uid="uid://c8d565cr28pwx"]
+
+[ext_resource type="Script" uid="uid://ben0v5dc8e4pl" path="res://player.gd" id="1_4flbx"]
+[ext_resource type="Shader" uid="uid://bcmdwyjuyraxo" path="res://post.gdshader" id="2_onrkg"]
+[ext_resource type="Script" uid="uid://cdwfan1xykvgh" path="res://boxline.gd" id="3_i3pqv"]
+[ext_resource type="Shader" uid="uid://3pgn14eohwd8" path="res://crosshair.gdshader" id="4_hqtel"]
+[ext_resource type="Texture2D" uid="uid://crnr8scc3dp5g" path="res://icon.svg" id="5_sweqy"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_onrkg"]
+radius = 0.2
+height = 1.25
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_i3pqv"]
+shading_mode = 0
+
+[sub_resource type="BoxMesh" id="BoxMesh_onrkg"]
+material = SubResource("StandardMaterial3D_i3pqv")
+size = Vector3(0.1, 0.1, 1)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_i3pqv"]
+shader = ExtResource("2_onrkg")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_hqtel"]
+shader = ExtResource("4_hqtel")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_2hs0m"]
+albedo_texture = ExtResource("5_sweqy")
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_hqtel"]
+material = SubResource("StandardMaterial3D_2hs0m")
+radius = 0.4
+height = 2.5
+
+[node name="Player" type="CharacterBody3D" unique_id=1234066966]
+script = ExtResource("1_4flbx")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=954143861]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 1.25, 0)
+shape = SubResource("CapsuleShape3D_onrkg")
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=548151771]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.25, 0)
+fov = 90.0
+
+[node name="RayCast3D" type="RayCast3D" parent="Camera3D" unique_id=1232509615]
+target_position = Vector3(0, 0, -2048)
+
+[node name="SpotLight3D" type="SpotLight3D" parent="Camera3D" unique_id=706525484]
+light_energy = 0.25
+spot_range = 8.0
+spot_angle = 30.0
+
+[node name="GrappleGun" type="Node3D" parent="Camera3D" unique_id=405499242]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.2, -0.5, 0)
+
+[node name="BoxLine" type="MeshInstance3D" parent="." unique_id=1357251747]
+mesh = SubResource("BoxMesh_onrkg")
+script = ExtResource("3_i3pqv")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=330074035]
+
+[node name="PostProcessing" type="ColorRect" parent="CanvasLayer" unique_id=1485664400]
+visible = false
+material = SubResource("ShaderMaterial_i3pqv")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Crosshair" type="ColorRect" parent="CanvasLayer" unique_id=820059056]
+material = SubResource("ShaderMaterial_hqtel")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1149832090]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.25, 0)
+mesh = SubResource("CapsuleMesh_hqtel")
