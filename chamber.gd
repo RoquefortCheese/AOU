@@ -22,6 +22,7 @@ var surfacetools: Dictionary[Global.Vox, SurfaceTool]
 
 func rescale(value: float, min: float, max: float):
 	return value * (max - min) / 2 + (max + min) / 2
+	
 
 func dicechoose(array: Array):
 	return array[dice.randi_range(0, len(array) - 1)]
