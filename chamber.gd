@@ -22,7 +22,6 @@ var surfacetools: Dictionary[Global.Vox, SurfaceTool]
 
 func rescale(value: float, min: float, max: float):
 	return value * (max - min) / 2 + (max + min) / 2
-	
 
 func dicechoose(array: Array):
 	return array[dice.randi_range(0, len(array) - 1)]
@@ -185,9 +184,9 @@ func placelights():
 		add_child(sphere)
 
 func anomalize():
-	for i in range(len(air) * 0.001):
+	for i in range(len(air) * 0.0004):
 		var anomaly = anomscene.instantiate()
-		anomaly.create(self, dicechoose([Color.MAGENTA, Color.YELLOW, Color.CYAN]))
+		anomaly.create(self, dicechoose([Color.MAGENTA, Color.BLUE, Color.CYAN]))
 		anomaly.position = randomair() + Vector3(0.5, 1, 0.5)
 		add_child(anomaly)
 

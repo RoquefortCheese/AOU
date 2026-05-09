@@ -2,11 +2,14 @@ extends CharacterBody3D
 
 const floatconst = 4
 const wobbleconst = 4
-const friction = -4
+const followconst = 2
+const heightfriction = -4
+const flatfriction = -1
 @export var boxmesh: BoxMesh
 
 var boxes: Array[MeshInstance3D]
 var spinvels: Dictionary[MeshInstance3D, Vector3]
+var acceleration: Vector3
 var chamber: Node
 var color: Color
 var offset: float
@@ -24,25 +27,43 @@ func create(chamber: Node, color: Color):
 		add_child(box)
 
 func _physics_process(delta: float):
+	acceleration = Vector3.ZERO
 	spinboxes(delta)
-	hover(delta)
+	follow()
+	hover()
+	domath(delta)
+	move_and_slide()
 
 func spinboxes(delta: float):
 	for box in boxes:
 		for axis in range(3):
 			box.rotation[axis] += spinvels[box][axis] * delta
 
-func hover(delta: float):
-	velocity.y *= exp(friction) ** delta
-	velocity.y += wobbleconst * sin(Global.time() * PI + offset) * delta
+func hover():
+	acceleration.y += wobbleconst * sin(Global.time() * PI + offset)
 	var grounddist = INF
 	for x in [-0.4, 0.4]:
 		for z in [-0.4, 0.4]:
-			var voxel = floor(position + Vector3(x, 0, z))
+			var voxel = floor(position + Vector3(x, 1, z))
 			if voxel in chamber.groundmap:
 				var ground = chamber.groundmap[voxel]
 				grounddist = min(grounddist, position.y - ground.y)
+	var nextpath = floor(position + Global.flatten(acceleration).normalized() * 0.8)
+	if nextpath in chamber.groundmap:
+		nextpath = chamber.groundmap[nextpath]
+	while nextpath not in chamber.groundmap and nextpath in chamber.voxmap:
+		nextpath.y += 1
+	if nextpath in chamber.voxmap:
+		grounddist = min(grounddist, position.y - nextpath.y)
 	if grounddist != INF:
 		var error = grounddist - 1
-		velocity.y += floatconst * error ** 2 * -sign(error) * delta
-	move_and_slide()
+		acceleration.y += min(floatconst * error ** 2, 32) * -sign(error)
+
+func follow():
+	acceleration += Global.flatten(Global.player.position - position).normalized() * followconst
+
+func domath(delta: float):
+	velocity.y *= exp(heightfriction) ** delta
+	velocity.x *= exp(flatfriction) ** delta
+	velocity.z *= exp(flatfriction) ** delta
+	velocity += acceleration * delta
