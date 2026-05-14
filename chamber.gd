@@ -13,12 +13,13 @@ const bases = {
 }
 var pos: Vector3
 var size: int
+var dice: RandomNumberGenerator
 var voxmap: Dictionary[Vector3, Global.Vox]
 var air: Array[Vector3]
 var groundmap: Dictionary[Vector3, Vector3]
-var dice: RandomNumberGenerator
 var noise: FastNoiseLite
 var surfacetools: Dictionary[Global.Vox, SurfaceTool]
+var anomalies: Array[CharacterBody3D]
 
 func rescale(value: float, min: float, max: float):
 	return value * (max - min) / 2 + (max + min) / 2
@@ -28,6 +29,16 @@ func dicechoose(array: Array):
 
 func randomair():
 	return dicechoose(air)
+
+func spawnpoint():
+	while true:
+		var point = groundmap[randomair()] + Vector3(0.5, 0, 0.5)
+		var distanced = true
+		for anomaly in anomalies:
+			if Global.dist(point, anomaly.position) < 4:
+				distanced = false
+		if distanced:
+			return point
 
 func genair():
 	air = []
@@ -66,7 +77,7 @@ func terragen():
 	noise = FastNoiseLite.new()
 	noise.seed = dice.randi()
 	noise.noise_type = FastNoiseLite.TYPE_SIMPLEX
-	noise.frequency = 0.2 / sqrt(size)
+	noise.frequency = 0.2 / sqrt(size) * 2 ** dice.randf_range(-1, 1)
 	noise.fractal_octaves = 4
 	for x in range(size):
 		for y in range(size):
@@ -92,6 +103,9 @@ func terragen():
 							voxmap[Vector3(x, yy, z)] = Global.Vox.STONE
 					streak = 0
 	genair()
+	if len(air) == 0:
+		terragen()
+		return
 	print("floodfilling...")
 	var frontier = [randomair()]
 	var flood = {frontier[0]: true}
@@ -159,17 +173,23 @@ func createmeshes():
 		add_child(meshinstance)
 
 func placelights():
+	var volumefactor = len(air) ** (1. / 3)
 	var lighting = {}
 	for point in air:
 		lighting[point] = 0
-	for i in range(8):
+	for i in range(24):
 		var light = OmniLight3D.new()
-		light.omni_range = 2 ** dice.randf_range(4, 7)
-		var lightpos
-		while true:
-			lightpos = randomair()
-			if i == 0 or dice.randf() ** 16 >= lighting[lightpos] / i:
-				break
+		light.omni_range = volumefactor * 2 ** dice.randf_range(-1, 1)
+		var bestpoints = []
+		var leastlight = INF
+		for point in air:
+			var brightness = lighting[point]
+			if brightness < leastlight:
+				leastlight = brightness
+				bestpoints.clear()
+			if brightness == leastlight:
+				bestpoints.append(point)
+		var lightpos = dicechoose(bestpoints)
 		light.position = lightpos + Vector3.ONE / 2.
 		for point in lighting:
 			lighting[point] += 1 / Global.dist(lightpos, point)
@@ -187,8 +207,9 @@ func anomalize():
 	for i in range(len(air) * 0.0004):
 		var anomaly = anomscene.instantiate()
 		anomaly.create(self, dicechoose([Color.MAGENTA, Color.BLUE, Color.CYAN]))
-		anomaly.position = randomair() + Vector3(0.5, 1, 0.5)
+		anomaly.position = spawnpoint() + Vector3.UP
+		anomalies.append(anomaly)
 		add_child(anomaly)
 
 func welcomeplayer():
-	Global.player.position = groundmap[randomair()] + Vector3(0.5, 0, 0.5)
+	Global.player.position = spawnpoint()

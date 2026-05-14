@@ -3,8 +3,10 @@ extends CharacterBody3D
 const floatconst = 4
 const wobbleconst = 4
 const followconst = 2
+const repelconst = 6
 const heightfriction = -4
 const flatfriction = -1
+const followradius = 16
 @export var boxmesh: BoxMesh
 
 var boxes: Array[MeshInstance3D]
@@ -30,6 +32,7 @@ func _physics_process(delta: float):
 	acceleration = Vector3.ZERO
 	spinboxes(delta)
 	follow()
+	spaceout()
 	hover()
 	domath(delta)
 	move_and_slide()
@@ -60,7 +63,16 @@ func hover():
 		acceleration.y += min(floatconst * error ** 2, 32) * -sign(error)
 
 func follow():
-	acceleration += Global.flatten(Global.player.position - position).normalized() * followconst
+	var diff = Global.player.position - position
+	if diff.length() <= followradius:
+		acceleration += Global.flatten(diff).normalized() * followconst
+
+func spaceout():
+	for anomaly in chamber.anomalies:
+		if anomaly != self:
+			var diff = position - anomaly.position
+			if diff.length() >= 2 ** -4:
+				acceleration += diff.normalized() * repelconst / diff.length() ** 2
 
 func domath(delta: float):
 	velocity.y *= exp(heightfriction) ** delta
