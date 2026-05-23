@@ -5,19 +5,23 @@ const jumpspeed = 10
 const cruisespeed = 10
 const friction = -6
 const acc = cruisespeed * -friction
-var hookconst = 0.2
-var hookpos
+
+var equipment: Dictionary[String, Variant]
 var pan: Vector3
 
 func _ready():
-	$Camera3D.rotation.y = randf() * PI * 2
+	Global.player = self
+	rotation.y = randf() * PI * 2
 	pan = $Camera3D.rotation
-	hookpos = null
+	$Camera3D/RayCast3D.add_exception(self)
+	equipment = {"leftclick": null, "rightclick": null}
+	
+	equip("leftclick", Global.EquipmentType.PISTOL)
 
 func _physics_process(delta: float):
 	handlecam(delta)
 	movementinput(delta)
-	handlehookshot(delta)
+	useequipment(delta)
 	otherphysics(delta)
 
 func movementinput(delta: float):
@@ -42,22 +46,11 @@ func handlecam(delta: float):
 	for axis in range(2):
 		$Camera3D.rotation[axis] += (pan[axis] - $Camera3D.rotation[axis]) * (1 - (2 ** 48) ** -delta)
 
-func handlehookshot(delta: float):
-	if Input.is_action_pressed("rightclick"):
-		var campos = $Camera3D.global_position
-		var gun = $Camera3D.get_node("GrappleGun").global_position
-		var target = hookpos
-		if hookpos == null:
-			target = $Camera3D.get_node("RayCast3D").get_collision_point()
-			hookpos = target
-		$BoxLine.visible = true
-		$BoxLine.line(gun, target)
-		var direction = (target - campos).normalized()
-		var springacc = hookconst * Global.dist(campos, target) ** 2
-		velocity += direction * springacc * delta
-	else:
-		$BoxLine.visible = false
-		hookpos = null
+func useequipment(delta: float):
+	if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
+		for hand in equipment:
+			if Input.is_action_just_pressed(hand) and equipment[hand] != null:
+				equipment[hand].fire()
 
 func otherphysics(delta: float):
 	velocity.x *= exp(friction) ** delta
@@ -65,6 +58,11 @@ func otherphysics(delta: float):
 	if not is_on_floor():
 		velocity.y -= 10 * delta
 	move_and_slide()
+
+func equip(hand: String, eqtype: Global.EquipmentType):
+	var item = Global.equipment[eqtype].instantiate()
+	item.equip()
+	equipment[hand] = item
 
 func _input(event: InputEvent):
 	if event is InputEventMouseMotion:

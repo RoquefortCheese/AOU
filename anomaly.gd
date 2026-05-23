@@ -1,14 +1,17 @@
 extends CharacterBody3D
+class_name Anomaly
 
 const floatconst = 4
 const wobbleconst = 4
 const followconst = 2
 const repelconst = 6
+const fallconst = -12
 const heightfriction = -4
 const flatfriction = -1
 const followradius = 16
 @export var boxmesh: BoxMesh
 
+var alive: bool
 var boxes: Array[MeshInstance3D]
 var spinvels: Dictionary[MeshInstance3D, Vector3]
 var acceleration: Vector3
@@ -17,6 +20,7 @@ var color: Color
 var offset: float
 
 func create(chamber: Node, color: Color):
+	self.alive = true
 	self.chamber = chamber
 	self.color = color
 	offset = randf() * TAU
@@ -30,10 +34,13 @@ func create(chamber: Node, color: Color):
 
 func _physics_process(delta: float):
 	acceleration = Vector3.ZERO
-	spinboxes(delta)
-	follow()
-	spaceout()
-	hover()
+	if alive:
+		spinboxes(delta)
+		follow()
+		spaceout()
+		hover()
+	else:
+		fall()
 	domath(delta)
 	move_and_slide()
 
@@ -74,8 +81,18 @@ func spaceout():
 			if diff.length() >= 2 ** -4:
 				acceleration += diff.normalized() * repelconst / diff.length() ** 2
 
+func fall():
+	if not is_on_floor():
+		acceleration.y = fallconst
+
 func domath(delta: float):
 	velocity.y *= exp(heightfriction) ** delta
 	velocity.x *= exp(flatfriction) ** delta
 	velocity.z *= exp(flatfriction) ** delta
 	velocity += acceleration * delta
+
+func die():
+	if alive:
+		alive = false
+		for box in boxes:
+			box.mesh.material.albedo_color *= 0.25

@@ -145,15 +145,40 @@ func calculatestuff():
 					ground = null
 
 func createvisuals():
-	createmeshes()
 	placelights()
+	createmeshes()
+
+func placelights():
+	var volumefactor = len(air) ** (1. / 3)
+	var lighting = {}
+	for point in air:
+		lighting[point] = 0
+	for i in range(24):
+		var light = OmniLight3D.new()
+		light.omni_range = volumefactor * 2 ** dice.randf_range(-1, 1)
+		light.light_energy = 4
+		var bestpoints = []
+		var leastlight = INF
+		for point in air:
+			var brightness = lighting[point]
+			if brightness < leastlight:
+				leastlight = brightness
+				bestpoints.clear()
+			if brightness == leastlight:
+				bestpoints.append(point)
+		var lightpos = dicechoose(bestpoints)
+		light.position = lightpos + Vector3.ONE / 2.
+		for point in lighting:
+			lighting[point] += 1 / Global.dist(lightpos, point)
+		add_child(light)
+		voxmap[lightpos] = Global.Vox.LIGHT
 
 func createmeshes():
 	for voxtype in Global.Vox.values():
 		if voxtype != Global.Vox.AIR:
 			var st = SurfaceTool.new()
-			st.set_material(Global.materials[voxtype])
 			st.begin(Mesh.PRIMITIVE_TRIANGLES)
+			st.set_material(Global.materials[voxtype])
 			surfacetools[voxtype] = st
 	for x in range(size):
 		for y in range(size):
@@ -169,39 +194,9 @@ func createmeshes():
 	for st in surfacetools.values():
 		var meshinstance = MeshInstance3D.new()
 		meshinstance.mesh = st.commit()
-		meshinstance.create_trimesh_collision()
-		add_child(meshinstance)
-
-func placelights():
-	var volumefactor = len(air) ** (1. / 3)
-	var lighting = {}
-	for point in air:
-		lighting[point] = 0
-	for i in range(24):
-		var light = OmniLight3D.new()
-		light.omni_range = volumefactor * 2 ** dice.randf_range(-1, 1)
-		var bestpoints = []
-		var leastlight = INF
-		for point in air:
-			var brightness = lighting[point]
-			if brightness < leastlight:
-				leastlight = brightness
-				bestpoints.clear()
-			if brightness == leastlight:
-				bestpoints.append(point)
-		var lightpos = dicechoose(bestpoints)
-		light.position = lightpos + Vector3.ONE / 2.
-		for point in lighting:
-			lighting[point] += 1 / Global.dist(lightpos, point)
-		add_child(light)
-		
-		var sphere = MeshInstance3D.new()
-		sphere.mesh = SphereMesh.new()
-		sphere.position = light.position
-		sphere.mesh.material = StandardMaterial3D.new()
-		sphere.mesh.material.albedo_color = Color.YELLOW
-		sphere.mesh.material.shading_mode = 0
-		add_child(sphere)
+		if meshinstance.mesh.get_surface_count() != 0:
+			meshinstance.create_trimesh_collision()
+			add_child(meshinstance)
 
 func anomalize():
 	for i in range(len(air) * 0.0004):

@@ -1,7 +1,9 @@
 extends Node
 
-enum Vox {AIR, STONE}
+enum Vox {AIR, STONE, LIGHT}
 @export var materials: Dictionary[Vox, Material]
+enum EquipmentType {PISTOL}
+@export var equipment: Dictionary[EquipmentType, PackedScene]
 
 var worldseed: int
 var player: CharacterBody3D

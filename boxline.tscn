@@ -1,0 +1,14 @@
+[gd_scene format=3 uid="uid://qlptchw5umvf"]
+
+[ext_resource type="Script" uid="uid://cdwfan1xykvgh" path="res://boxline.gd" id="1_bnx2p"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_i3pqv"]
+shading_mode = 0
+
+[sub_resource type="BoxMesh" id="BoxMesh_onrkg"]
+material = SubResource("StandardMaterial3D_i3pqv")
+size = Vector3(0.1, 0.1, 1)
+
+[node name="BoxLine" type="MeshInstance3D" unique_id=2034336193]
+mesh = SubResource("BoxMesh_onrkg")
+script = ExtResource("1_bnx2p")

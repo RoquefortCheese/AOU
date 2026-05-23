@@ -10,7 +10,6 @@ material = SubResource("StandardMaterial3D_c1slk")
 size = Vector3(0.6, 0.6, 0.6)
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_c1slk"]
-radius = 0.4
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_knx40"]
 shading_mode = 0
