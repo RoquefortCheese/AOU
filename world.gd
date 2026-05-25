@@ -11,6 +11,6 @@ func _ready():
 	add_child(chamber)
 
 func setglobals():
-	Global.worldseed = randi()
+	Global.worldseed = 3208526376
 	print("world seed: " + str(Global.worldseed))
 	Global.world = self

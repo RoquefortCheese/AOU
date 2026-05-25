@@ -57,10 +57,10 @@ func create(pos: Vector3, size: int):
 	print("dice manufactured!")
 	terragen()
 	print("terra genned!")
-	calculatestuff()
-	print("stuff calculated!")
 	createvisuals()
 	print("visuals created!")
+	calculatestuff()
+	print("stuff calculated!")
 	anomalize()
 	print("anomalies materialized!")
 	welcomeplayer()
@@ -127,7 +127,7 @@ func terragen():
 	for point in filling:
 		voxmap[point] = Global.Vox.STONE
 	genair()
-	if len(air) < size ** 3 * 2 ** -4:
+	if len(air) < size ** 3 * 2 ** -4.:
 		print("regenerating...")
 		terragen()
 

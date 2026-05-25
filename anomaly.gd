@@ -3,12 +3,12 @@ class_name Anomaly
 
 const floatconst = 4
 const wobbleconst = 4
-const followconst = 2
+const followconst = 3
 const repelconst = 6
 const fallconst = -12
 const heightfriction = -4
 const flatfriction = -1
-const followradius = 16
+const followradius = 20
 @export var boxmesh: BoxMesh
 
 var alive: bool
@@ -78,7 +78,7 @@ func spaceout():
 	for anomaly in chamber.anomalies:
 		if anomaly != self:
 			var diff = position - anomaly.position
-			if diff.length() >= 2 ** -4:
+			if diff.length() >= 2 ** -4.:
 				acceleration += diff.normalized() * repelconst / diff.length() ** 2
 
 func fall():
