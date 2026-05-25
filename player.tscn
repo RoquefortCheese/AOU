@@ -13,6 +13,7 @@ shader = ExtResource("2_onrkg")
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_2hs0m"]
 albedo_texture = ExtResource("5_sweqy")
+texture_filter = 2
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_hqtel"]
 material = SubResource("StandardMaterial3D_2hs0m")

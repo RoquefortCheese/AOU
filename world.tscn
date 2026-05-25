@@ -18,20 +18,11 @@ sky = SubResource("Sky_tlwt5")
 ambient_light_energy = 0.0
 reflected_light_source = 1
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_fj7yv"]
-albedo_color = Color(1, 0.7529412, 0, 1)
-
-[sub_resource type="BoxMesh" id="BoxMesh_tlwt5"]
-material = SubResource("StandardMaterial3D_fj7yv")
-
 [node name="World" type="Node" unique_id=784559713]
 script = ExtResource("1_f3sb7")
 chamberscene = ExtResource("2_fj7yv")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=96221940]
 environment = SubResource("Environment_aqk2v")
-
-[node name="TestCube" type="MeshInstance3D" parent="." unique_id=833366027]
-mesh = SubResource("BoxMesh_tlwt5")
 
 [node name="Player" parent="." unique_id=1234066966 instance=ExtResource("3_tlwt5")]
