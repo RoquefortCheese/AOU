@@ -7,7 +7,7 @@ func _ready():
 	starttime = Time.get_ticks_msec()
 	setglobals()
 	var chamber = chamberscene.instantiate()
-	chamber.create(Vector3.ZERO, 128)
+	chamber.create(Vector3.ZERO, 64)
 	add_child(chamber)
 
 func setglobals():

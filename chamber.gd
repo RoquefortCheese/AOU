@@ -172,6 +172,7 @@ func placelights():
 			lighting[point] += 1 / Global.dist(lightpos, point)
 		add_child(light)
 		voxmap[lightpos] = Global.Vox.LIGHT
+	genair()
 
 func createmeshes():
 	for voxtype in Global.Vox.values():
@@ -199,7 +200,7 @@ func createmeshes():
 			add_child(meshinstance)
 
 func anomalize():
-	for i in range(len(air) * 0.0004):
+	for i in range(len(air) * 2 ** -13.):
 		var anomaly = anomscene.instantiate()
 		anomaly.create(self, dicechoose([Color.MAGENTA, Color.BLUE, Color.CYAN]))
 		anomaly.position = spawnpoint() + Vector3.UP

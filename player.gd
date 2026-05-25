@@ -11,7 +11,7 @@ var pan: Vector3
 
 func _ready():
 	Global.player = self
-	rotation.y = randf() * PI * 2
+	$Camera3D.rotation.y = randf() * PI * 2
 	pan = $Camera3D.rotation
 	$Camera3D/RayCast3D.add_exception(self)
 	equipment = {"leftclick": null, "rightclick": null}
@@ -45,6 +45,7 @@ func movementinput(delta: float):
 func handlecam(delta: float):
 	for axis in range(2):
 		$Camera3D.rotation[axis] += (pan[axis] - $Camera3D.rotation[axis]) * (1 - (2 ** 48) ** -delta)
+	$MeshInstance3D.rotation.y = $Camera3D.rotation.y + PI
 
 func useequipment(delta: float):
 	if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
