@@ -1,10 +1,10 @@
 [gd_scene format=3 uid="uid://cd55ua6sp41hp"]
 
 [ext_resource type="Script" uid="uid://dum7hxs2t1hc0" path="res://pistol.gd" id="1_08c3m"]
-[ext_resource type="PackedScene" uid="uid://dk3cd5rsdd22k" path="res://pistol.glb" id="2_bttkv"]
+[ext_resource type="PackedScene" uid="uid://behu8hlh1pn0u" path="res://pistol.glb" id="2_bttkv"]
 
 [node name="Pistol" type="Node3D" unique_id=778629940]
 script = ExtResource("1_08c3m")
 
-[node name="PistolModel" parent="." unique_id=740285335 instance=ExtResource("2_bttkv")]
-transform = Transform3D(-5.4639235e-09, 0, -0.125, 0, 0.125, 0, 0.125, 0, -5.4639235e-09, 0.125, 0.375, -0.375)
+[node name="PistolModel" parent="." unique_id=478504501 instance=ExtResource("2_bttkv")]
+transform = Transform3D(-2.0544353e-09, 0, -0.047, 0, 0.047, 0, 0.047, 0, -2.0544353e-09, 0.125, 0.375, -0.375)
