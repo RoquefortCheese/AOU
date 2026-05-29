@@ -9,6 +9,9 @@ const fallconst = -12
 const heightfriction = -4
 const flatfriction = -1
 const followradius = 20
+const committhresh = 0.25
+const steppingconst = 1
+const knockbackconst = 2
 @export var boxmesh: BoxMesh
 
 var alive: bool
@@ -24,7 +27,7 @@ func create(chamber: Node, color: Color):
 	self.chamber = chamber
 	self.color = color
 	offset = randf() * TAU
-	for i in range(3):
+	for i in 3:
 		var box = MeshInstance3D.new()
 		box.mesh = boxmesh.duplicate_deep()
 		box.mesh.material.albedo_color = color
@@ -41,12 +44,13 @@ func _physics_process(delta: float):
 		hover()
 	else:
 		fall()
+	commit()
 	domath(delta)
 	move_and_slide()
 
 func spinboxes(delta: float):
 	for box in boxes:
-		for axis in range(3):
+		for axis in 3:
 			box.rotation[axis] += spinvels[box][axis] * delta
 
 func hover():
@@ -58,13 +62,15 @@ func hover():
 			if voxel in chamber.groundmap:
 				var ground = chamber.groundmap[voxel]
 				grounddist = min(grounddist, position.y - ground.y)
-	var nextpath = floor(position + Global.flatten(acceleration).normalized() * 0.8)
-	if nextpath in chamber.groundmap:
-		nextpath = chamber.groundmap[nextpath]
-	while nextpath not in chamber.groundmap and nextpath in chamber.voxmap:
-		nextpath.y += 1
-	if nextpath in chamber.voxmap:
-		grounddist = min(grounddist, position.y - nextpath.y)
+	var path = Global.flatten(acceleration)
+	if path.length() >= steppingconst:
+		var nextpath = floor(position + path.normalized() * 0.8)
+		if nextpath in chamber.groundmap:
+			nextpath = chamber.groundmap[nextpath]
+		while nextpath not in chamber.groundmap and nextpath in chamber.voxmap:
+			nextpath.y += 1
+		if nextpath in chamber.voxmap:
+			grounddist = min(grounddist, position.y - nextpath.y)
 	if grounddist != INF:
 		var error = grounddist - 1
 		acceleration.y += min(floatconst * error ** 2, 32) * -sign(error)
@@ -79,11 +85,16 @@ func spaceout():
 		if anomaly != self:
 			var diff = position - anomaly.position
 			if diff.length() >= 2 ** -4.:
-				acceleration += diff.normalized() * repelconst / diff.length() ** 2
+				acceleration += Global.flatten(diff.normalized() * repelconst / diff.length() ** 2)
 
 func fall():
 	if not is_on_floor():
 		acceleration.y = fallconst
+
+func commit():
+	for axis in 3:
+		if abs(acceleration[axis]) <= committhresh:
+			acceleration[axis] = 0
 
 func domath(delta: float):
 	velocity.y *= exp(heightfriction) ** delta
@@ -91,7 +102,8 @@ func domath(delta: float):
 	velocity.z *= exp(flatfriction) ** delta
 	velocity += acceleration * delta
 
-func die():
+func die(source: Vector3):
+	velocity += (position - source).normalized() * knockbackconst
 	if alive:
 		alive = false
 		for box in boxes:

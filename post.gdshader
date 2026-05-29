@@ -11,6 +11,7 @@ float random(vec2 uv) {
 void addcross(inout vec3 color, vec2 uv, vec2 pixelsize) {
 	vec2 fromcent = abs(uv - vec2(0.5)) * pixelsize.y / pixelsize;
 	if (min(fromcent.x, fromcent.y) <= mindim && max(fromcent.x, fromcent.y) <= maxdim) {
+		color.rg = vec2(min(color.r, color.g));
 		color = vec3(1.) - color;
 	}
 }
@@ -21,7 +22,7 @@ void addnoise(inout vec3 color, vec2 uv) {
 
 void fragment() {
 	vec3 color = texture(screen, SCREEN_UV).rgb;
-	addcross(color, SCREEN_UV, SCREEN_PIXEL_SIZE);
 	addnoise(color, SCREEN_UV);
+	addcross(color, SCREEN_UV, SCREEN_PIXEL_SIZE);
 	COLOR.rgb = color;
 }

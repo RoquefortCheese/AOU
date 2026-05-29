@@ -2,6 +2,7 @@ extends Node
 
 @export var face: PlaneMesh
 @export var anomscene: PackedScene
+@export var doorscene: PackedScene
 const cardinals = [Vector3.UP, Vector3.DOWN, Vector3.LEFT, Vector3.RIGHT, Vector3.FORWARD, Vector3.BACK]
 const bases = {
 	Vector3.UP: Basis(Vector3.RIGHT, Vector3.UP, Vector3.BACK),
@@ -19,6 +20,7 @@ var air: Array[Vector3]
 var groundmap: Dictionary[Vector3, Vector3]
 var noise: FastNoiseLite
 var surfacetools: Dictionary[Global.Vox, SurfaceTool]
+var entities: Array[PhysicsBody3D]
 var anomalies: Array[CharacterBody3D]
 
 func rescale(value: float, min: float, max: float):
@@ -34,17 +36,17 @@ func spawnpoint():
 	while true:
 		var point = groundmap[randomair()] + Vector3(0.5, 0, 0.5)
 		var distanced = true
-		for anomaly in anomalies:
-			if Global.dist(point, anomaly.position) < 4:
+		for entity in entities:
+			if Global.dist(point, entity.position) < 4:
 				distanced = false
 		if distanced:
 			return point
 
 func genair():
 	air = []
-	for x in range(size):
-		for y in range(size):
-			for z in range(size):
+	for x in size:
+		for y in size:
+			for z in size:
 				var point = Vector3(x, y, z)
 				if voxmap[point] == Global.Vox.AIR:
 					air.append(point)
@@ -57,10 +59,10 @@ func create(pos: Vector3, size: int):
 	print("dice manufactured!")
 	terragen()
 	print("terra genned!")
-	createvisuals()
-	print("visuals created!")
-	calculatestuff()
-	print("stuff calculated!")
+	placefeatures()
+	print("features placed!")
+	createmeshes()
+	print("meshes created!")
 	anomalize()
 	print("anomalies materialized!")
 	welcomeplayer()
@@ -69,7 +71,7 @@ func create(pos: Vector3, size: int):
 func manufacturedice():
 	dice = RandomNumberGenerator.new()
 	dice.seed = Global.worldseed
-	for axis in range(3):
+	for axis in 3:
 		dice.seed += pos[axis]
 		dice.seed = dice.randi()
 
@@ -79,21 +81,21 @@ func terragen():
 	noise.noise_type = FastNoiseLite.TYPE_SIMPLEX
 	noise.frequency = 0.2 / sqrt(size) * 2 ** dice.randf_range(-1, 1)
 	noise.fractal_octaves = 4
-	for x in range(size):
-		for y in range(size):
-			for z in range(size):
+	for x in size:
+		for y in size:
+			for z in size:
 				var point = Vector3(x, y, z)
 				var spheubedist = 0
-				for axis in range(3):
+				for axis in 3:
 					spheubedist += ((point[axis] + 0.5) * 2 / size - 1) ** 4
 				if (min(x, y, z) == 0 or max(x, y, z) == size - 1) or rescale(noise.get_noise_3d(x + 0.5, y + 0.5, z + 0.5), 0, 1) < spheubedist * 0.5 + 0.5:
 					voxmap[point] = Global.Vox.STONE
 				else:
 					voxmap[point] = Global.Vox.AIR
-	for x in range(size):
-		for z in range(size):
+	for x in size:
+		for z in size:
 			var streak = 0
-			for y in range(size + 1):
+			for y in size + 1:
 				var point = Vector3(x, y, z)
 				if point in voxmap and voxmap[point] == Global.Vox.AIR:
 					streak += 1
@@ -132,10 +134,10 @@ func terragen():
 		terragen()
 
 func calculatestuff():
-	for x in range(size):
-		for z in range(size):
+	for x in size:
+		for z in size:
 			var ground = null
-			for y in range(size):
+			for y in size:
 				var point = Vector3(x, y, z)
 				if voxmap[point] == Global.Vox.AIR:
 					if ground == null:
@@ -144,16 +146,23 @@ func calculatestuff():
 				else:
 					ground = null
 
-func createvisuals():
+func placefeatures():
 	placelights()
-	createmeshes()
+	calculatestuff()
+	placedoor()
+
+func placedoor():
+	var door = doorscene.instantiate()
+	door.position = spawnpoint()
+	entities.append(door)
+	add_child(door)
 
 func placelights():
 	var volumefactor = len(air) ** (1. / 3)
 	var lighting = {}
 	for point in air:
 		lighting[point] = 0
-	for i in range(24):
+	for i in 24:
 		var light = OmniLight3D.new()
 		light.omni_range = volumefactor * 2 ** dice.randf_range(-1, 1)
 		light.light_energy = 4
@@ -181,9 +190,9 @@ func createmeshes():
 			st.begin(Mesh.PRIMITIVE_TRIANGLES)
 			st.set_material(Global.materials[voxtype])
 			surfacetools[voxtype] = st
-	for x in range(size):
-		for y in range(size):
-			for z in range(size):
+	for x in size:
+		for y in size:
+			for z in size:
 				var point = Vector3(x, y, z)
 				var voxtype = voxmap[point]
 				if voxtype != Global.Vox.AIR:
@@ -200,11 +209,12 @@ func createmeshes():
 			add_child(meshinstance)
 
 func anomalize():
-	for i in range(len(air) * 2 ** -13.):
+	for i in len(air) * 2 ** -12.:
 		var anomaly = anomscene.instantiate()
 		anomaly.create(self, dicechoose([Color.MAGENTA, Color.BLUE, Color.CYAN]))
 		anomaly.position = spawnpoint() + Vector3.UP
 		anomalies.append(anomaly)
+		entities.append(anomaly)
 		add_child(anomaly)
 
 func welcomeplayer():

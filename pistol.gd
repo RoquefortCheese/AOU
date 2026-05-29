@@ -4,7 +4,7 @@ func fire():
 	if ray.is_colliding(): #and Global.dist(ray.global_position, ray.get_collision_point()) <= 12:
 		var target = ray.get_collider()
 		if is_instance_of(target, Anomaly):
-			target.die()
+			target.die(global_position)
 
 func _process(delta: float):
 	var time = Global.time()

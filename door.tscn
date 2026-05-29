@@ -1,0 +1,21 @@
+[gd_scene format=3 uid="uid://ctkkqpc5eadfs"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_hun61"]
+height = 3.0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ba8gm"]
+shading_mode = 0
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_v6xrn"]
+material = SubResource("StandardMaterial3D_ba8gm")
+height = 3.0
+
+[node name="Door" type="StaticBody3D" unique_id=1064033547]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=554767752]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("CapsuleShape3D_hun61")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1466480996]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+mesh = SubResource("CapsuleMesh_v6xrn")

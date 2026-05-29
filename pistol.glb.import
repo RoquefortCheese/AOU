@@ -3,7 +3,7 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://b1q4dnstg7yqa"
+uid="uid://dk3cd5rsdd22k"
 path="res://.godot/imported/pistol.glb-ca1bacfbef1ca1370179b291ebf7f0f4.scn"
 
 [deps]
@@ -26,7 +26,7 @@ meshes/generate_lods=true
 meshes/create_shadow_meshes=true
 meshes/light_baking=1
 meshes/lightmap_texel_size=0.2
-meshes/force_disable_compression=true
+meshes/force_disable_compression=false
 skins/use_named_skins=true
 animation/import=true
 animation/fps=30

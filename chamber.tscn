@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://bx1eoid3fhikg" path="res://chamber.gd" id="1_c2m2e"]
 [ext_resource type="PackedScene" uid="uid://6ckuifqjy0ne" path="res://anomaly.tscn" id="2_2nx3e"]
+[ext_resource type="PackedScene" uid="uid://ctkkqpc5eadfs" path="res://door.tscn" id="3_ngk1o"]
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_c2m2e"]
 size = Vector2(1, 1)
@@ -10,3 +11,4 @@ size = Vector2(1, 1)
 script = ExtResource("1_c2m2e")
 face = SubResource("PlaneMesh_c2m2e")
 anomscene = ExtResource("2_2nx3e")
+doorscene = ExtResource("3_ngk1o")

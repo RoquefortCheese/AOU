@@ -43,7 +43,7 @@ func movementinput(delta: float):
 	#print(sqrt(velocity.x ** 2 + velocity.z ** 2))
 
 func handlecam(delta: float):
-	for axis in range(2):
+	for axis in 2:
 		$Camera3D.rotation[axis] += (pan[axis] - $Camera3D.rotation[axis]) * (1 - (2 ** 48) ** -delta)
 	$MeshInstance3D.rotation.y = $Camera3D.rotation.y + PI
 
