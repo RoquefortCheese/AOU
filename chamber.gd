@@ -1,4 +1,5 @@
 extends Node
+class_name Chamber
 
 @export var face: PlaneMesh
 @export var anomscene: PackedScene
@@ -12,16 +13,19 @@ const bases = {
 	Vector3.FORWARD: Basis(Vector3.LEFT, Vector3.FORWARD, Vector3.DOWN),
 	Vector3.BACK: Basis(Vector3.RIGHT, Vector3.BACK, Vector3.DOWN)
 }
-var pos: Vector3
 var size: int
 var dice: RandomNumberGenerator
 var voxmap: Dictionary[Vector3, Global.Vox]
 var air: Array[Vector3]
+var approxsidelen: float
 var groundmap: Dictionary[Vector3, Vector3]
 var noise: FastNoiseLite
 var surfacetools: Dictionary[Global.Vox, SurfaceTool]
 var entities: Array[PhysicsBody3D]
 var anomalies: Array[CharacterBody3D]
+var door: StaticBody3D
+var time: float
+var score: int
 
 func rescale(value: float, min: float, max: float):
 	return value * (max - min) / 2 + (max + min) / 2
@@ -50,13 +54,11 @@ func genair():
 				var point = Vector3(x, y, z)
 				if voxmap[point] == Global.Vox.AIR:
 					air.append(point)
+	approxsidelen = len(air) ** (1 / 3.)
 
-func create(pos: Vector3, size: int):
+func create(dice: RandomNumberGenerator):
 	print("starting!")
-	self.pos = pos
-	self.size = size
-	manufacturedice()
-	print("dice manufactured!")
+	self.dice = dice
 	terragen()
 	print("terra genned!")
 	placefeatures()
@@ -68,18 +70,12 @@ func create(pos: Vector3, size: int):
 	welcomeplayer()
 	print("done!")
 
-func manufacturedice():
-	dice = RandomNumberGenerator.new()
-	dice.seed = Global.worldseed
-	for axis in 3:
-		dice.seed += pos[axis]
-		dice.seed = dice.randi()
-
 func terragen():
+	size = floor(2 ** dice.randf_range(6.25, 6.75))
 	noise = FastNoiseLite.new()
 	noise.seed = dice.randi()
 	noise.noise_type = FastNoiseLite.TYPE_SIMPLEX
-	noise.frequency = 0.2 / sqrt(size) * 2 ** dice.randf_range(-1, 1)
+	noise.frequency = 0.2 / sqrt(size) * 2 ** dice.randf_range(-0.5, 0.5)
 	noise.fractal_octaves = 4
 	for x in size:
 		for y in size:
@@ -150,15 +146,26 @@ func placefeatures():
 	placelights()
 	calculatestuff()
 	placedoor()
+	placedoorstone()
 
 func placedoor():
-	var door = doorscene.instantiate()
+	door = doorscene.instantiate()
 	door.position = spawnpoint()
 	entities.append(door)
 	add_child(door)
 
+func placedoorstone():
+	for x in size:
+		for y in size:
+			for z in size:
+				var point = Vector3(x, y, z)
+				if voxmap[point] == Global.Vox.STONE:
+					var reldist = Global.dist(point + Vector3.ONE / 2., door.position) / (approxsidelen * sqrt(3))
+					if dice.randf() < (cos(min(reldist * 2, 1) * PI) ** (1 / 3.) + 1) / 2:
+						voxmap[point] = Global.Vox.DOORSTONE
+
 func placelights():
-	var volumefactor = len(air) ** (1. / 3)
+	var volumefactor = approxsidelen
 	var lighting = {}
 	for point in air:
 		lighting[point] = 0
@@ -209,9 +216,9 @@ func createmeshes():
 			add_child(meshinstance)
 
 func anomalize():
-	for i in len(air) * 2 ** -12.:
+	for i in len(air) * 2 ** -12.5:
 		var anomaly = anomscene.instantiate()
-		anomaly.create(self, dicechoose([Color.MAGENTA, Color.BLUE, Color.CYAN]))
+		anomaly.create(dicechoose([Color.MAGENTA, Color.BLUE, Color.CYAN]))
 		anomaly.position = spawnpoint() + Vector3.UP
 		anomalies.append(anomaly)
 		entities.append(anomaly)
@@ -219,3 +226,12 @@ func anomalize():
 
 func welcomeplayer():
 	Global.player.position = spawnpoint()
+	time = 0
+
+func _process(delta: float):
+	updatescore(delta)
+
+func updatescore(delta: float):
+	time += delta
+	score = 1024 / 2 ** (time / 60)
+	$ScoreLabel.text = str(score)

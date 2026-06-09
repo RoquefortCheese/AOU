@@ -1,7 +1,5 @@
 extends Node
 
-func _input(event: InputEvent):
-	if event.is_action_pressed("esc"):
+func _process(delta: float):
+	if Input.is_action_just_pressed("esc"):
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-	if event.is_action_pressed("leftclick"):
-		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED

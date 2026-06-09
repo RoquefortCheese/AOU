@@ -1,13 +1,14 @@
 [gd_scene format=3 uid="uid://6ckuifqjy0ne"]
 
 [ext_resource type="Script" uid="uid://c3olph35n8pip" path="res://anomaly.gd" id="1_c1slk"]
+[ext_resource type="AudioStream" uid="uid://btn0ken7qx2ra" path="res://pseudocrowderhum.wav" id="2_knx40"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_c1slk"]
 shading_mode = 0
 
 [sub_resource type="BoxMesh" id="BoxMesh_knx40"]
 material = SubResource("StandardMaterial3D_c1slk")
-size = Vector3(0.6, 0.6, 0.6)
+size = Vector3(0.55, 0.55, 0.55)
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_c1slk"]
 radius = 0.45
@@ -24,10 +25,21 @@ height = 0.8
 [node name="Anomaly" type="CharacterBody3D" unique_id=1667139649]
 wall_min_slide_angle = 0.17453292
 script = ExtResource("1_c1slk")
+freqs = Dictionary[Color, int]({
+Color(0, 0, 1, 1): 0,
+Color(1, 0, 1, 1): 5,
+Color(0, 1, 1, 1): 9
+})
 boxmesh = SubResource("BoxMesh_knx40")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=544735407]
 shape = SubResource("SphereShape3D_c1slk")
+
+[node name="AudioStreamPlayer3D" type="AudioStreamPlayer3D" parent="." unique_id=1194667956]
+stream = ExtResource("2_knx40")
+volume_db = -8.0
+unit_size = 1.0
+max_db = -4.0
 
 [node name="DebugHitboxVisual" type="MeshInstance3D" parent="." unique_id=1750258409]
 visible = false

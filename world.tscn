@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://dwgnpa0txi05s" path="res://world.gd" id="1_f3sb7"]
 [ext_resource type="PackedScene" uid="uid://dsk4v1c4280oc" path="res://chamber.tscn" id="2_fj7yv"]
 [ext_resource type="PackedScene" uid="uid://c8d565cr28pwx" path="res://player.tscn" id="3_tlwt5"]
+[ext_resource type="Shader" uid="uid://d0snqeiv81mua" path="res://ambient.gdshader" id="4_aqk2v"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_fj7yv"]
 sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
@@ -18,6 +19,10 @@ sky = SubResource("Sky_tlwt5")
 ambient_light_energy = 0.0
 reflected_light_source = 1
 
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_tlwt5"]
+shader = ExtResource("4_aqk2v")
+shader_parameter/displacement = 0.0
+
 [node name="World" type="Node" unique_id=784559713]
 script = ExtResource("1_f3sb7")
 chamberscene = ExtResource("2_fj7yv")
@@ -26,3 +31,11 @@ chamberscene = ExtResource("2_fj7yv")
 environment = SubResource("Environment_aqk2v")
 
 [node name="Player" parent="." unique_id=1234066966 instance=ExtResource("3_tlwt5")]
+
+[node name="AmbientLoadingShader" type="ColorRect" parent="." unique_id=822503856]
+material = SubResource("ShaderMaterial_tlwt5")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2

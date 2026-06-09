@@ -7,6 +7,7 @@ const friction = -6
 const acc = cruisespeed * -friction
 
 var equipment: Dictionary[String, Variant]
+var score: int
 var pan: Vector3
 
 func _ready():
@@ -15,6 +16,7 @@ func _ready():
 	pan = $Camera3D.rotation
 	$Camera3D/RayCast3D.add_exception(self)
 	equipment = {"leftclick": null, "rightclick": null}
+	score = 0
 	
 	equip("leftclick", Global.EquipmentType.PISTOL)
 
@@ -22,7 +24,9 @@ func _physics_process(delta: float):
 	handlecam(delta)
 	movementinput(delta)
 	useequipment(delta)
+	considerfocusing()
 	otherphysics(delta)
+	belikelumi()
 
 func movementinput(delta: float):
 	var direction = Vector3.ZERO
@@ -53,12 +57,23 @@ func useequipment(delta: float):
 			if Input.is_action_just_pressed(hand) and equipment[hand] != null:
 				equipment[hand].fire()
 
+func considerfocusing():
+	if Input.is_action_just_pressed("leftclick"):
+		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+
 func otherphysics(delta: float):
 	velocity.x *= exp(friction) ** delta
 	velocity.z *= exp(friction) ** delta
 	if not is_on_floor():
 		velocity.y -= 10 * delta
 	move_and_slide()
+
+func belikelumi():
+	for i in get_slide_collision_count():
+		if get_slide_collision(i).get_collider() == Global.chamber.door:
+			score += Global.chamber.score
+			print(score)
+			Global.world.enterdoor()
 
 func equip(hand: String, eqtype: Global.EquipmentType):
 	var item = Global.equipment[eqtype].instantiate()
@@ -70,4 +85,4 @@ func _input(event: InputEvent):
 		if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
 			pan.y -= event.relative.x * sensitivity
 			pan.x -= event.relative.y * sensitivity
-			pan.x = clamp(pan.x, -PI * 0.49, PI * 0.49)
+			pan.x = clamp(pan.x, -PI / 2, PI / 2)

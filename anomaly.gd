@@ -1,9 +1,10 @@
 extends CharacterBody3D
 class_name Anomaly
 
+@export var freqs: Dictionary[Color, int]
 const floatconst = 4
 const wobbleconst = 4
-const followconst = 3
+const followconst = 2.5
 const repelconst = 6
 const fallconst = -12
 const heightfriction = -4
@@ -18,14 +19,13 @@ var alive: bool
 var boxes: Array[MeshInstance3D]
 var spinvels: Dictionary[MeshInstance3D, Vector3]
 var acceleration: Vector3
-var chamber: Node
 var color: Color
 var offset: float
 
-func create(chamber: Node, color: Color):
+func create(color: Color):
 	self.alive = true
-	self.chamber = chamber
 	self.color = color
+	$AudioStreamPlayer3D.pitch_scale = 2 ** (freqs[color] / 12.)
 	offset = randf() * TAU
 	for i in 3:
 		var box = MeshInstance3D.new()
@@ -47,6 +47,8 @@ func _physics_process(delta: float):
 	commit()
 	domath(delta)
 	move_and_slide()
+	if alive:
+		maybetouch()
 
 func spinboxes(delta: float):
 	for box in boxes:
@@ -59,17 +61,17 @@ func hover():
 	for x in [-0.4, 0.4]:
 		for z in [-0.4, 0.4]:
 			var voxel = floor(position + Vector3(x, 1, z))
-			if voxel in chamber.groundmap:
-				var ground = chamber.groundmap[voxel]
+			if voxel in Global.chamber.groundmap:
+				var ground = Global.chamber.groundmap[voxel]
 				grounddist = min(grounddist, position.y - ground.y)
 	var path = Global.flatten(acceleration)
 	if path.length() >= steppingconst:
 		var nextpath = floor(position + path.normalized() * 0.8)
-		if nextpath in chamber.groundmap:
-			nextpath = chamber.groundmap[nextpath]
-		while nextpath not in chamber.groundmap and nextpath in chamber.voxmap:
+		if nextpath in Global.chamber.groundmap:
+			nextpath = Global.chamber.groundmap[nextpath]
+		while nextpath not in Global.chamber.groundmap and nextpath in Global.chamber.voxmap:
 			nextpath.y += 1
-		if nextpath in chamber.voxmap:
+		if nextpath in Global.chamber.voxmap:
 			grounddist = min(grounddist, position.y - nextpath.y)
 	if grounddist != INF:
 		var error = grounddist - 1
@@ -81,10 +83,10 @@ func follow():
 		acceleration += Global.flatten(diff).normalized() * followconst
 
 func spaceout():
-	for anomaly in chamber.anomalies:
-		if anomaly != self:
+	for anomaly in Global.chamber.anomalies:
+		if anomaly != self and anomaly.alive:
 			var diff = position - anomaly.position
-			if diff.length() >= 2 ** -4.:
+			if diff.length() >= 2 ** -4.: 
 				acceleration += Global.flatten(diff.normalized() * repelconst / diff.length() ** 2)
 
 func fall():
@@ -102,9 +104,16 @@ func domath(delta: float):
 	velocity.z *= exp(flatfriction) ** delta
 	velocity += acceleration * delta
 
+func maybetouch():
+	for i in get_slide_collision_count():
+		if get_slide_collision(i).get_collider() == Global.player:
+			die(Global.player.position)
+			print("ouch")
+
 func die(source: Vector3):
 	velocity += (position - source).normalized() * knockbackconst
 	if alive:
 		alive = false
+		$AudioStreamPlayer3D.playing = false
 		for box in boxes:
 			box.mesh.material.albedo_color *= 0.25
