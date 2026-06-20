@@ -20,7 +20,7 @@ face = SubResource("PlaneMesh_c2m2e")
 anomscene = ExtResource("2_2nx3e")
 doorscene = ExtResource("3_ngk1o")
 
-[node name="ScoreLabel" type="Label" parent="." unique_id=1351575785]
+[node name="StatLabel" type="Label" parent="." unique_id=1351575785]
 offset_left = 50.0
 offset_top = 50.0
 offset_right = 90.0

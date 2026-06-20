@@ -41,7 +41,7 @@ func spawnpoint():
 		var point = groundmap[randomair()] + Vector3(0.5, 0, 0.5)
 		var distanced = true
 		for entity in entities:
-			if Global.dist(point, entity.position) < 4:
+			if Global.dist(point, entity.position) < (16 if entity == Global.player else 4):
 				distanced = false
 		if distanced:
 			return point
@@ -65,13 +65,14 @@ func create(dice: RandomNumberGenerator):
 	print("features placed!")
 	createmeshes()
 	print("meshes created!")
+	welcomeplayer()
+	print("player welcomed!")
 	anomalize()
 	print("anomalies materialized!")
-	welcomeplayer()
 	print("done!")
 
 func terragen():
-	size = floor(2 ** dice.randf_range(6.25, 6.75))
+	size = floor(2 ** dice.randf_range(6.5, 7.5))
 	noise = FastNoiseLite.new()
 	noise.seed = dice.randi()
 	noise.noise_type = FastNoiseLite.TYPE_SIMPLEX
@@ -226,12 +227,24 @@ func anomalize():
 
 func welcomeplayer():
 	Global.player.position = spawnpoint()
+	Global.player.process_mode = Node.PROCESS_MODE_ALWAYS
+	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	time = 0
 
 func _process(delta: float):
-	updatescore(delta)
+	updatelabel(delta)
+
+func updatelabel(delta: float):
+	$StatLabel.text = ""
+	$StatLabel.text += updatescore(delta) + "\n"
+	$StatLabel.text += updatecompass() + "\n"
 
 func updatescore(delta: float):
 	time += delta
 	score = 1024 / 2 ** (time / 60)
-	$ScoreLabel.text = str(score)
+	return str(score)
+
+func updatecompass():
+	var prox = 1 - min(1, Global.dist(Global.player.position, door.position) / approxsidelen)
+	var strength = 1 + ceilf(prox * 5)
+	return "█".repeat(strength) + "░".repeat(6 - strength)

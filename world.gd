@@ -11,7 +11,7 @@ func _ready():
 	loadchamber()
 
 func setglobals():
-	Global.worldseed = 747985611
+	Global.worldseed = randi()
 	print("world seed: " + str(Global.worldseed))
 	Global.world = self
 
@@ -33,6 +33,7 @@ func loadchamber():
 	$AmbientLoadingShader.visible = false
 
 func enterdoor():
+	$Player.process_mode = Node.PROCESS_MODE_DISABLED
 	Global.chamber.process_mode = Node.PROCESS_MODE_DISABLED
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	loadchamber()

@@ -21,6 +21,7 @@ radius = 0.4
 height = 2.5
 
 [node name="Player" type="CharacterBody3D" unique_id=1234066966]
+process_mode = 3
 script = ExtResource("1_4flbx")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=954143861]

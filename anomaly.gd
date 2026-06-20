@@ -109,6 +109,7 @@ func maybetouch():
 		if get_slide_collision(i).get_collider() == Global.player:
 			die(Global.player.position)
 			print("ouch")
+			break
 
 func die(source: Vector3):
 	velocity += (position - source).normalized() * knockbackconst

@@ -74,6 +74,8 @@ func belikelumi():
 			score += Global.chamber.score
 			print(score)
 			Global.world.enterdoor()
+			print("entered door???")
+			break
 
 func equip(hand: String, eqtype: Global.EquipmentType):
 	var item = Global.equipment[eqtype].instantiate()
