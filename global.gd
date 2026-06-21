@@ -4,6 +4,8 @@ enum Vox {AIR, STONE, LIGHT, DOORSTONE}
 @export var materials: Dictionary[Vox, Material]
 enum EquipmentType {PISTOL}
 @export var equipment: Dictionary[EquipmentType, PackedScene]
+enum FeatureType {DOORSTONE}
+@export var features: Dictionary[FeatureType, Script]
 
 var worldseed: int
 var player: CharacterBody3D

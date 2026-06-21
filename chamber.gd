@@ -58,6 +58,7 @@ func genair():
 
 func create(dice: RandomNumberGenerator):
 	print("starting!")
+	Global.chamber = self
 	self.dice = dice
 	terragen()
 	print("terra genned!")
@@ -147,23 +148,17 @@ func placefeatures():
 	placelights()
 	calculatestuff()
 	placedoor()
-	placedoorstone()
+	featureterrain()
+
+func featureterrain():
+	for feature in Global.player.features:
+		feature.generate()
 
 func placedoor():
 	door = doorscene.instantiate()
 	door.position = spawnpoint()
 	entities.append(door)
 	add_child(door)
-
-func placedoorstone():
-	for x in size:
-		for y in size:
-			for z in size:
-				var point = Vector3(x, y, z)
-				if voxmap[point] == Global.Vox.STONE:
-					var reldist = Global.dist(point + Vector3.ONE / 2., door.position) / (approxsidelen * sqrt(3))
-					if dice.randf() < (cos(min(reldist * 2, 1) * PI) ** (1 / 3.) + 1) / 2:
-						voxmap[point] = Global.Vox.DOORSTONE
 
 func placelights():
 	var volumefactor = approxsidelen
@@ -245,6 +240,6 @@ func updatescore(delta: float):
 	return str(score)
 
 func updatecompass():
-	var prox = 1 - min(1, Global.dist(Global.player.position, door.position) / approxsidelen)
-	var strength = 1 + ceilf(prox * 5)
-	return "█".repeat(strength) + "░".repeat(6 - strength)
+	var prox = 1 - min(1, Global.dist(Global.player.position, door.position) / (approxsidelen * sqrt(3)))
+	var strength = ceilf(prox * 6)
+	return "O".repeat(strength) + "o".repeat(6 - strength)

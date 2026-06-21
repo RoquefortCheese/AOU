@@ -28,7 +28,6 @@ func loadchamber():
 		await get_tree().process_frame
 	var chamber = chamberscene.instantiate()
 	chamber.create(dice)
-	Global.chamber = chamber
 	add_child(chamber)
 	$AmbientLoadingShader.visible = false
 

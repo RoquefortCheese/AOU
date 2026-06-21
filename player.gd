@@ -7,8 +7,10 @@ const friction = -6
 const acc = cruisespeed * -friction
 
 var equipment: Dictionary[String, Variant]
+var features: Array[Script] = [DoorStone]
 var score: int
 var pan: Vector3
+
 
 func _ready():
 	Global.player = self

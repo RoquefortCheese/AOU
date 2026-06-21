@@ -25,4 +25,5 @@ offset_left = 50.0
 offset_top = 50.0
 offset_right = 90.0
 offset_bottom = 90.0
+text = "████"
 label_settings = SubResource("LabelSettings_f7isl")

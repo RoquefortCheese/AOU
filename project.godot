@@ -23,6 +23,8 @@ Global="*uid://bywumdx7if63m"
 
 window/size/viewport_width=1500
 window/size/viewport_height=1000
+window/size/resizable=false
+window/stretch/mode="canvas_items"
 
 [editor_plugins]
 
