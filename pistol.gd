@@ -6,12 +6,10 @@ func equip():
 	material = $PistolModel.mesh.surface_get_material(0)
 
 func fire():
-	var hit = false
 	if ray.is_colliding():
 		var target = ray.get_collider()
 		if is_instance_of(target, Anomaly):
 			target.die(global_position)
-			hit = true
 
 func _process(delta: float):
 	var time = Global.time()

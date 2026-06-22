@@ -16,8 +16,7 @@ const bases = {
 var size: int
 var dice: RandomNumberGenerator
 var voxmap: Dictionary[Vector3, Global.Vox]
-var air: Array[Vector3]
-var approxsidelen: float
+var air: Dictionary[Vector3, bool]  # once again no sets {._.}
 var groundmap: Dictionary[Vector3, Vector3]
 var noise: FastNoiseLite
 var surfacetools: Dictionary[Global.Vox, SurfaceTool]
@@ -27,14 +26,21 @@ var door: StaticBody3D
 var time: float
 var score: int
 
-func rescale(value: float, min: float, max: float):
-	return value * (max - min) / 2 + (max + min) / 2
+func rescale(value: float, minval: float, maxval: float):
+	return value * (maxval - minval) / 2 + (maxval + minval) / 2
 
 func dicechoose(array: Array):
 	return array[dice.randi_range(0, len(array) - 1)]
 
+func setvox(point: Vector3, voxtype: Global.Vox):
+	voxmap[point] = voxtype
+	if voxtype == Global.Vox.AIR and point not in air:
+		air[point] = true
+	if voxtype != Global.Vox.AIR and point in air:
+		air.erase(point)
+
 func randomair():
-	return dicechoose(air)
+	return dicechoose(air.keys())
 
 func spawnpoint():
 	while true:
@@ -46,15 +52,8 @@ func spawnpoint():
 		if distanced:
 			return point
 
-func genair():
-	air = []
-	for x in size:
-		for y in size:
-			for z in size:
-				var point = Vector3(x, y, z)
-				if voxmap[point] == Global.Vox.AIR:
-					air.append(point)
-	approxsidelen = len(air) ** (1 / 3.)
+func approxsidelen():
+	return len(air) ** (1 / 3.)
 
 func create(dice: RandomNumberGenerator):
 	print("starting!")
@@ -73,7 +72,7 @@ func create(dice: RandomNumberGenerator):
 	print("done!")
 
 func terragen():
-	size = floor(2 ** dice.randf_range(6.5, 7.5))
+	size = floor(2 ** dice.randf_range(6, 6)) ###
 	noise = FastNoiseLite.new()
 	noise.seed = dice.randi()
 	noise.noise_type = FastNoiseLite.TYPE_SIMPLEX
@@ -86,10 +85,10 @@ func terragen():
 				var spheubedist = 0
 				for axis in 3:
 					spheubedist += ((point[axis] + 0.5) * 2 / size - 1) ** 4
-				if (min(x, y, z) == 0 or max(x, y, z) == size - 1) or rescale(noise.get_noise_3d(x + 0.5, y + 0.5, z + 0.5), 0, 1) < spheubedist * 0.5 + 0.5:
-					voxmap[point] = Global.Vox.STONE
+				if rescale(noise.get_noise_3d(x + 0.5, y + 0.5, z + 0.5), 0, 1) < spheubedist * 0.5 + 0.5 or (min(x, y, z) == 0 or max(x, y, z) == size - 1):
+					setvox(point, Global.Vox.STONE)
 				else:
-					voxmap[point] = Global.Vox.AIR
+					setvox(point, Global.Vox.AIR)
 	for x in size:
 		for z in size:
 			var streak = 0
@@ -100,9 +99,8 @@ func terragen():
 				else:
 					if streak < 3:
 						for yy in range(y - streak, y):
-							voxmap[Vector3(x, yy, z)] = Global.Vox.STONE
+							setvox(Vector3(x, yy, z), Global.Vox.STONE)
 					streak = 0
-	genair()
 	if len(air) == 0:
 		terragen()
 		return
@@ -125,8 +123,7 @@ func terragen():
 		if point not in flood:
 			filling.append(point)
 	for point in filling:
-		voxmap[point] = Global.Vox.STONE
-	genair()
+		setvox(point, Global.Vox.STONE)
 	if len(air) < size ** 3 * 2 ** -4.:
 		print("regenerating...")
 		terragen()
@@ -161,30 +158,46 @@ func placedoor():
 	add_child(door)
 
 func placelights():
-	var volumefactor = approxsidelen
-	var lighting = {}
+	var volumefactor = approxsidelen()
+	var nooks = []
 	for point in air:
-		lighting[point] = 0
-	for i in 24:
+		var isnook = true
+		for axis in 3:
+			var hidden = false
+			for dir in Global.pm:
+				var disp = Vector3.ZERO
+				disp[axis] += dir
+				if voxmap[point + disp] != Global.Vox.AIR:
+					hidden = true
+			if not hidden:
+				isnook = false
+		if isnook:
+			nooks.append(point)
+	var bestlighting = -INF
+	var besttry
+	for attempt in 32:
+		var lights = []
+		for i in 24:
+			var point
+			while true:
+				point = dicechoose(nooks)
+				if point not in lights:
+					break
+			lights.append(point)
+		var lighting = 0
+		for first in len(lights) - 1:
+			for second in range(first + 1, len(lights)):
+				lighting += Global.dist(lights[first], lights[second])
+		if lighting > bestlighting:
+			bestlighting = lighting
+			besttry = lights
+	for point in besttry:
 		var light = OmniLight3D.new()
 		light.omni_range = volumefactor * 2 ** dice.randf_range(-1, 1)
 		light.light_energy = 4
-		var bestpoints = []
-		var leastlight = INF
-		for point in air:
-			var brightness = lighting[point]
-			if brightness < leastlight:
-				leastlight = brightness
-				bestpoints.clear()
-			if brightness == leastlight:
-				bestpoints.append(point)
-		var lightpos = dicechoose(bestpoints)
-		light.position = lightpos + Vector3.ONE / 2.
-		for point in lighting:
-			lighting[point] += 1 / Global.dist(lightpos, point)
+		light.position = point + Vector3.ONE / 2.
 		add_child(light)
-		voxmap[lightpos] = Global.Vox.LIGHT
-	genair()
+		setvox(point, Global.Vox.LIGHT)
 
 func createmeshes():
 	for voxtype in Global.Vox.values():
@@ -240,6 +253,6 @@ func updatescore(delta: float):
 	return str(score)
 
 func updatecompass():
-	var prox = 1 - min(1, Global.dist(Global.player.position, door.position) / (approxsidelen * sqrt(3)))
+	var prox = 1 - min(1, Global.dist(Global.player.position, door.position) / (approxsidelen() * sqrt(3)))
 	var strength = ceilf(prox * 6)
 	return "O".repeat(strength) + "o".repeat(6 - strength)

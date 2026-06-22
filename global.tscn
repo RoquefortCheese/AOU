@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://ddoamclbqn0gj" path="res://global.gd" id="1_6q3x5"]
 [ext_resource type="PackedScene" uid="uid://cd55ua6sp41hp" path="res://pistol.tscn" id="2_qxp0b"]
+[ext_resource type="Script" uid="uid://4e2xsv6d738r" path="res://doorstone.gd" id="3_2wtbm"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_qxp0b"]
 albedo_color = Color(0.3764706, 0.3764706, 0.3764706, 1)
@@ -11,8 +12,8 @@ shading_mode = 0
 albedo_color = Color(1, 1, 0, 1)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_2wtbm"]
-albedo_color = Color(0.3764706, 0.3764706, 0.3764706, 1)
-metallic = 1.0
+albedo_color = Color(0.7529412, 0.7529412, 0.7529412, 1)
+metallic_specular = 0.0
 
 [node name="Global" type="Node" unique_id=1677589215]
 script = ExtResource("1_6q3x5")
@@ -23,4 +24,7 @@ materials = Dictionary[int, Material]({
 })
 equipment = Dictionary[int, PackedScene]({
 0: ExtResource("2_qxp0b")
+})
+features = Dictionary[int, Script]({
+0: ExtResource("3_2wtbm")
 })

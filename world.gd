@@ -20,6 +20,7 @@ func manufacturedice():
 	dice.seed = Global.worldseed
 
 func loadchamber():
+	$AmbientLoadingShader.process_mode = Node.PROCESS_MODE_ALWAYS
 	$AmbientLoadingShader.visible = true
 	$AmbientLoadingShader.material.set_shader_parameter("displacement", randf())
 	if Global.chamber != null:
@@ -29,6 +30,7 @@ func loadchamber():
 	var chamber = chamberscene.instantiate()
 	chamber.create(dice)
 	add_child(chamber)
+	$AmbientLoadingShader.process_mode = Node.PROCESS_MODE_DISABLED
 	$AmbientLoadingShader.visible = false
 
 func enterdoor():

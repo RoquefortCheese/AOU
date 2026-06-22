@@ -12,6 +12,8 @@ var player: CharacterBody3D
 var world: World
 var chamber: Chamber
 
+const pm = [-1, 1]
+
 func dist(point1: Vector3, point2: Vector3):
 	return (point2 - point1).length()
 
