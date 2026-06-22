@@ -15,12 +15,23 @@ albedo_color = Color(1, 1, 0, 1)
 albedo_color = Color(0.7529412, 0.7529412, 0.7529412, 1)
 metallic_specular = 0.0
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_8tbuy"]
+cull_mode = 2
+albedo_color = Color(0, 1, 1, 1)
+
 [node name="Global" type="Node" unique_id=1677589215]
 script = ExtResource("1_6q3x5")
 materials = Dictionary[int, Material]({
 1: SubResource("StandardMaterial3D_qxp0b"),
 2: SubResource("StandardMaterial3D_6q3x5"),
-3: SubResource("StandardMaterial3D_2wtbm")
+3: SubResource("StandardMaterial3D_2wtbm"),
+4: SubResource("StandardMaterial3D_8tbuy")
+})
+meshtypes = Dictionary[int, int]({
+1: 0,
+2: 0,
+3: 0,
+4: 1
 })
 equipment = Dictionary[int, PackedScene]({
 0: ExtResource("2_qxp0b")

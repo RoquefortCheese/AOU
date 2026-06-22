@@ -13,6 +13,7 @@ const bases = {
 	Vector3.FORWARD: Basis(Vector3.LEFT, Vector3.FORWARD, Vector3.DOWN),
 	Vector3.BACK: Basis(Vector3.RIGHT, Vector3.BACK, Vector3.DOWN)
 }
+var plantbases = [bases[Vector3.LEFT].rotated(Vector3.UP, PI / 4), bases[Vector3.FORWARD].rotated(Vector3.UP, PI / 4)]
 var size: int
 var dice: RandomNumberGenerator
 var voxmap: Dictionary[Vector3, Global.Vox]
@@ -72,7 +73,7 @@ func create(dice: RandomNumberGenerator):
 	print("done!")
 
 func terragen():
-	size = floor(2 ** dice.randf_range(6, 6)) ###
+	size = floor(2 ** dice.randf_range(7, 7)) ###
 	noise = FastNoiseLite.new()
 	noise.seed = dice.randi()
 	noise.noise_type = FastNoiseLite.TYPE_SIMPLEX
@@ -154,6 +155,9 @@ func featureterrain():
 func placedoor():
 	door = doorscene.instantiate()
 	door.position = spawnpoint()
+	for x in range(door.position.x - 1, door.position.x + 2):
+		for z in range(door.position.z - 1, door.position.z + 2):
+			setvox(Vector3(x, door.position.y - 1, z), Global.Vox.STONE)
 	entities.append(door)
 	add_child(door)
 
@@ -196,6 +200,7 @@ func placelights():
 		light.omni_range = volumefactor * 2 ** dice.randf_range(-1, 1)
 		light.light_energy = 4
 		light.position = point + Vector3.ONE / 2.
+		print(light.position)
 		add_child(light)
 		setvox(point, Global.Vox.LIGHT)
 
@@ -213,16 +218,24 @@ func createmeshes():
 				var voxtype = voxmap[point]
 				if voxtype != Global.Vox.AIR:
 					var st = surfacetools[voxtype]
-					for disp in cardinals:
-						var npoint = point + disp
-						if npoint in voxmap and voxmap[npoint] == Global.Vox.AIR:
-							st.append_from(face, 0, Transform3D(bases[disp], point + disp / 2. + Vector3.ONE / 2.))
-	for st in surfacetools.values():
-		var meshinstance = MeshInstance3D.new()
-		meshinstance.mesh = st.commit()
-		if meshinstance.mesh.get_surface_count() != 0:
-			meshinstance.create_trimesh_collision()
-			add_child(meshinstance)
+					var meshtype = Global.meshtypes[voxtype]
+					if meshtype == Global.MeshType.CUBE:
+						for disp in cardinals:
+							var npoint = point + disp
+							if npoint in voxmap and (voxmap[npoint] == Global.Vox.AIR or Global.meshtypes[voxmap[npoint]] != Global.MeshType.CUBE):
+								st.append_from(face, 0, Transform3D(bases[disp], point + disp / 2. + Vector3.ONE / 2.))
+					if meshtype == Global.MeshType.PLANT:
+						for basis in plantbases:
+							st.append_from(face, 0, Transform3D(basis, point + Vector3.ONE / 2.))
+	for voxtype in Global.Vox.values():
+		if voxtype in surfacetools:
+			var st = surfacetools[voxtype]
+			var meshinstance = MeshInstance3D.new()
+			meshinstance.mesh = st.commit()
+			if meshinstance.mesh.get_surface_count() != 0:
+				if voxtype != Global.Vox.GOLDENVINE:
+					meshinstance.create_trimesh_collision()
+				add_child(meshinstance)
 
 func anomalize():
 	for i in len(air) * 2 ** -12.5:
@@ -244,7 +257,7 @@ func _process(delta: float):
 
 func updatelabel(delta: float):
 	$StatLabel.text = ""
-	$StatLabel.text += updatescore(delta) + "\n"
+	# $StatLabel.text += updatescore(delta) + "\n"
 	$StatLabel.text += updatecompass() + "\n"
 
 func updatescore(delta: float):

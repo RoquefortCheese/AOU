@@ -1,7 +1,9 @@
 extends Node
 
-enum Vox {AIR, STONE, LIGHT, DOORSTONE}
+enum Vox {AIR, STONE, LIGHT, DOORSTONE, GOLDENVINE}
+enum MeshType {CUBE, PLANT}
 @export var materials: Dictionary[Vox, Material]
+@export var meshtypes: Dictionary[Vox, MeshType]
 enum EquipmentType {PISTOL}
 @export var equipment: Dictionary[EquipmentType, PackedScene]
 enum FeatureType {DOORSTONE}

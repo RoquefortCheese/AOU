@@ -7,10 +7,12 @@ const friction = -6
 const acc = cruisespeed * -friction
 
 var equipment: Dictionary[String, Variant]
-var features: Array[Script] = [DoorStone]
+var features: Array[Script] = [GoldenVine]
 var score: int
 var pan: Vector3
 
+func currentblock():
+	return Global.chamber.voxmap[floor(position)]
 
 func _ready():
 	Global.player = self
@@ -19,7 +21,6 @@ func _ready():
 	$Camera3D/RayCast3D.add_exception(self)
 	equipment = {"leftclick": null, "rightclick": null}
 	score = 0
-	
 	equip("leftclick", Global.EquipmentType.PISTOL)
 
 func _physics_process(delta: float):
@@ -41,7 +42,7 @@ func movementinput(delta: float):
 	if Input.is_action_pressed("right"):
 		direction += Vector3.RIGHT
 	if Input.is_action_just_pressed("jump"):
-		if is_on_floor():
+		if is_on_floor() or currentblock() == Global.Vox.GOLDENVINE:
 			velocity.y = jumpspeed
 	direction = direction.rotated(Vector3.UP, $Camera3D.rotation.y).normalized() * acc * delta
 	velocity.x += direction.x
@@ -68,6 +69,8 @@ func otherphysics(delta: float):
 	velocity.z *= exp(friction) ** delta
 	if not is_on_floor():
 		velocity.y -= 10 * delta
+	if currentblock() == Global.Vox.GOLDENVINE:
+		velocity.y *= exp(friction) ** delta
 	move_and_slide()
 
 func belikelumi():
