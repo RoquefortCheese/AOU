@@ -12,7 +12,7 @@ static func generate():
 			var streak = []
 			for y in cham.size:
 				var point = Vector3(x, y, z)
-				if Global.meshtypes[cham.voxmap[point]] != Global.MeshType.CUBE and point != cham.doorpos:
+				if not cham.issolid(point) and point != cham.doorpos:
 					streak.append(point)
 				else:
 					if len(streak) >= cham.approxsidelen():

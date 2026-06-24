@@ -13,6 +13,7 @@ var worldseed: int
 var player: CharacterBody3D
 var world: World
 var chamber: Chamber
+var chamberindex: int
 
 const pm = [-1, 1]
 

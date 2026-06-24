@@ -91,6 +91,7 @@ func impacthealth(amount: int):
 		die()
 
 func die():
+	health = 0 ####
 	print("oh no!!!")
 
 func _input(event: InputEvent):

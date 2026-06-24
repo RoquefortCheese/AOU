@@ -4,18 +4,20 @@ class_name Anomaly
 @export var freqs: Dictionary[Color, int]
 const floatconst = 4
 const wobbleconst = 4
-const followconst = 2.5
+const followconst = 3
 const repelconst = 6
 const fallconst = -12
 const heightfriction = -4
 const flatfriction = -1
-const followradius = 20
+const noticeradius = 20
+const followradius = 40
 const committhresh = 0.25
 const steppingconst = 1
 const knockbackconst = 2
 @export var boxmesh: BoxMesh
 
 var alive: bool
+var following: bool
 var boxes: Array[MeshInstance3D]
 var spinvels: Dictionary[MeshInstance3D, Vector3]
 var acceleration: Vector3
@@ -25,6 +27,7 @@ var offset: float
 func create(color: Color):
 	self.alive = true
 	self.color = color
+	following = false
 	$AudioStreamPlayer3D.pitch_scale = 2 ** (freqs[color] / 12.)
 	offset = randf() * TAU
 	for i in 3:
@@ -61,15 +64,15 @@ func hover():
 	for x in [-0.4, 0.4]:
 		for z in [-0.4, 0.4]:
 			var voxel = floor(position + Vector3(x, 1, z))
-			if voxel in Global.chamber.groundmap:
-				var ground = Global.chamber.groundmap[voxel]
+			if not Global.chamber.issolid(voxel):
+				var ground = Global.chamber.ground(voxel)
 				grounddist = min(grounddist, position.y - ground.y)
 	var path = Global.flatten(acceleration)
 	if path.length() >= steppingconst:
 		var nextpath = floor(position + path.normalized() * 0.8)
-		if nextpath in Global.chamber.groundmap:
-			nextpath = Global.chamber.groundmap[nextpath]
-		while nextpath not in Global.chamber.groundmap and nextpath in Global.chamber.voxmap:
+		if not Global.chamber.issolid(nextpath):
+			nextpath = Global.chamber.ground(nextpath)
+		while Global.chamber.issolid(nextpath) and nextpath in Global.chamber.voxmap:
 			nextpath.y += 1
 		if nextpath in Global.chamber.voxmap:
 			grounddist = min(grounddist, position.y - nextpath.y)
@@ -79,7 +82,12 @@ func hover():
 
 func follow():
 	var diff = Global.player.position - position
-	if diff.length() <= followradius:
+	var distance = diff.length()
+	if not following and distance <= noticeradius:
+		following = true
+	if following and distance > followradius:
+		following = false
+	if following:
 		acceleration += Global.flatten(diff).normalized() * followconst
 
 func spaceout():
