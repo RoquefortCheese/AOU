@@ -7,8 +7,8 @@ const friction = -6
 const acc = cruisespeed * -friction
 
 var equipment: Dictionary[String, Variant]
-var features: Array[Script] = [GoldenVine]
-var score: int
+var features: Array[Script] = [PillarVine]
+var health: int
 var pan: Vector3
 
 func currentblock():
@@ -20,7 +20,7 @@ func _ready():
 	pan = $Camera3D.rotation
 	$Camera3D/RayCast3D.add_exception(self)
 	equipment = {"leftclick": null, "rightclick": null}
-	score = 0
+	health = 6
 	equip("leftclick", Global.EquipmentType.PISTOL)
 
 func _physics_process(delta: float):
@@ -42,12 +42,11 @@ func movementinput(delta: float):
 	if Input.is_action_pressed("right"):
 		direction += Vector3.RIGHT
 	if Input.is_action_just_pressed("jump"):
-		if is_on_floor() or currentblock() == Global.Vox.GOLDENVINE:
+		if is_on_floor() or currentblock() == Global.Vox.PILLARVINE:
 			velocity.y = jumpspeed
 	direction = direction.rotated(Vector3.UP, $Camera3D.rotation.y).normalized() * acc * delta
 	velocity.x += direction.x
 	velocity.z += direction.z
-	#print(sqrt(velocity.x ** 2 + velocity.z ** 2))
 
 func handlecam(delta: float):
 	for axis in 2:
@@ -65,27 +64,34 @@ func considerfocusing():
 		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
 func otherphysics(delta: float):
-	velocity.x *= exp(friction) ** delta
-	velocity.z *= exp(friction) ** delta
 	if not is_on_floor():
 		velocity.y -= 10 * delta
-	if currentblock() == Global.Vox.GOLDENVINE:
-		velocity.y *= exp(friction) ** delta
+	velocity.x *= exp(friction) ** delta
+	velocity.z *= exp(friction) ** delta
+	if currentblock() == Global.Vox.PILLARVINE:
+		for axis in 3:
+			velocity[axis] *= exp(friction) ** delta
 	move_and_slide()
 
 func belikelumi():
 	for i in get_slide_collision_count():
 		if get_slide_collision(i).get_collider() == Global.chamber.door:
-			score += Global.chamber.score
-			print(score)
+			impacthealth(1)
 			Global.world.enterdoor()
-			print("entered door???")
 			break
 
 func equip(hand: String, eqtype: Global.EquipmentType):
 	var item = Global.equipment[eqtype].instantiate()
 	item.equip()
 	equipment[hand] = item
+
+func impacthealth(amount: int):
+	health = min(health + amount, 6)
+	if health < 0:
+		die()
+
+func die():
+	print("oh no!!!")
 
 func _input(event: InputEvent):
 	if event is InputEventMouseMotion:

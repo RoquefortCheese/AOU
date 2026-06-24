@@ -11,7 +11,7 @@ size = Vector2(1, 1)
 [sub_resource type="LabelSettings" id="LabelSettings_f7isl"]
 line_spacing = 0.0
 font = ExtResource("4_s3137")
-font_size = 50
+font_size = 28
 shadow_size = 0
 
 [node name="Chamber" type="Node" unique_id=684829429]
@@ -21,9 +21,8 @@ anomscene = ExtResource("2_2nx3e")
 doorscene = ExtResource("3_ngk1o")
 
 [node name="StatLabel" type="Label" parent="." unique_id=1351575785]
-offset_left = 50.0
-offset_top = 50.0
-offset_right = 90.0
-offset_bottom = 90.0
-text = "████"
+offset_left = 36.0
+offset_top = 36.0
+offset_right = 164.0
+offset_bottom = 164.0
 label_settings = SubResource("LabelSettings_f7isl")

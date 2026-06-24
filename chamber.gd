@@ -24,8 +24,10 @@ var surfacetools: Dictionary[Global.Vox, SurfaceTool]
 var entities: Array[PhysicsBody3D]
 var anomalies: Array[CharacterBody3D]
 var door: StaticBody3D
-var time: float
-var score: int
+var doorpos: Vector3
+var timebudget: float
+var cyclesdone: int
+var starttime: float
 
 func rescale(value: float, minval: float, maxval: float):
 	return value * (maxval - minval) / 2 + (maxval + minval) / 2
@@ -62,23 +64,38 @@ func create(dice: RandomNumberGenerator):
 	self.dice = dice
 	terragen()
 	print("terra genned!")
+	if not goodfloodfill():
+		print("regenerating...")
+		create(dice)
+		return
 	placefeatures()
 	print("features placed!")
+	print("cave aquifered!")
 	createmeshes()
 	print("meshes created!")
-	welcomeplayer()
-	print("player welcomed!")
 	anomalize()
 	print("anomalies materialized!")
+	welcomeplayer()
+	print("player welcomed!")
 	print("done!")
+	self.starttime = Time.get_ticks_msec()
 
 func terragen():
-	size = floor(2 ** dice.randf_range(7, 7)) ###
+	metaterragen()
+	actualterragen()
+	if len(air) == 0:
+		terragen()
+		return
+
+func metaterragen():
+	size = floor(2 ** dice.randf_range(5.5, 7.5)) ###
 	noise = FastNoiseLite.new()
 	noise.seed = dice.randi()
 	noise.noise_type = FastNoiseLite.TYPE_SIMPLEX
 	noise.frequency = 0.2 / sqrt(size) * 2 ** dice.randf_range(-0.5, 0.5)
 	noise.fractal_octaves = 4
+
+func actualterragen():
 	for x in size:
 		for y in size:
 			for z in size:
@@ -90,22 +107,8 @@ func terragen():
 					setvox(point, Global.Vox.STONE)
 				else:
 					setvox(point, Global.Vox.AIR)
-	for x in size:
-		for z in size:
-			var streak = 0
-			for y in size + 1:
-				var point = Vector3(x, y, z)
-				if point in voxmap and voxmap[point] == Global.Vox.AIR:
-					streak += 1
-				else:
-					if streak < 3:
-						for yy in range(y - streak, y):
-							setvox(Vector3(x, yy, z), Global.Vox.STONE)
-					streak = 0
-	if len(air) == 0:
-		terragen()
-		return
-	print("floodfilling...")
+
+func goodfloodfill():
 	var frontier = [randomair()]
 	var flood = {frontier[0]: true}
 	while true:
@@ -113,7 +116,7 @@ func terragen():
 		for point in frontier:
 			for disp in cardinals:
 				var npoint = point + disp
-				if npoint not in flood and voxmap[npoint] == Global.Vox.AIR:
+				if npoint not in flood and Global.meshtypes[voxmap[npoint]] != Global.MeshType.CUBE:
 					flood[npoint] = true
 					newfrontier.append(npoint)
 		frontier = newfrontier
@@ -123,11 +126,10 @@ func terragen():
 	for point in air:
 		if point not in flood:
 			filling.append(point)
+	print(len(filling))
 	for point in filling:
 		setvox(point, Global.Vox.STONE)
-	if len(air) < size ** 3 * 2 ** -4.:
-		print("regenerating...")
-		terragen()
+	return len(air) >= size ** 3 * 2 ** -4.
 
 func calculatestuff():
 	for x in size:
@@ -135,7 +137,7 @@ func calculatestuff():
 			var ground = null
 			for y in size:
 				var point = Vector3(x, y, z)
-				if voxmap[point] == Global.Vox.AIR:
+				if Global.meshtypes[voxmap[point]] != Global.MeshType.CUBE:
 					if ground == null:
 						ground = point
 					groundmap[point] = ground
@@ -147,6 +149,7 @@ func placefeatures():
 	calculatestuff()
 	placedoor()
 	featureterrain()
+	fillsmallgaps()
 
 func featureterrain():
 	for feature in Global.player.features:
@@ -155,9 +158,10 @@ func featureterrain():
 func placedoor():
 	door = doorscene.instantiate()
 	door.position = spawnpoint()
-	for x in range(door.position.x - 1, door.position.x + 2):
-		for z in range(door.position.z - 1, door.position.z + 2):
-			setvox(Vector3(x, door.position.y - 1, z), Global.Vox.STONE)
+	doorpos = door.position - Vector3(0.5, 0, 0.5)
+	for x in range(doorpos.x - 1, doorpos.x + 2):
+		for z in range(doorpos.z - 1, doorpos.z + 2):
+			setvox(Vector3(x, doorpos.y - 1, z), Global.Vox.STONE)
 	entities.append(door)
 	add_child(door)
 
@@ -171,7 +175,7 @@ func placelights():
 			for dir in Global.pm:
 				var disp = Vector3.ZERO
 				disp[axis] += dir
-				if voxmap[point + disp] != Global.Vox.AIR:
+				if Global.meshtypes[voxmap[point + disp]] == Global.MeshType.CUBE:
 					hidden = true
 			if not hidden:
 				isnook = false
@@ -200,13 +204,26 @@ func placelights():
 		light.omni_range = volumefactor * 2 ** dice.randf_range(-1, 1)
 		light.light_energy = 4
 		light.position = point + Vector3.ONE / 2.
-		print(light.position)
 		add_child(light)
 		setvox(point, Global.Vox.LIGHT)
 
+func fillsmallgaps():
+	for x in size:
+		for z in size:
+			var streak = 0
+			for y in size + 1:
+				var point = Vector3(x, y, z)
+				if point in voxmap and Global.meshtypes[voxmap[point]] != Global.MeshType.CUBE:
+					streak += 1
+				else:
+					if streak < 3:
+						for yy in range(y - streak, y):
+							setvox(Vector3(x, yy, z), Global.Vox.STONE)
+					streak = 0
+
 func createmeshes():
 	for voxtype in Global.Vox.values():
-		if voxtype != Global.Vox.AIR:
+		if Global.meshtypes[voxtype] != Global.MeshType.AIR:
 			var st = SurfaceTool.new()
 			st.begin(Mesh.PRIMITIVE_TRIANGLES)
 			st.set_material(Global.materials[voxtype])
@@ -216,13 +233,13 @@ func createmeshes():
 			for z in size:
 				var point = Vector3(x, y, z)
 				var voxtype = voxmap[point]
-				if voxtype != Global.Vox.AIR:
+				if Global.meshtypes[voxtype] != Global.MeshType.AIR:
 					var st = surfacetools[voxtype]
 					var meshtype = Global.meshtypes[voxtype]
 					if meshtype == Global.MeshType.CUBE:
 						for disp in cardinals:
 							var npoint = point + disp
-							if npoint in voxmap and (voxmap[npoint] == Global.Vox.AIR or Global.meshtypes[voxmap[npoint]] != Global.MeshType.CUBE):
+							if npoint in voxmap and Global.meshtypes[voxmap[npoint]] != Global.MeshType.CUBE:
 								st.append_from(face, 0, Transform3D(bases[disp], point + disp / 2. + Vector3.ONE / 2.))
 					if meshtype == Global.MeshType.PLANT:
 						for basis in plantbases:
@@ -233,11 +250,12 @@ func createmeshes():
 			var meshinstance = MeshInstance3D.new()
 			meshinstance.mesh = st.commit()
 			if meshinstance.mesh.get_surface_count() != 0:
-				if voxtype != Global.Vox.GOLDENVINE:
+				if voxtype != Global.Vox.PILLARVINE:
 					meshinstance.create_trimesh_collision()
 				add_child(meshinstance)
 
 func anomalize():
+	Global.player.position = spawnpoint()
 	for i in len(air) * 2 ** -12.5:
 		var anomaly = anomscene.instantiate()
 		anomaly.create(dicechoose([Color.MAGENTA, Color.BLUE, Color.CYAN]))
@@ -247,25 +265,36 @@ func anomalize():
 		add_child(anomaly)
 
 func welcomeplayer():
-	Global.player.position = spawnpoint()
 	Global.player.process_mode = Node.PROCESS_MODE_ALWAYS
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
-	time = 0
+	timebudget = approxsidelen() * 2.0
+	cyclesdone = 0
 
 func _process(delta: float):
+	countdown()
 	updatelabel(delta)
+
+func countdown():
+	if floor(Global.time() / timebudget) > cyclesdone:
+		Global.player.impacthealth(-1)
+		cyclesdone += 1
 
 func updatelabel(delta: float):
 	$StatLabel.text = ""
-	# $StatLabel.text += updatescore(delta) + "\n"
+	$StatLabel.text += updatehealth() + "\n"
 	$StatLabel.text += updatecompass() + "\n"
+	$StatLabel.text += updatecountdown() + "\n"
 
-func updatescore(delta: float):
-	time += delta
-	score = 1024 / 2 ** (time / 60)
-	return str(score)
+func OoOoOo(quantity: String, amount: int):
+	return quantity + ":" + " ".repeat(8 - len(quantity)) + "O".repeat(amount) + "o".repeat(6 - amount)
+
+func updatehealth():
+	return OoOoOo("Health", Global.player.health)
 
 func updatecompass():
 	var prox = 1 - min(1, Global.dist(Global.player.position, door.position) / (approxsidelen() * sqrt(3)))
-	var strength = ceilf(prox * 6)
-	return "O".repeat(strength) + "o".repeat(6 - strength)
+	return OoOoOo("Compass", ceilf(prox * 6))
+
+func updatecountdown():
+	var timeleft = 1 - (fmod(Global.time(), timebudget) / timebudget)
+	return OoOoOo("Time", min(6, floor(timeleft * 7)))

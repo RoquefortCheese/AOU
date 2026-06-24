@@ -2,7 +2,6 @@ extends Node
 class_name World
 
 @export var chamberscene: PackedScene
-var starttime: float
 var dice: RandomNumberGenerator
 
 func _ready():
@@ -11,7 +10,7 @@ func _ready():
 	loadchamber()
 
 func setglobals():
-	Global.worldseed = randi()
+	Global.worldseed = 985991134
 	print("world seed: " + str(Global.worldseed))
 	Global.world = self
 

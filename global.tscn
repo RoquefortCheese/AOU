@@ -18,6 +18,9 @@ metallic_specular = 0.0
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_8tbuy"]
 cull_mode = 2
 albedo_color = Color(0, 1, 1, 1)
+distance_fade_mode = 2
+distance_fade_min_distance = 2.0
+distance_fade_max_distance = 2.0
 
 [node name="Global" type="Node" unique_id=1677589215]
 script = ExtResource("1_6q3x5")
@@ -28,10 +31,11 @@ materials = Dictionary[int, Material]({
 4: SubResource("StandardMaterial3D_8tbuy")
 })
 meshtypes = Dictionary[int, int]({
-1: 0,
-2: 0,
-3: 0,
-4: 1
+0: 0,
+1: 1,
+2: 1,
+3: 1,
+4: 2
 })
 equipment = Dictionary[int, PackedScene]({
 0: ExtResource("2_qxp0b")

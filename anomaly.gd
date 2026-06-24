@@ -108,7 +108,7 @@ func maybetouch():
 	for i in get_slide_collision_count():
 		if get_slide_collision(i).get_collider() == Global.player:
 			die(Global.player.position)
-			print("ouch")
+			Global.player.impacthealth(-1)
 			break
 
 func die(source: Vector3):

@@ -1,5 +1,5 @@
 extends TerrainFeature
-class_name GoldenVine  # we're going up, up, up, it's our moment...
+class_name PillarVine  # we're going up, up, up, it's our moment...
 
 static var cost = 1
 
@@ -12,7 +12,7 @@ static func generate():
 			var streak = []
 			for y in cham.size:
 				var point = Vector3(x, y, z)
-				if cham.voxmap[point] == Global.Vox.AIR:
+				if Global.meshtypes[cham.voxmap[point]] != Global.MeshType.CUBE and point != cham.doorpos:
 					streak.append(point)
 				else:
 					if len(streak) >= cham.approxsidelen():
@@ -29,4 +29,4 @@ static func generate():
 			finalvines.append(vine)
 	for vine in finalvines:
 		for point in vine:
-			cham.setvox(point, Global.Vox.GOLDENVINE)
+			cham.setvox(point, Global.Vox.PILLARVINE)
