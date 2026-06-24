@@ -174,7 +174,6 @@ func placedoor():
 	add_child(door)
 
 func placelights():
-	var volumefactor = approxsidelen()
 	var nooks = []
 	for point in air:
 		var isnook = true
@@ -189,11 +188,13 @@ func placelights():
 				isnook = false
 		if isnook:
 			nooks.append(point)
+	var lightquant = min(32, ceil(approxsidelen() * 0.5))
+	print(lightquant)
 	var bestlighting = -INF
 	var besttry
 	for attempt in 32:
 		var lights = []
-		for i in 24:
+		for i in lightquant:
 			var point
 			while true:
 				point = dicechoose(nooks)
@@ -209,7 +210,7 @@ func placelights():
 			besttry = lights
 	for point in besttry:
 		var light = OmniLight3D.new()
-		light.omni_range = volumefactor * 2 ** dice.randf_range(-1, 1)
+		light.omni_range = approxsidelen() * 2 ** dice.randf_range(-1, 1)
 		light.light_energy = 4
 		light.position = point + Vector3.ONE / 2.
 		add_child(light)
