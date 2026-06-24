@@ -104,7 +104,7 @@ func terragen():
 	fillsmallgaps()
 
 func metaterragen():
-	size = 128 #floor(2 ** dice.randf_range(5.5, 7)) ###
+	size = floor(2 ** dice.randf_range(5.5, 7)) ###
 	noise = FastNoiseLite.new()
 	noise.seed = dice.randi()
 	noise.noise_type = FastNoiseLite.TYPE_SIMPLEX
@@ -142,7 +142,6 @@ func goodfloodfill():
 	for point in air:
 		if point not in flood:
 			filling.append(point)
-	print(len(filling))
 	for point in filling:
 		setvox(point, Global.Vox.STONE)
 	return len(air) >= size ** 3 * 2 ** -4.
@@ -158,7 +157,15 @@ func featureterrain():
 
 func placedoor():
 	door = doorscene.instantiate()
-	door.position = spawnpoint()
+	var furthest
+	var furthestdist = -INF
+	for i in 12:
+		var point = spawnpoint()
+		var distance = Global.dist(point, Global.player.position)
+		if distance > furthestdist:
+			furthestdist = distance
+			furthest = point
+	door.position = furthest
 	doorpos = door.position - Vector3(0.5, 0, 0.5)
 	for x in range(doorpos.x - 1, doorpos.x + 2):
 		for z in range(doorpos.z - 1, doorpos.z + 2):
@@ -268,7 +275,8 @@ func anomalize():
 func welcomeplayer():
 	Global.player.process_mode = Node.PROCESS_MODE_ALWAYS
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
-	timebudget = approxsidelen() * (1 + 2 ** (Global.chamberindex * -0.1))
+	print(approxsidelen())
+	timebudget = approxsidelen() ** 2 / 64 * (1 + 2 * 2 ** (Global.chamberindex * -0.2))
 	cyclesdone = 0
 
 func _process(delta: float):

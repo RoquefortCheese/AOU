@@ -13,7 +13,7 @@ func setglobals():
 	Global.worldseed = randi()
 	print("world seed: " + str(Global.worldseed))
 	Global.world = self
-	Global.chamberindex = 0
+	Global.chamberindex = 0 ###
 
 func manufacturedice():
 	dice = RandomNumberGenerator.new()
