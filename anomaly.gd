@@ -110,6 +110,8 @@ func domath(delta: float):
 	velocity.y *= exp(heightfriction) ** delta
 	velocity.x *= exp(flatfriction) ** delta
 	velocity.z *= exp(flatfriction) ** delta
+	if FastAnoms in Global.player.modifiers:
+		acceleration *= 2
 	velocity += acceleration * delta
 
 func maybetouch():

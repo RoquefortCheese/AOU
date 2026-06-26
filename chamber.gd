@@ -69,7 +69,6 @@ func spawnpoint():
 		if distanced:
 			return point
 
-
 func approxsidelen():
 	return len(air) ** (1 / 3.)
 
@@ -104,11 +103,15 @@ func terragen():
 	fillsmallgaps()
 
 func metaterragen():
-	size = floor(2 ** dice.randf_range(5.5, 7)) ###
+	size = floor(2 ** dice.randf_range(6, 7)) ###
 	noise = FastNoiseLite.new()
 	noise.seed = dice.randi()
 	noise.noise_type = FastNoiseLite.TYPE_SIMPLEX
 	noise.frequency = 0.2 / sqrt(size) * 2 ** dice.randf_range(-0.5, 0.5)
+	if LessSpace in Global.player.modifiers:
+		noise.frequency *= 2
+	if MoreSpace in Global.player.modifiers:
+		noise.frequency *= 0.5
 	noise.fractal_octaves = 4
 
 func actualterragen():
@@ -152,8 +155,9 @@ func placefeatures():
 	featureterrain()
 
 func featureterrain():
-	for feature in Global.player.features:
-		feature.generate()
+	for modifier in Global.player.modifiers:
+		if modifier.modtype() == Global.ModifierType.TERRAIN:
+			modifier.generate()
 
 func placedoor():
 	door = doorscene.instantiate()
@@ -259,7 +263,7 @@ func createmeshes():
 			var meshinstance = MeshInstance3D.new()
 			meshinstance.mesh = st.commit()
 			if meshinstance.mesh.get_surface_count() != 0:
-				if voxtype != Global.Vox.PILLARVINE:
+				if Global.meshtypes[voxtype] == Global.MeshType.CUBE:
 					meshinstance.create_trimesh_collision()
 				add_child(meshinstance)
 

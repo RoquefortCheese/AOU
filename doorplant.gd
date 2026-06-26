@@ -1,7 +1,8 @@
-extends TerrainFeature
-class_name DoorStone
+extends Modifier
+class_name DoorPlant
 
-static var cost = 5  ## five what? apples? bananas?
+static func modtype():
+	return Global.ModifierType.TERRAIN
 
 static func generate():
 	var cham = Global.chamber
@@ -11,5 +12,5 @@ static func generate():
 		for y in range(floor(doorpos.y - cuberadius), ceil(doorpos.y + cuberadius) + 1):
 			for z in range(floor(doorpos.z - cuberadius), ceil(doorpos.z + cuberadius) + 1):
 				var point = Vector3(x, y, z)
-				if point in cham.voxmap and cham.voxmap[point] == Global.Vox.STONE:
-					cham.setvox(point, Global.Vox.DOORSTONE)
+				if point == cham.ground(point) and randf() < 0.25:
+					cham.setvox(point, Global.Vox.DOORPLANT)

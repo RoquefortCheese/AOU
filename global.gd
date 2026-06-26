@@ -1,13 +1,12 @@
 extends Node
 
-enum Vox {AIR, STONE, LIGHT, DOORSTONE, PILLARVINE}
+enum Vox {AIR, STONE, LIGHT, PILLARVINE, DOORPLANT}
 enum MeshType {AIR, CUBE, PLANT}
 @export var materials: Dictionary[Vox, Material]
 @export var meshtypes: Dictionary[Vox, MeshType]
 enum EquipmentType {PISTOL}
 @export var equipment: Dictionary[EquipmentType, PackedScene]
-enum FeatureType {DOORSTONE}
-@export var features: Dictionary[FeatureType, Script]
+enum ModifierType {TERRAIN, METATERRAIN, ANOMALOUS}
 
 var worldseed: int
 var player: CharacterBody3D

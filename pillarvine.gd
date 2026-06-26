@@ -1,7 +1,8 @@
-extends TerrainFeature
-class_name PillarVine  # we're going up, up, up, it's our moment...
+extends Modifier
+class_name PillarVine
 
-static var cost = 1
+static func modtype():
+	return Global.ModifierType.TERRAIN
 
 static func generate():
 	var cham = Global.chamber
