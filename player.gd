@@ -7,7 +7,7 @@ const friction = -6
 const acc = cruisespeed * -friction
 
 var equipment: Dictionary[String, Variant]
-var modifiers: Array[Script] = [LessSpace, FastAnoms]
+var modifiers: Array[Global.Modifier] = [Global.Modifier.PILLARVINE]
 var health: int
 var pan: Vector3
 

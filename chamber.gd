@@ -108,9 +108,9 @@ func metaterragen():
 	noise.seed = dice.randi()
 	noise.noise_type = FastNoiseLite.TYPE_SIMPLEX
 	noise.frequency = 0.2 / sqrt(size) * 2 ** dice.randf_range(-0.5, 0.5)
-	if LessSpace in Global.player.modifiers:
+	if Global.Modifier.LESSSPACE in Global.player.modifiers:
 		noise.frequency *= 2
-	if MoreSpace in Global.player.modifiers:
+	if Global.Modifier.MORESPACE in Global.player.modifiers:
 		noise.frequency *= 0.5
 	noise.fractal_octaves = 4
 
@@ -155,9 +155,40 @@ func placefeatures():
 	featureterrain()
 
 func featureterrain():
-	for modifier in Global.player.modifiers:
-		if modifier.modtype() == Global.ModifierType.TERRAIN:
-			modifier.generate()
+	if Global.Modifier.DOORPLANT in Global.player.modifiers:
+		var cuberadius = approxsidelen() * sqrt(3) / 4
+		for x in range(floor(doorpos.x - cuberadius), ceil(doorpos.x + cuberadius) + 1):
+			for y in range(floor(doorpos.y - cuberadius), ceil(doorpos.y + cuberadius) + 1):
+				for z in range(floor(doorpos.z - cuberadius), ceil(doorpos.z + cuberadius) + 1):
+					var point = Vector3(x, y, z)
+					if point == ground(point) and randf() < 0.25:
+						setvox(point, Global.Vox.DOORPLANT)
+	if Global.Modifier.PILLARVINE in Global.player.modifiers:
+		var candidates = []
+		var finalvines = []
+		for x in size:
+			for z in size:
+				var streak = []
+				for y in size:
+					var point = Vector3(x, y, z)
+					if not issolid(point) and point != doorpos:
+						streak.append(point)
+					else:
+						if len(streak) >= approxsidelen():
+							candidates.append(streak)
+						streak = []
+		candidates.shuffle()
+		for vine in candidates:
+			var distant = true
+			for finalist in finalvines:
+				if Global.dist(vine[0], finalist[0]) < 16:
+					distant = false
+					break
+			if distant:
+				finalvines.append(vine)
+		for vine in finalvines:
+			for point in vine:
+				setvox(point, Global.Vox.PILLARVINE)
 
 func placedoor():
 	door = doorscene.instantiate()

@@ -6,7 +6,7 @@ enum MeshType {AIR, CUBE, PLANT}
 @export var meshtypes: Dictionary[Vox, MeshType]
 enum EquipmentType {PISTOL}
 @export var equipment: Dictionary[EquipmentType, PackedScene]
-enum ModifierType {TERRAIN, METATERRAIN, ANOMALOUS}
+enum Modifier {DOORPLANT, PILLARVINE, MORESPACE, LESSSPACE, FASTANOMS}
 
 var worldseed: int
 var player: CharacterBody3D
