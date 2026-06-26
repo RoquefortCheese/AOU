@@ -54,3 +54,5 @@ meshtypes = Dictionary[int, int]({
 equipment = Dictionary[int, PackedScene]({
 0: ExtResource("2_qxp0b")
 })
+goodmods = null
+badmods = null

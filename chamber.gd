@@ -151,8 +151,9 @@ func goodfloodfill():
 
 func placefeatures():
 	placelights()
-	placedoor()
 	featureterrain()
+	Global.player.position = spawnpoint()
+	placedoor()
 
 func featureterrain():
 	if Global.Modifier.DOORPLANT in Global.player.modifiers:
@@ -194,7 +195,7 @@ func placedoor():
 	door = doorscene.instantiate()
 	var furthest
 	var furthestdist = -INF
-	for i in 12:
+	for i in 64:
 		var point = spawnpoint()
 		var distance = Global.dist(point, Global.player.position)
 		if distance > furthestdist:
@@ -299,8 +300,7 @@ func createmeshes():
 				add_child(meshinstance)
 
 func anomalize():
-	Global.player.position = spawnpoint()
-	for i in len(air) * 2 ** (-11 - 3 * 2 ** (Global.chamberindex * -0.1)):
+	for i in len(air) * 2 ** Global.ifmod(-11.5, -11., Global.Modifier.MOREANOMS): #(-11 - 3 * 2 ** (Global.chamberindex * -0.1)):
 		var anomaly = anomscene.instantiate()
 		anomaly.create(dicechoose([Color.MAGENTA, Color.BLUE, Color.CYAN]))
 		anomaly.position = spawnpoint() + Vector3.UP
@@ -337,8 +337,12 @@ func updatehealth():
 	return OoOoOo("Health", Global.player.health)
 
 func updatecompass():
-	var prox = 1 - min(1, Global.dist(Global.player.position, door.position) / (approxsidelen() * sqrt(3)))
-	return OoOoOo("Compass", ceilf(prox * 6))
+	#var prox = 1 - min(1, Global.dist(Global.player.position, door.position) / (approxsidelen() * sqrt(3)))
+	var playerangle = fmod(Global.player.get_node("Camera3D").rotation.y, TAU)
+	var doorangle = atan2(door.position.x - Global.player.position.x, door.position.z - Global.player.position.z)
+	var diff = playerangle - doorangle
+	var angdiff = min(abs(diff - TAU), abs(diff), abs(diff + TAU))
+	return OoOoOo("Compass", floor(angdiff / PI * 7))
 
 func updatecountdown():
 	var timeleft = 1 - (fmod(Global.time(), timebudget) / timebudget)

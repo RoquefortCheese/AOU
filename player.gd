@@ -2,12 +2,12 @@ extends CharacterBody3D
 
 const sensitivity = 0.005
 const jumpspeed = 10
-const cruisespeed = 10
+const cruisespeed = 8
 const friction = -6
 const acc = cruisespeed * -friction
 
 var equipment: Dictionary[String, Variant]
-var modifiers: Array[Global.Modifier] = [Global.Modifier.PILLARVINE]
+var modifiers: Array[Global.Modifier] = []
 var health: int
 var pan: Vector3
 
@@ -65,7 +65,7 @@ func considerfocusing():
 
 func otherphysics(delta: float):
 	if not is_on_floor():
-		velocity.y -= 10 * delta
+		velocity.y -= Global.ifmod(12, 8, Global.Modifier.FLOATY) * delta
 	velocity.x *= exp(friction) ** delta
 	velocity.z *= exp(friction) ** delta
 	if currentblock() == Global.Vox.PILLARVINE:

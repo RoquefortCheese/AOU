@@ -6,7 +6,9 @@ enum MeshType {AIR, CUBE, PLANT}
 @export var meshtypes: Dictionary[Vox, MeshType]
 enum EquipmentType {PISTOL}
 @export var equipment: Dictionary[EquipmentType, PackedScene]
-enum Modifier {DOORPLANT, PILLARVINE, MORESPACE, LESSSPACE, FASTANOMS}
+enum Modifier {DOORPLANT, PILLARVINE, MORESPACE, LESSSPACE, FASTANOMS, FLOATY, MOREANOMS}
+@export var goodmods: Array[Modifier]
+@export var badmods: Array[Modifier]
 
 var worldseed: int
 var player: CharacterBody3D
@@ -24,3 +26,6 @@ func time():
 
 func flatten(vector: Vector3):
 	return vector * Vector3(1, 0, 1)
+
+func ifmod(default: Variant, modified: Variant, modifier: Modifier):
+	return default if modifier not in player.modifiers else modified
