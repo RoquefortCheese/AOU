@@ -1,15 +1,16 @@
-extends Equipment
-var material: StandardMaterial3D
+extends Node3D
 
-func equip():
-	super.equip()
-	material = $PistolModel.mesh.surface_get_material(0)
+var ray: RayCast3D
 
 func fire():
+	var ray = Global.player.get_node("Camera3D/RayCast3D")
 	if ray.is_colliding():
 		var target = ray.get_collider()
 		if is_instance_of(target, Anomaly):
 			target.die(global_position)
+		if is_instance_of(target, Computer):
+			if Global.dist(target.position, ray.global_position) <= 1.1:
+				Global.player.usingterminal = true
 
 func _process(delta: float):
 	var time = Global.time()

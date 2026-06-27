@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://bx1eoid3fhikg" path="res://chamber.gd" id="1_c2m2e"]
 [ext_resource type="PackedScene" uid="uid://6ckuifqjy0ne" path="res://anomaly.tscn" id="2_2nx3e"]
 [ext_resource type="PackedScene" uid="uid://ctkkqpc5eadfs" path="res://door.tscn" id="3_ngk1o"]
+[ext_resource type="PackedScene" uid="uid://bvtq7jwgsgi8v" path="res://computer.tscn" id="4_f7isl"]
 [ext_resource type="FontFile" uid="uid://bcp5neowb2rqu" path="res://JetBrainsMono-ExtraBold.ttf" id="4_s3137"]
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_6g747"]
@@ -19,6 +20,7 @@ script = ExtResource("1_c2m2e")
 face = SubResource("PlaneMesh_6g747")
 anomscene = ExtResource("2_2nx3e")
 doorscene = ExtResource("3_ngk1o")
+compscene = ExtResource("4_f7isl")
 
 [node name="StatLabel" type="Label" parent="." unique_id=1351575785]
 offset_left = 36.0

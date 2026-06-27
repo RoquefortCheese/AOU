@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://c8d565cr28pwx"]
 
 [ext_resource type="Script" uid="uid://ben0v5dc8e4pl" path="res://player.gd" id="1_4flbx"]
+[ext_resource type="PackedScene" uid="uid://cd55ua6sp41hp" path="res://pistol.tscn" id="2_hqtel"]
 [ext_resource type="Shader" uid="uid://bcmdwyjuyraxo" path="res://post.gdshader" id="2_onrkg"]
 [ext_resource type="Texture2D" uid="uid://crnr8scc3dp5g" path="res://icon.svg" id="5_sweqy"]
 
@@ -37,6 +38,8 @@ target_position = Vector3(0, 0, -2048)
 
 [node name="HandPos" type="Node3D" parent="Camera3D" unique_id=405499242]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.4, -0.2, -0.4)
+
+[node name="Pistol" parent="Camera3D/HandPos" unique_id=778629940 instance=ExtResource("2_hqtel")]
 
 [node name="PostProcessing" type="ColorRect" parent="." unique_id=1485664400]
 material = SubResource("ShaderMaterial_i3pqv")

@@ -4,6 +4,7 @@ class_name Chamber
 @export var face: PlaneMesh
 @export var anomscene: PackedScene
 @export var doorscene: PackedScene
+@export var compscene: PackedScene
 const cardinals = [Vector3.UP, Vector3.DOWN, Vector3.LEFT, Vector3.RIGHT, Vector3.FORWARD, Vector3.BACK]
 const bases = {
 	Vector3.UP: Basis(Vector3.RIGHT, Vector3.UP, Vector3.BACK),
@@ -23,6 +24,7 @@ var surfacetools: Dictionary[Global.Vox, SurfaceTool]
 var entities: Array[PhysicsBody3D]
 var anomalies: Array[CharacterBody3D]
 var door: StaticBody3D
+var computer: StaticBody3D
 var doorpos: Vector3
 var timebudget: float
 var cyclesdone: int
@@ -80,6 +82,7 @@ func create(dice: RandomNumberGenerator):
 	print("terra genned!")
 	if not goodfloodfill():
 		print("regenerating...")
+		resetvars()
 		create(dice)
 		return
 	placefeatures()
@@ -93,6 +96,21 @@ func create(dice: RandomNumberGenerator):
 	print("player welcomed!")
 	print("done!")
 	self.starttime = Time.get_ticks_msec()
+
+func resetvars():
+	size = 0
+	voxmap = {}
+	air = {}
+	noise = null
+	surfacetools = {}
+	entities = []
+	anomalies = []
+	door = null
+	computer = null
+	doorpos = Vector3(0, 0, 0)
+	timebudget = 0
+	cyclesdone = 0
+	starttime = 0
 
 func terragen():
 	metaterragen()
@@ -152,8 +170,11 @@ func goodfloodfill():
 func placefeatures():
 	placelights()
 	featureterrain()
+	placeplayer()
+	placethings()
+
+func placeplayer():
 	Global.player.position = spawnpoint()
-	placedoor()
 
 func featureterrain():
 	if Global.Modifier.DOORPLANT in Global.player.modifiers:
@@ -191,6 +212,10 @@ func featureterrain():
 			for point in vine:
 				setvox(point, Global.Vox.PILLARVINE)
 
+func placethings():
+	placedoor()
+	placecomputer()
+
 func placedoor():
 	door = doorscene.instantiate()
 	var furthest
@@ -209,6 +234,23 @@ func placedoor():
 	entities.append(door)
 	add_child(door)
 
+func placecomputer():
+	computer = compscene.instantiate()
+	var pos
+	var spin
+	while true:
+		pos = spawnpoint()
+		spin = PI / 2 * floor(dice.randf() * 4)
+		var userpos = pos - Vector3(0.5, 0, 0.5) + Vector3.BACK.rotated(Vector3.UP, spin)
+		print(pos)
+		print(userpos)
+		if issolid(userpos + Vector3.DOWN) and not issolid(userpos) and not issolid(userpos + Vector3.UP):
+			break
+	computer.position = pos + Vector3.UP * 2
+	computer.rotation.y = spin
+	entities.append(computer)
+	add_child(computer)
+
 func placelights():
 	var nooks = []
 	for point in air:
@@ -225,7 +267,6 @@ func placelights():
 		if isnook:
 			nooks.append(point)
 	var lightquant = min(32, ceil(approxsidelen() * 0.5))
-	print(lightquant)
 	var bestlighting = -INF
 	var besttry
 	for attempt in 32:
@@ -311,7 +352,6 @@ func anomalize():
 func welcomeplayer():
 	Global.player.process_mode = Node.PROCESS_MODE_ALWAYS
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
-	print(approxsidelen())
 	timebudget = approxsidelen() ** 2 / 64 * (1 + 2 * 2 ** (Global.chamberindex * -0.2))
 	cyclesdone = 0
 

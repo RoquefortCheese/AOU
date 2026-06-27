@@ -1,0 +1,104 @@
+[gd_scene format=4 uid="uid://bvtq7jwgsgi8v"]
+
+[ext_resource type="Shader" uid="uid://guyajf65enc7" path="res://computer.gdshader" id="1_18hgq"]
+[ext_resource type="Script" uid="uid://yne0tp644s4t" path="res://computer.gd" id="1_gcbbq"]
+[ext_resource type="FontFile" uid="uid://bcp5neowb2rqu" path="res://JetBrainsMono-ExtraBold.ttf" id="2_gcbbq"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_bae8c"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_18hgq"]
+resource_name = "Material"
+cull_mode = 2
+albedo_color = Color(0.627451, 0.627451, 0.627451, 1)
+metallic = 1.0
+metallic_specular = 0.0
+roughness = 0.5
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_gcbbq"]
+_surfaces = [{
+"aabb": AABB(-1, -1, -1, 2, 2, 2),
+"format": 34896613377,
+"index_count": 84,
+"index_data": PackedByteArray("AAABAAIAAwACAAEAAwAEAAIABAAAAAIABQADAAEABAADAAUAAAAGAAEABQABAAYABAAHAAAABAAFAAcACAAAAAcACQAGAAAACQAAAAgACgAFAAYACgAGAAkACwAHAAUACwAFAAoACAAHAAsACQAMAAoACwANAAgACAAOAAkACQAOAAwACAANAA4ACgAMAA8ACgAPAAsADwAMAA4ACwAPAA0ADwAOAA0A"),
+"name": "Material",
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 16,
+"vertex_data": PackedByteArray("/////wAAAAAAAP////8AAAAA//8AAAAAAAAAAP//AAAAAAAAAAAAAP//AAD//wAA////////AAD//wAAAAAAAP//ZeaZGQAA//9l5mXmAAD//5kZZeYAAP//mRmZGQAA/7+ZGWXmAAD/v2XmmRkAAP+/ZeZl5gAA/7+ZGZkZAAA=")
+}]
+blend_shape_mode = 0
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_jr5mb"]
+resource_name = "computerbox_Cube"
+_surfaces = [{
+"aabb": AABB(-1, -1, -1, 2, 2, 2),
+"attribute_data": PackedByteArray("/5//f//f/z//3/9//5//P/9f/z//nwAA/5//P/9fAAD/X////5//v/+f////X/+//x//f/9f/z//X/9//x//P5mZmXmZmWZGmZlmRpmZmXn/X/+//5//f/+f/7//X/9/mZmZef9f/39mZpl5/1//P/+f/39mZmZGmZlmRv+f/z9mZpl5mZlmRpmZmXlmZmZGZmaZeZmZmXmZmZl5ZmaZeWZmZkZmZpl5ZmaZeWZmZkaZmWZGZmZmRmZmZkaZmWZG"),
+"format": 34896613399,
+"index_count": 84,
+"index_data": PackedByteArray("AAABAAIAAAADAAEABAAFAAYABAAHAAUACAAJAAoACAALAAkADAANAA4ADAAPAA0AEAARABIAEAATABEAFAAVABYAFAAXABUAGAAZABoAGgAZABsAGAAcABkAGgAbAB0AHgAcABgAHQAbAB8AHgAfABwAHQAfAB4AIAAhACIAIAAjACEAJAAlACYAJAAnACUAKAApACoAKAArACkALAAtAC4ALAAvAC0A"),
+"material": SubResource("StandardMaterial3D_18hgq"),
+"name": "Material",
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 48,
+"vertex_data": PackedByteArray("/////wAA//8AAP///////wAA//8AAP///////////////wAA////vwAA//////+//////////78AAAAA////vwAAAAD//1TVAAD//wAAVNUAAP////9U1QAAAAAAAFTVAAAAAAAA/7///wAA////v///AAAAAP+/AAAAAP///7///2XmmRn/v/+/ZeZl5v+///9l5mXm/7//v2XmmRn/vwAAAAAAAP///////wAA//8AAP//AAD/////AAAAAP////9l5pkZVNX//wAAAABU1f//mRmZGVTV//8AAP//VNX/////AABU1f//mRll5lTV//9l5mXmVNX///////9U1f+/mRmZGVTV/79l5mXmVNX/v2XmmRlU1f+/mRll5lTV//+ZGZkZ/n//v2XmmRn+f///ZeaZGf5//7+ZGZkZ/n///5kZZeb/v/+/mRmZGf+///+ZGZkZ/7//v5kZZeb/v///ZeZl5v///7+ZGWXm/////5kZZeb///+/ZeZl5v///3//v/9//7//f/+//3//v/////////////////////9U1VTVVNVU1VTVVNVU1VTVAAD/fwAA/38AAP9/AAD/fwAA/38AAP9/AAD/fwAA/3//v/+//7//v/+//7//v/+/qiqqKqoqqiqqKqoqqiqqKqoqqiqqKqoqqiqqKqoqqiqqKqoqqiqqKqoqqiqqKqoq/3////9/////f////3///////3////9/////f////3////9/////f////3////9/")
+}]
+blend_shape_mode = 0
+shadow_mesh = SubResource("ArrayMesh_gcbbq")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_guk6m"]
+shading_mode = 0
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_bae8c"]
+material = SubResource("StandardMaterial3D_guk6m")
+size = Vector2(0.8, 0.8)
+orientation = 2
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_xk2bu"]
+render_priority = 0
+shader = ExtResource("1_18hgq")
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_jr5mb"]
+material = SubResource("ShaderMaterial_xk2bu")
+size = Vector2(0.8, 0.8)
+orientation = 2
+
+[node name="Computer" type="StaticBody3D" unique_id=1676356701]
+script = ExtResource("1_gcbbq")
+allowedchars = Array[int]([48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 32])
+terminalstring = "Welcome to CrowderOS! Enter a command. For a list of commands, enter \"help\". To exit, click once more.
+
+"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=154767974]
+shape = SubResource("BoxShape3D_bae8c")
+
+[node name="ComputerMesh" type="MeshInstance3D" parent="." unique_id=74920878]
+transform = Transform3D(-2.1855694e-08, 0, -0.5, 0, 0.5, 0, 0.5, 0, -2.1855694e-08, 0, 0, 0)
+mesh = SubResource("ArrayMesh_jr5mb")
+
+[node name="ScreenMesh" type="MeshInstance3D" parent="." unique_id=864265889]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.4)
+mesh = SubResource("PlaneMesh_bae8c")
+
+[node name="TextLabel" type="Label3D" parent="." unique_id=1838480134]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.4, 0.4, 0.41)
+pixel_size = 0.0005
+offset = Vector2(40, -40)
+double_sided = false
+alpha_cut = 1
+texture_filter = 2
+modulate = Color(0.2509804, 0.2509804, 0.2509804, 1)
+outline_modulate = Color(0.8784314, 0.8784314, 0.8784314, 1)
+font = ExtResource("2_gcbbq")
+font_size = 40
+outline_size = 10
+horizontal_alignment = 0
+vertical_alignment = 0
+line_spacing = -10.0
+autowrap_trim_flags = 0
+width = 1500.0
+
+[node name="PostProcessingMesh" type="MeshInstance3D" parent="." unique_id=469583659]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.42)
+mesh = SubResource("PlaneMesh_jr5mb")

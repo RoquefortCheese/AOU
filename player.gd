@@ -6,9 +6,9 @@ const cruisespeed = 8
 const friction = -6
 const acc = cruisespeed * -friction
 
-var equipment: Dictionary[String, Variant]
-var modifiers: Array[Global.Modifier] = []
+var modifiers: Array[Global.Modifier] = [Global.Modifier.MORESPACE]
 var health: int
+var usingterminal: bool
 var pan: Vector3
 
 func currentblock():
@@ -19,9 +19,8 @@ func _ready():
 	$Camera3D.rotation.y = randf() * PI * 2
 	pan = $Camera3D.rotation
 	$Camera3D/RayCast3D.add_exception(self)
-	equipment = {"leftclick": null, "rightclick": null}
+	usingterminal = false
 	health = 6
-	equip("leftclick", Global.EquipmentType.PISTOL)
 
 func _physics_process(delta: float):
 	handlecam(delta)
@@ -32,21 +31,22 @@ func _physics_process(delta: float):
 	belikelumi()
 
 func movementinput(delta: float):
-	var direction = Vector3.ZERO
-	if Input.is_action_pressed("forward"):
-		direction += Vector3.FORWARD
-	if Input.is_action_pressed("back"):
-		direction += Vector3.BACK
-	if Input.is_action_pressed("left"):
-		direction += Vector3.LEFT
-	if Input.is_action_pressed("right"):
-		direction += Vector3.RIGHT
-	if Input.is_action_just_pressed("jump"):
-		if is_on_floor() or currentblock() == Global.Vox.PILLARVINE:
-			velocity.y = jumpspeed
-	direction = direction.rotated(Vector3.UP, $Camera3D.rotation.y).normalized() * acc * delta
-	velocity.x += direction.x
-	velocity.z += direction.z
+	if not usingterminal:
+		var direction = Vector3.ZERO
+		if Input.is_action_pressed("forward"):
+			direction += Vector3.FORWARD
+		if Input.is_action_pressed("back"):
+			direction += Vector3.BACK
+		if Input.is_action_pressed("left"):
+			direction += Vector3.LEFT
+		if Input.is_action_pressed("right"):
+			direction += Vector3.RIGHT
+		if Input.is_action_just_pressed("jump"):
+			if is_on_floor() or currentblock() == Global.Vox.PILLARVINE:
+				velocity.y = jumpspeed
+		direction = direction.rotated(Vector3.UP, $Camera3D.rotation.y).normalized() * acc * delta
+		velocity.x += direction.x
+		velocity.z += direction.z
 
 func handlecam(delta: float):
 	for axis in 2:
@@ -54,10 +54,11 @@ func handlecam(delta: float):
 	$MeshInstance3D.rotation.y = $Camera3D.rotation.y + PI
 
 func useequipment(delta: float):
-	if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
-		for hand in equipment:
-			if Input.is_action_just_pressed(hand) and equipment[hand] != null:
-				equipment[hand].fire()
+	if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED and Input.is_action_just_pressed("leftclick"):
+		if usingterminal:
+			usingterminal = false
+		else:
+			$Camera3D/HandPos/Pistol.fire()
 
 func considerfocusing():
 	if Input.is_action_just_pressed("leftclick"):
@@ -76,14 +77,10 @@ func otherphysics(delta: float):
 func belikelumi():
 	for i in get_slide_collision_count():
 		if get_slide_collision(i).get_collider() == Global.chamber.door:
+			usingterminal = false
 			impacthealth(1)
 			Global.world.enterdoor()
 			break
-
-func equip(hand: String, eqtype: Global.EquipmentType):
-	var item = Global.equipment[eqtype].instantiate()
-	item.equip()
-	equipment[hand] = item
 
 func impacthealth(amount: int):
 	health = min(health + amount, 6)
