@@ -2,7 +2,6 @@
 
 [ext_resource type="Script" uid="uid://ddoamclbqn0gj" path="res://global.gd" id="1_6q3x5"]
 [ext_resource type="Texture2D" uid="uid://sxqdrd08wseu" path="res://pillarvine.png" id="2_hhif3"]
-[ext_resource type="PackedScene" uid="uid://cd55ua6sp41hp" path="res://pistol.tscn" id="2_qxp0b"]
 [ext_resource type="Texture2D" uid="uid://d22ccjtf1pac8" path="res://doorplant.png" id="3_74nqk"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_qxp0b"]
@@ -51,8 +50,36 @@ meshtypes = Dictionary[int, int]({
 3: 2,
 4: 2
 })
-equipment = Dictionary[int, PackedScene]({
-0: ExtResource("2_qxp0b")
+modcosts = Dictionary[int, Vector3]({
+0: Vector3(0.75, 0.25, 0),
+1: Vector3(0.25, 1, 0.75),
+2: Vector3(0.5, 1, -0.25),
+3: Vector3(-0.5, -1, 0.25),
+4: Vector3(0, -0.25, -1),
+5: Vector3(0, 1, 0.25),
+6: Vector3(0, -0.25, -1),
+7: Vector3(0, 0.75, 0),
+8: Vector3(0, -0.75, 0)
 })
-goodmods = null
-badmods = null
+modnames = Dictionary[int, String]({
+0: "DoorPlant",
+1: "PillarVine",
+2: "MoreSpace",
+3: "LessSpace",
+4: "FastAnoms",
+5: "Floaty",
+6: "MoreAnoms",
+7: "Squash",
+8: "Stretch"
+})
+moddescs = Dictionary[int, String]({
+0: "Blue plants that grow next to doors.",
+1: "Tall vines that can be climbed.",
+2: "More open caves.",
+3: "More constricted caves.",
+4: "Anomalies move much faster.",
+5: "Less gravity.",
+6: "Significantly more anomalies.",
+7: "Caves compressed vertically.",
+8: "Caves stretched vertically."
+})

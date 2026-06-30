@@ -15,6 +15,10 @@ font = ExtResource("4_s3137")
 font_size = 28
 shadow_size = 0
 
+[sub_resource type="Theme" id="Theme_guk6m"]
+default_font = ExtResource("4_s3137")
+default_font_size = 28
+
 [node name="Chamber" type="Node" unique_id=684829429]
 script = ExtResource("1_c2m2e")
 face = SubResource("PlaneMesh_6g747")
@@ -27,4 +31,21 @@ offset_left = 36.0
 offset_top = 36.0
 offset_right = 164.0
 offset_bottom = 164.0
+text = "banana"
 label_settings = SubResource("LabelSettings_f7isl")
+
+[node name="ScoreLabel" type="RichTextLabel" parent="." unique_id=527015719]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -164.0
+offset_top = 36.0
+offset_right = -36.0
+offset_bottom = 164.0
+grow_horizontal = 0
+theme = SubResource("Theme_guk6m")
+bbcode_enabled = true
+fit_content = true
+scroll_active = false
+autowrap_mode = 0
+horizontal_alignment = 2

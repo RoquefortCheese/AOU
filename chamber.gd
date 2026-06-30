@@ -22,12 +22,10 @@ var air: Dictionary[Vector3, bool]  # once again no sets {._.}
 var noise: FastNoiseLite
 var surfacetools: Dictionary[Global.Vox, SurfaceTool]
 var entities: Array[PhysicsBody3D]
-var anomalies: Array[CharacterBody3D]
+var anomalies: Array[Anomaly]
+var computers: Array[Computer]
 var door: StaticBody3D
-var computer: StaticBody3D
 var doorpos: Vector3
-var timebudget: float
-var cyclesdone: int
 var starttime: float
 
 func rescale(value: float, minval: float, maxval: float):
@@ -35,6 +33,14 @@ func rescale(value: float, minval: float, maxval: float):
 
 func dicechoose(array: Array):
 	return array[dice.randi_range(0, len(array) - 1)]
+
+func diceshuffle(array: Array):
+	var copy = array.duplicate()
+	var newarray = []
+	while len(copy) != 0:
+		var index = floor(dice.randf() * len(copy))
+		newarray.append(copy.pop_at(index))
+	return newarray
 
 func setvox(point: Vector3, voxtype: Global.Vox):
 	voxmap[point] = voxtype
@@ -106,16 +112,12 @@ func resetvars():
 	entities = []
 	anomalies = []
 	door = null
-	computer = null
 	doorpos = Vector3(0, 0, 0)
-	timebudget = 0
-	cyclesdone = 0
-	starttime = 0
 
 func terragen():
 	metaterragen()
 	actualterragen()
-	if len(air) < 64:
+	if len(air) < 512:
 		terragen()
 		return
 	fillsmallgaps()
@@ -140,7 +142,7 @@ func actualterragen():
 				var spheubedist = 0
 				for axis in 3:
 					spheubedist += ((point[axis] + 0.5) * 2 / size - 1) ** 4
-				if rescale(noise.get_noise_3d(x + 0.5, y + 0.5, z + 0.5), 0, 1) < spheubedist * 0.5 + 0.5 or (min(x, y, z) == 0 or max(x, y, z) == size - 1):
+				if rescale(noise.get_noise_3d(x + 0.5, (y + 0.5) * Global.ifmod(1, 2, Global.Modifier.SQUASH) * Global.ifmod(1, 0.5, Global.Modifier.STRETCH), z + 0.5), 0, 1) < spheubedist * 0.5 + 0.5 or (min(x, y, z) == 0 or max(x, y, z) == size - 1):
 					setvox(point, Global.Vox.STONE)
 				else:
 					setvox(point, Global.Vox.AIR)
@@ -169,12 +171,13 @@ func goodfloodfill():
 
 func placefeatures():
 	placelights()
-	featureterrain()
 	placeplayer()
 	placethings()
+	featureterrain()
 
 func placeplayer():
 	Global.player.position = spawnpoint()
+	entities.append(Global.player)
 
 func featureterrain():
 	if Global.Modifier.DOORPLANT in Global.player.modifiers:
@@ -214,7 +217,7 @@ func featureterrain():
 
 func placethings():
 	placedoor()
-	placecomputer()
+	placecomputers()
 
 func placedoor():
 	door = doorscene.instantiate()
@@ -234,22 +237,23 @@ func placedoor():
 	entities.append(door)
 	add_child(door)
 
-func placecomputer():
-	computer = compscene.instantiate()
-	var pos
-	var spin
-	while true:
-		pos = spawnpoint()
-		spin = PI / 2 * floor(dice.randf() * 4)
-		var userpos = pos - Vector3(0.5, 0, 0.5) + Vector3.BACK.rotated(Vector3.UP, spin)
-		print(pos)
-		print(userpos)
-		if issolid(userpos + Vector3.DOWN) and not issolid(userpos) and not issolid(userpos + Vector3.UP):
-			break
-	computer.position = pos + Vector3.UP * 2
-	computer.rotation.y = spin
-	entities.append(computer)
-	add_child(computer)
+func placecomputers():
+	for i in floor(len(air) * 2 ** -15.):
+		var computer = compscene.instantiate()
+		computer.create(dicechoose(Computer.TerminalClass.values()))
+		var pos
+		var spin
+		while true:
+			pos = spawnpoint()
+			spin = PI / 2 * floor(dice.randf() * 4)
+			var userpos = pos - Vector3(0.5, 0, 0.5) + Vector3.BACK.rotated(Vector3.UP, spin)
+			if issolid(userpos + Vector3.DOWN) and not issolid(userpos) and not issolid(userpos + Vector3.UP):
+				break
+		computer.position = pos + Vector3.UP * 2
+		computer.rotation.y = spin
+		entities.append(computer)
+		computers.append(computer)
+		add_child(computer)
 
 func placelights():
 	var nooks = []
@@ -341,9 +345,10 @@ func createmeshes():
 				add_child(meshinstance)
 
 func anomalize():
-	for i in len(air) * 2 ** Global.ifmod(-11.5, -11., Global.Modifier.MOREANOMS): #(-11 - 3 * 2 ** (Global.chamberindex * -0.1)):
+	var colorder = diceshuffle(Anomaly.AnomColor.values())
+	for i in int(len(air) * 2 ** Global.ifmod(-12., -11., Global.Modifier.MOREANOMS)): #(-11 - 3 * 2 ** (Global.chamberindex * -0.1)):
 		var anomaly = anomscene.instantiate()
-		anomaly.create(dicechoose([Color.MAGENTA, Color.BLUE, Color.CYAN]))
+		anomaly.create(colorder[i % 3])
 		anomaly.position = spawnpoint() + Vector3.UP
 		anomalies.append(anomaly)
 		entities.append(anomaly)
@@ -352,23 +357,24 @@ func anomalize():
 func welcomeplayer():
 	Global.player.process_mode = Node.PROCESS_MODE_ALWAYS
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
-	timebudget = approxsidelen() ** 2 / 64 * (1 + 2 * 2 ** (Global.chamberindex * -0.2))
-	cyclesdone = 0
 
 func _process(delta: float):
-	countdown()
 	updatelabel(delta)
-
-func countdown():
-	if floor(Global.time() / timebudget) > cyclesdone:
-		Global.player.impacthealth(-1)
-		cyclesdone += 1
+	updatescorelabel()
 
 func updatelabel(delta: float):
 	$StatLabel.text = ""
 	$StatLabel.text += updatehealth() + "\n"
 	$StatLabel.text += updatecompass() + "\n"
-	$StatLabel.text += updatecountdown() + "\n"
+
+func updatescorelabel():
+	$ScoreLabel.text = ""
+	for color in Anomaly.AnomColor.values():
+		var score = Global.player.score[color]
+		var numstring = str(abs(score))
+		$ScoreLabel.text += "[color=" + Anomaly.actualcolor[color].to_html() + "]"
+		$ScoreLabel.text += "0".repeat(max(0, 4 - len(numstring)))
+		$ScoreLabel.text += numstring + "\n"
 
 func OoOoOo(quantity: String, amount: int):
 	return quantity + ":" + " ".repeat(8 - len(quantity)) + "O".repeat(amount) + "o".repeat(6 - amount)
@@ -383,7 +389,3 @@ func updatecompass():
 	var diff = playerangle - doorangle
 	var angdiff = min(abs(diff - TAU), abs(diff), abs(diff + TAU))
 	return OoOoOo("Compass", floor(angdiff / PI * 7))
-
-func updatecountdown():
-	var timeleft = 1 - (fmod(Global.time(), timebudget) / timebudget)
-	return OoOoOo("Time", min(6, floor(timeleft * 7)))

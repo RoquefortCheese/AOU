@@ -65,10 +65,12 @@ orientation = 2
 
 [node name="Computer" type="StaticBody3D" unique_id=1676356701]
 script = ExtResource("1_gcbbq")
+classnames = Dictionary[int, String]({
+0: "info",
+1: "restoration",
+2: "mod"
+})
 allowedchars = Array[int]([48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 32])
-terminalstring = "Welcome to CrowderOS! Enter a command. For a list of commands, enter \"help\". To exit, click once more.
-
-"
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=154767974]
 shape = SubResource("BoxShape3D_bae8c")
@@ -78,11 +80,11 @@ transform = Transform3D(-2.1855694e-08, 0, -0.5, 0, 0.5, 0, 0.5, 0, -2.1855694e-
 mesh = SubResource("ArrayMesh_jr5mb")
 
 [node name="ScreenMesh" type="MeshInstance3D" parent="." unique_id=864265889]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.4)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.38)
 mesh = SubResource("PlaneMesh_bae8c")
 
 [node name="TextLabel" type="Label3D" parent="." unique_id=1838480134]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.4, 0.4, 0.41)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.4, 0.4, 0.39)
 pixel_size = 0.0005
 offset = Vector2(40, -40)
 double_sided = false
@@ -90,6 +92,7 @@ alpha_cut = 1
 texture_filter = 2
 modulate = Color(0.2509804, 0.2509804, 0.2509804, 1)
 outline_modulate = Color(0.8784314, 0.8784314, 0.8784314, 1)
+text = "Terminal"
 font = ExtResource("2_gcbbq")
 font_size = 40
 outline_size = 10
@@ -100,5 +103,5 @@ autowrap_trim_flags = 0
 width = 1500.0
 
 [node name="PostProcessingMesh" type="MeshInstance3D" parent="." unique_id=469583659]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.42)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.4)
 mesh = SubResource("PlaneMesh_jr5mb")

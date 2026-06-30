@@ -3,6 +3,7 @@ uniform sampler2D screen: hint_screen_texture, filter_nearest_mipmap;
 const float mindim = 0.005;
 const float maxdim = 0.02;
 const float deviation = 0.025;
+uniform bool crosshair = true;
 
 float random(vec2 uv) {
     return mod(float(int(uv.x * 9137152.495) ^ int(uv.y * 3138278.634)), 89.) / 89.;
@@ -23,6 +24,8 @@ void addnoise(inout vec3 color, vec2 uv) {
 void fragment() {
 	vec3 color = texture(screen, SCREEN_UV).rgb;
 	addnoise(color, SCREEN_UV);
-	addcross(color, SCREEN_UV, SCREEN_PIXEL_SIZE);
+	if (crosshair) {
+		addcross(color, SCREEN_UV, SCREEN_PIXEL_SIZE);
+	}
 	COLOR.rgb = color;
 }

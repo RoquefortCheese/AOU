@@ -4,14 +4,18 @@ enum Vox {AIR, STONE, LIGHT, PILLARVINE, DOORPLANT}
 enum MeshType {AIR, CUBE, PLANT}
 @export var materials: Dictionary[Vox, Material]
 @export var meshtypes: Dictionary[Vox, MeshType]
-enum EquipmentType {PISTOL}
-@export var equipment: Dictionary[EquipmentType, PackedScene]
-enum Modifier {DOORPLANT, PILLARVINE, MORESPACE, LESSSPACE, FASTANOMS, FLOATY, MOREANOMS}
-@export var goodmods: Array[Modifier]
-@export var badmods: Array[Modifier]
+enum Modifier {DOORPLANT, PILLARVINE, MORESPACE, LESSSPACE, FASTANOMS, FLOATY, MOREANOMS, SQUASH, STRETCH}
+@export var modcosts: Dictionary[Modifier, Vector3]
+	# x = blue
+	# y = cyan
+	# z = magenta
+@export var modnames: Dictionary[Modifier, String]
+@export var moddescs: Dictionary[Modifier, String]
+const costmult = 32
+const maxmods = 6
 
 var worldseed: int
-var player: CharacterBody3D
+var player: Player
 var world: World
 var chamber: Chamber
 var chamberindex: int

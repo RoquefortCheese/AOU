@@ -1,4 +1,5 @@
 extends CharacterBody3D
+class_name Player
 
 const sensitivity = 0.005
 const jumpspeed = 10
@@ -6,9 +7,10 @@ const cruisespeed = 8
 const friction = -6
 const acc = cruisespeed * -friction
 
-var modifiers: Array[Global.Modifier] = [Global.Modifier.MORESPACE]
+var score: Dictionary[Anomaly.AnomColor, int]
+var modifiers: Array[Global.Modifier] = [Global.Modifier.MORESPACE, Global.Modifier.SQUASH]
 var health: int
-var usingterminal: bool
+var terminalinuse: Computer
 var pan: Vector3
 
 func currentblock():
@@ -19,8 +21,10 @@ func _ready():
 	$Camera3D.rotation.y = randf() * PI * 2
 	pan = $Camera3D.rotation
 	$Camera3D/RayCast3D.add_exception(self)
-	usingterminal = false
+	score = {Anomaly.AnomColor.BLUE: 0, Anomaly.AnomColor.CYAN: 0, Anomaly.AnomColor.MAGENTA: 0}
 	health = 6
+	terminalinuse = null
+
 
 func _physics_process(delta: float):
 	handlecam(delta)
@@ -31,7 +35,7 @@ func _physics_process(delta: float):
 	belikelumi()
 
 func movementinput(delta: float):
-	if not usingterminal:
+	if terminalinuse == null:
 		var direction = Vector3.ZERO
 		if Input.is_action_pressed("forward"):
 			direction += Vector3.FORWARD
@@ -48,6 +52,14 @@ func movementinput(delta: float):
 		velocity.x += direction.x
 		velocity.z += direction.z
 
+func useterminal(terminal: Computer):
+	terminalinuse = terminal
+	$PostProcessing.material.set_shader_parameter("crosshair", false)
+
+func stopusingterminal():
+	terminalinuse = null
+	$PostProcessing.material.set_shader_parameter("crosshair", true)
+
 func handlecam(delta: float):
 	for axis in 2:
 		$Camera3D.rotation[axis] += (pan[axis] - $Camera3D.rotation[axis]) * (1 - (2 ** 48) ** -delta)
@@ -55,8 +67,8 @@ func handlecam(delta: float):
 
 func useequipment(delta: float):
 	if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED and Input.is_action_just_pressed("leftclick"):
-		if usingterminal:
-			usingterminal = false
+		if terminalinuse != null:
+			stopusingterminal()
 		else:
 			$Camera3D/HandPos/Pistol.fire()
 
@@ -77,8 +89,7 @@ func otherphysics(delta: float):
 func belikelumi():
 	for i in get_slide_collision_count():
 		if get_slide_collision(i).get_collider() == Global.chamber.door:
-			usingterminal = false
-			impacthealth(1)
+			stopusingterminal()
 			Global.world.enterdoor()
 			break
 

@@ -1,16 +1,22 @@
 extends CharacterBody3D
 class_name Anomaly
 
-@export var freqs: Dictionary[Color, int]
+enum AnomColor {BLUE, CYAN, MAGENTA}
+const actualcolor = {
+	AnomColor.BLUE: Color.BLUE,
+	AnomColor.CYAN: Color.CYAN,
+	AnomColor.MAGENTA: Color.MAGENTA
+}
+
 const floatconst = 4
 const wobbleconst = 4
-const followconst = 3
+const followconst = 4
 const repelconst = 6
 const fallconst = -12
 const heightfriction = -4
 const flatfriction = -1
-const noticeradius = 20
-const followradius = 40
+const noticeradius = 16
+const followradius = 32
 const committhresh = 0.25
 const steppingconst = 1
 const knockbackconst = 2
@@ -21,19 +27,18 @@ var following: bool
 var boxes: Array[MeshInstance3D]
 var spinvels: Dictionary[MeshInstance3D, Vector3]
 var acceleration: Vector3
-var color: Color
+var color: AnomColor
 var offset: float
 
-func create(color: Color):
+func create(color: AnomColor):
 	self.alive = true
 	self.color = color
 	following = false
-	$AudioStreamPlayer3D.pitch_scale = 2 ** (freqs[color] / 12.)
 	offset = randf() * TAU
 	for i in 3:
 		var box = MeshInstance3D.new()
 		box.mesh = boxmesh.duplicate_deep()
-		box.mesh.material.albedo_color = color
+		box.mesh.material.albedo_color = actualcolor[color]
 		boxes.append(box)
 		spinvels[box] = Vector3(randf(), randf(), randf()) * PI
 		add_child(box)
@@ -117,14 +122,15 @@ func domath(delta: float):
 func maybetouch():
 	for i in get_slide_collision_count():
 		if get_slide_collision(i).get_collider() == Global.player:
-			die(Global.player.position)
+			die(Global.player.position, false)
 			Global.player.impacthealth(-1)
 			break
 
-func die(source: Vector3):
+func die(source: Vector3, shot: bool):
 	velocity += (position - source).normalized() * knockbackconst
 	if alive:
 		alive = false
-		$AudioStreamPlayer3D.playing = false
+		if following and shot:
+			Global.player.score[color] += 1
 		for box in boxes:
 			box.mesh.material.albedo_color *= 0.25
