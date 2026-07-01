@@ -62,8 +62,8 @@ func existentmod(modname: String):
 func costandname(mod: Global.Modifier):
 	var output = ""
 	for color in Anomaly.AnomColor.values():
-		var cost = str(int(Global.modcosts[mod][color] * Global.costmult))
-		output += cost + " ".repeat(3 - len(cost)) + "/"
+		var cost = str(int(Global.modcosts[mod][color] * 4))
+		output += cost + " ".repeat(3 - len(cost)) + "|"
 	output += "  " + Global.modnames[mod]
 	return output
 
@@ -158,19 +158,15 @@ func add(args: Array[String]):
 		terminalstring += "This modifier is unavailable at this terminal.\n\n"
 		return
 	if mod in Global.player.modifiers:
-		terminalstring += "This modifier has already been purchased.\n\n"
+		terminalstring += "This modifier has already been added.\n\n"
 		return
-	for color in Anomaly.AnomColor.values():
-		if Global.player.score[color] < Global.modcosts[mod][color] * Global.costmult:
-			terminalstring += "Insufficient score to purchase this mod.\n\n"
-			return
 	if len(Global.player.modifiers) == Global.maxmods:
 		terminalstring += "Cannot exceed the max amount of modifiers.\n\n"
 		return
 	Global.player.modifiers.append(mod)
 	for color in Anomaly.AnomColor.values():
-		Global.player.score[color] -= Global.modcosts[mod][color] * Global.costmult
-	terminalstring += Global.modnames[mod] + " purchased!\n\n"
+		Global.player.scoremult[color] *= 2. ** -Global.modcosts[mod][color]
+	terminalstring += Global.modnames[mod] + " added!\n\n"
 
 func _process(delta: float):
 	writeoutput()

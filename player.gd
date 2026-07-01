@@ -8,7 +8,8 @@ const friction = -6
 const acc = cruisespeed * -friction
 
 var score: Dictionary[Anomaly.AnomColor, int]
-var modifiers: Array[Global.Modifier] = [Global.Modifier.MORESPACE, Global.Modifier.SQUASH]
+var scoremult: Dictionary[Anomaly.AnomColor, float]
+var modifiers: Array[Global.Modifier] = []
 var health: int
 var terminalinuse: Computer
 var pan: Vector3
@@ -22,6 +23,7 @@ func _ready():
 	pan = $Camera3D.rotation
 	$Camera3D/RayCast3D.add_exception(self)
 	score = {Anomaly.AnomColor.BLUE: 0, Anomaly.AnomColor.CYAN: 0, Anomaly.AnomColor.MAGENTA: 0}
+	scoremult = {Anomaly.AnomColor.BLUE: 1, Anomaly.AnomColor.CYAN: 1, Anomaly.AnomColor.MAGENTA: 1}
 	health = 6
 	terminalinuse = null
 

@@ -2,7 +2,7 @@
 
 [ext_resource type="Shader" uid="uid://guyajf65enc7" path="res://computer.gdshader" id="1_18hgq"]
 [ext_resource type="Script" uid="uid://yne0tp644s4t" path="res://computer.gd" id="1_gcbbq"]
-[ext_resource type="FontFile" uid="uid://bcp5neowb2rqu" path="res://JetBrainsMono-ExtraBold.ttf" id="2_gcbbq"]
+[ext_resource type="FontFile" uid="uid://4tvrxsh3fis4" path="res://JetBrainsMonoNL-ExtraBold.ttf" id="2_gcbbq"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_bae8c"]
 

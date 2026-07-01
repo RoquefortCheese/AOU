@@ -346,13 +346,15 @@ func createmeshes():
 
 func anomalize():
 	var colorder = diceshuffle(Anomaly.AnomColor.values())
-	for i in int(len(air) * 2 ** Global.ifmod(-12., -11., Global.Modifier.MOREANOMS)): #(-11 - 3 * 2 ** (Global.chamberindex * -0.1)):
+	for i in int(len(air) * 2 ** Global.ifmod(-12.5, -11.5, Global.Modifier.MOREANOMS)): #(-11 - 3 * 2 ** (Global.chamberindex * -0.1)):
 		var anomaly = anomscene.instantiate()
-		anomaly.create(colorder[i % 3])
 		anomaly.position = spawnpoint() + Vector3.UP
 		anomalies.append(anomaly)
 		entities.append(anomaly)
 		add_child(anomaly)
+	anomalies.sort_custom(func(one, two): return one.position.y > two.position.y)
+	for i in len(anomalies):
+		anomalies[i].create(colorder[Global.ifmod(i % 3, floor(i * 3. / len(anomalies)), Global.Modifier.SORTANOMS)])
 
 func welcomeplayer():
 	Global.player.process_mode = Node.PROCESS_MODE_ALWAYS
@@ -362,6 +364,17 @@ func _process(delta: float):
 	updatelabel(delta)
 	updatescorelabel()
 
+func padnumstring(num: float, whole: int, deci: int):
+	var output = ""
+	var numstring = str(num).split(".")
+	output += "0".repeat(max(0, whole - len(numstring[0])))
+	output += numstring[0]
+	if deci != 0:
+		var decistring = numstring[1].left(deci)
+		output += "." + decistring
+		output += "0".repeat(max(0, deci - len(decistring)))
+	return output
+
 func updatelabel(delta: float):
 	$StatLabel.text = ""
 	$StatLabel.text += updatehealth() + "\n"
@@ -369,12 +382,17 @@ func updatelabel(delta: float):
 
 func updatescorelabel():
 	$ScoreLabel.text = ""
+	var totalscore = 0  # future: implement score counting somewhere better
 	for color in Anomaly.AnomColor.values():
 		var score = Global.player.score[color]
-		var numstring = str(abs(score))
+		var mult = Global.player.scoremult[color]
 		$ScoreLabel.text += "[color=" + Anomaly.actualcolor[color].to_html() + "]"
-		$ScoreLabel.text += "0".repeat(max(0, 4 - len(numstring)))
-		$ScoreLabel.text += numstring + "\n"
+		$ScoreLabel.text += padnumstring(score, 3, 0) + " x "
+		$ScoreLabel.text += padnumstring(mult, 2, 2) + " = "
+		$ScoreLabel.text += padnumstring(score * mult, 4, 0) + "\n"
+		totalscore += int(score * mult)
+	$ScoreLabel.text += "[color=white]"
+	$ScoreLabel.text += padnumstring(totalscore, 4, 0)
 
 func OoOoOo(quantity: String, amount: int):
 	return quantity + ":" + " ".repeat(8 - len(quantity)) + "O".repeat(amount) + "o".repeat(6 - amount)

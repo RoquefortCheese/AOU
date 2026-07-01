@@ -10,7 +10,8 @@ const actualcolor = {
 
 const floatconst = 4
 const wobbleconst = 4
-const followconst = 4
+const followconst = 6
+const flyconst = 32
 const repelconst = 6
 const fallconst = -12
 const heightfriction = -4
@@ -58,13 +59,16 @@ func _physics_process(delta: float):
 	if alive:
 		maybetouch()
 
+func flying():
+	var diff = Global.player.position - position
+	return Global.flatten(diff).length() <= 3 and diff.y >= 0
+
 func spinboxes(delta: float):
 	for box in boxes:
 		for axis in 3:
 			box.rotation[axis] += spinvels[box][axis] * delta
 
 func hover():
-	acceleration.y += wobbleconst * sin(Global.time() * PI + offset)
 	var grounddist = INF
 	for x in [-0.4, 0.4]:
 		for z in [-0.4, 0.4]:
@@ -84,6 +88,8 @@ func hover():
 	if grounddist != INF:
 		var error = grounddist - 1
 		acceleration.y += min(floatconst * error ** 2, 32) * -sign(error)
+	if not flying():
+		acceleration.y += wobbleconst * sin(Global.time() * PI + offset)
 
 func follow():
 	var diff = Global.player.position - position
@@ -94,6 +100,8 @@ func follow():
 		following = false
 	if following:
 		acceleration += Global.flatten(diff).normalized() * followconst
+		if flying():
+			acceleration += Vector3.UP * flyconst
 
 func spaceout():
 	for anomaly in Global.chamber.anomalies:
@@ -116,7 +124,7 @@ func domath(delta: float):
 	velocity.x *= exp(flatfriction) ** delta
 	velocity.z *= exp(flatfriction) ** delta
 	if Global.Modifier.FASTANOMS in Global.player.modifiers:
-		acceleration *= 2
+		acceleration *= 1.5
 	velocity += acceleration * delta
 
 func maybetouch():

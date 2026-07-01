@@ -4,19 +4,19 @@
 [ext_resource type="PackedScene" uid="uid://6ckuifqjy0ne" path="res://anomaly.tscn" id="2_2nx3e"]
 [ext_resource type="PackedScene" uid="uid://ctkkqpc5eadfs" path="res://door.tscn" id="3_ngk1o"]
 [ext_resource type="PackedScene" uid="uid://bvtq7jwgsgi8v" path="res://computer.tscn" id="4_f7isl"]
-[ext_resource type="FontFile" uid="uid://bcp5neowb2rqu" path="res://JetBrainsMono-ExtraBold.ttf" id="4_s3137"]
+[ext_resource type="FontFile" uid="uid://4tvrxsh3fis4" path="res://JetBrainsMonoNL-ExtraBold.ttf" id="5_f7isl"]
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_6g747"]
 size = Vector2(1, 1)
 
 [sub_resource type="LabelSettings" id="LabelSettings_f7isl"]
 line_spacing = 0.0
-font = ExtResource("4_s3137")
+font = ExtResource("5_f7isl")
 font_size = 28
 shadow_size = 0
 
 [sub_resource type="Theme" id="Theme_guk6m"]
-default_font = ExtResource("4_s3137")
+default_font = ExtResource("5_f7isl")
 default_font_size = 28
 
 [node name="Chamber" type="Node" unique_id=684829429]
@@ -31,7 +31,6 @@ offset_left = 36.0
 offset_top = 36.0
 offset_right = 164.0
 offset_bottom = 164.0
-text = "banana"
 label_settings = SubResource("LabelSettings_f7isl")
 
 [node name="ScoreLabel" type="RichTextLabel" parent="." unique_id=527015719]

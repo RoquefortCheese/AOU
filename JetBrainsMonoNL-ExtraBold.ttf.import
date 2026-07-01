@@ -2,13 +2,13 @@
 
 importer="font_data_dynamic"
 type="FontFile"
-uid="uid://bcp5neowb2rqu"
-path="res://.godot/imported/JetBrainsMono-ExtraBold.ttf-d06260e590b66f921b3b5d2ae3a70f1a.fontdata"
+uid="uid://4tvrxsh3fis4"
+path="res://.godot/imported/JetBrainsMonoNL-ExtraBold.ttf-e95c0e60b81e68a4d6b724f3e8becff5.fontdata"
 
 [deps]
 
-source_file="res://JetBrainsMono-ExtraBold.ttf"
-dest_files=["res://.godot/imported/JetBrainsMono-ExtraBold.ttf-d06260e590b66f921b3b5d2ae3a70f1a.fontdata"]
+source_file="res://JetBrainsMonoNL-ExtraBold.ttf"
+dest_files=["res://.godot/imported/JetBrainsMonoNL-ExtraBold.ttf-e95c0e60b81e68a4d6b724f3e8becff5.fontdata"]
 
 [params]
 
@@ -22,9 +22,9 @@ msdf_size=48
 allow_system_fallback=true
 force_autohinter=false
 modulate_color_glyphs=false
-hinting=2
-subpixel_positioning=0
-keep_rounding_remainders=false
+hinting=3
+subpixel_positioning=4
+keep_rounding_remainders=true
 oversampling=0.0
 Fallbacks=null
 fallbacks=[]
