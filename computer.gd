@@ -49,8 +49,8 @@ func classfilter(rightclass: TerminalClass):
 		return false
 	return true
 
-func tabbed(entry: String):
-	return entry + " ".repeat(max(0, 16 - len(entry)))
+func tabbed(entry: String, space: int = 16):
+	return entry + " ".repeat(max(0, space - len(entry)))
 
 func existentmod(modname: String):
 	modname = modname.to_upper()
@@ -59,12 +59,11 @@ func existentmod(modname: String):
 		return null
 	return Global.Modifier[modname]
 
-func costandname(mod: Global.Modifier):
+func infoname(mod: Global.Modifier):
 	var output = ""
-	for color in Anomaly.AnomColor.values():
-		var cost = str(int(Global.modcosts[mod][color] * 4))
-		output += cost + " ".repeat(3 - len(cost)) + "|"
-	output += "  " + Global.modnames[mod]
+	output += tabbed(Anomaly.colname[Global.modcolors[mod]], 8) + "| "
+	output += tabbed(str(Global.modcosts[mod]), 3) + "| "
+	output += Global.modnames[mod]
 	return output
 
 func clear():
@@ -140,14 +139,14 @@ func restore():
 
 func modlist():
 	for mod in otherstuff[OtherStuff.MODS]:
-		terminalstring += costandname(mod) + "\n"
+		terminalstring += infoname(mod) + "\n"
 	terminalstring += "\n"
 
 func about(args: Array[String]):
 	var mod = existentmod(args[1])
 	if mod == null:
 		return
-	terminalstring += costandname(mod) + ": "
+	terminalstring += infoname(mod) + ": "
 	terminalstring += Global.moddescs[mod] + "\n\n"
 
 func add(args: Array[String]):
@@ -158,14 +157,16 @@ func add(args: Array[String]):
 		terminalstring += "This modifier is unavailable at this terminal.\n\n"
 		return
 	if mod in Global.player.modifiers:
-		terminalstring += "This modifier has already been added.\n\n"
+		terminalstring += "This modifier has already been purchased.\n\n"
 		return
 	if len(Global.player.modifiers) == Global.maxmods:
 		terminalstring += "Cannot exceed the max amount of modifiers.\n\n"
 		return
+	if Global.modcosts[mod] > Global.player.balance:
+		terminalstring += "Insufficient balance.\n\n"
+		return
 	Global.player.modifiers.append(mod)
-	for color in Anomaly.AnomColor.values():
-		Global.player.scoremult[color] *= 2. ** -Global.modcosts[mod][color]
+	Global.player.balance -= Global.modcosts[mod]
 	terminalstring += Global.modnames[mod] + " added!\n\n"
 
 func _process(delta: float):

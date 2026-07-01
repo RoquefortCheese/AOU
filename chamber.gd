@@ -238,9 +238,10 @@ func placedoor():
 	add_child(door)
 
 func placecomputers():
-	for i in floor(len(air) * 2 ** -15.):
+	var classorder = diceshuffle(Computer.TerminalClass.values())
+	for i in int(len(air) * 2 ** -15.):
 		var computer = compscene.instantiate()
-		computer.create(dicechoose(Computer.TerminalClass.values()))
+		computer.create(classorder[i % len(classorder)])
 		var pos
 		var spin
 		while true:
@@ -361,38 +362,46 @@ func welcomeplayer():
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
 func _process(delta: float):
-	updatelabel(delta)
+	updatestatlabel()
 	updatescorelabel()
+	updatemodlabel()
+	updatebalancelabel()
 
-func padnumstring(num: float, whole: int, deci: int):
-	var output = ""
-	var numstring = str(num).split(".")
-	output += "0".repeat(max(0, whole - len(numstring[0])))
-	output += numstring[0]
-	if deci != 0:
-		var decistring = numstring[1].left(deci)
-		output += "." + decistring
-		output += "0".repeat(max(0, deci - len(decistring)))
-	return output
+func _input(event: InputEvent):
+	if Global.player.terminalinuse == null:
+		if event.is_action_pressed("stattoggle"):
+			$StatLabel.visible = not $StatLabel.visible
+		if event.is_action_pressed("scoretoggle"):
+			$ScoreLabel.visible = not $ScoreLabel.visible
+		if event.is_action_pressed("modtoggle"):
+			$ModLabel.visible = not $ModLabel.visible
+		if event.is_action_pressed("balancetoggle"):
+			$BalanceLabel.visible = not $BalanceLabel.visible
 
-func updatelabel(delta: float):
+func updatestatlabel():
 	$StatLabel.text = ""
 	$StatLabel.text += updatehealth() + "\n"
 	$StatLabel.text += updatecompass() + "\n"
 
 func updatescorelabel():
 	$ScoreLabel.text = ""
-	var totalscore = 0  # future: implement score counting somewhere better
-	for color in Anomaly.AnomColor.values():
-		var score = Global.player.score[color]
-		var mult = Global.player.scoremult[color]
+	for color in 3:
 		$ScoreLabel.text += "[color=" + Anomaly.actualcolor[color].to_html() + "]"
-		$ScoreLabel.text += padnumstring(score, 3, 0) + " x "
-		$ScoreLabel.text += padnumstring(mult, 2, 2) + " = "
-		$ScoreLabel.text += padnumstring(score * mult, 4, 0) + "\n"
-		totalscore += int(score * mult)
+		$ScoreLabel.text += Global.padnumstring(Global.player.score[color], 3) + " x "
+		$ScoreLabel.text += Global.padnumstring(Global.player.scoremult(color), 2, 2) + " = "
+		$ScoreLabel.text += Global.padnumstring(Global.player.productscore(color), 4) + "\n"
 	$ScoreLabel.text += "[color=white]"
-	$ScoreLabel.text += padnumstring(totalscore, 4, 0)
+	$ScoreLabel.text += Global.padnumstring(Global.player.totalscore(), 4)
+
+func updatemodlabel():
+	$ModLabel.text = ""
+	for mod in Global.player.modifiers:
+		$ModLabel.text += "\n" + Global.modnames[mod]
+
+func updatebalancelabel():
+	$BalanceLabel.text = ""
+	$BalanceLabel.text += "Balance: "
+	$BalanceLabel.text += Global.padnumstring(Global.player.balance, 3)
 
 func OoOoOo(quantity: String, amount: int):
 	return quantity + ":" + " ".repeat(8 - len(quantity)) + "O".repeat(amount) + "o".repeat(6 - amount)

@@ -48,3 +48,33 @@ fit_content = true
 scroll_active = false
 autowrap_mode = 0
 horizontal_alignment = 2
+
+[node name="ModLabel" type="Label" parent="." unique_id=485796735]
+visible = false
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 36.0
+offset_top = -164.0
+offset_right = 164.0
+offset_bottom = -36.0
+grow_vertical = 0
+label_settings = SubResource("LabelSettings_f7isl")
+vertical_alignment = 2
+
+[node name="BalanceLabel" type="Label" parent="." unique_id=1351313194]
+visible = false
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -164.0
+offset_top = -164.0
+offset_right = -36.0
+offset_bottom = -36.0
+grow_horizontal = 0
+grow_vertical = 0
+label_settings = SubResource("LabelSettings_f7isl")
+horizontal_alignment = 2
+vertical_alignment = 2

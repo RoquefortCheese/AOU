@@ -8,8 +8,8 @@ const friction = -6
 const acc = cruisespeed * -friction
 
 var score: Dictionary[Anomaly.AnomColor, int]
-var scoremult: Dictionary[Anomaly.AnomColor, float]
 var modifiers: Array[Global.Modifier] = []
+var balance: int
 var health: int
 var terminalinuse: Computer
 var pan: Vector3
@@ -17,16 +17,31 @@ var pan: Vector3
 func currentblock():
 	return Global.chamber.voxmap[floor(position)]
 
+func scoremult(color: Anomaly.AnomColor):
+	var scoremult = 1
+	for mod in modifiers:
+		if Global.modcolors[mod] == color:
+			scoremult *= 2 ** (Global.modcosts[color] / -4.)
+	return scoremult
+
+func productscore(color: Anomaly.AnomColor):
+	return int(score[color] * scoremult(color))
+
+func totalscore():
+	var total = 0
+	for color in 3:
+		total += productscore(color)
+	return total
+
 func _ready():
 	Global.player = self
 	$Camera3D.rotation.y = randf() * PI * 2
 	pan = $Camera3D.rotation
 	$Camera3D/RayCast3D.add_exception(self)
 	score = {Anomaly.AnomColor.BLUE: 0, Anomaly.AnomColor.CYAN: 0, Anomaly.AnomColor.MAGENTA: 0}
-	scoremult = {Anomaly.AnomColor.BLUE: 1, Anomaly.AnomColor.CYAN: 1, Anomaly.AnomColor.MAGENTA: 1}
+	balance = 0
 	health = 6
 	terminalinuse = null
-
 
 func _physics_process(delta: float):
 	handlecam(delta)
