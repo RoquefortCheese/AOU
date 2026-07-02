@@ -14,10 +14,20 @@ var terminalinuse: Computer
 var jumpsleft: int
 
 var score: Dictionary[Anomaly.AnomColor, int]
-var modifiers: Array[Global.Modifier] = [Global.Modifier.ISLANDS, Global.Modifier.MOREANOMS]
+var modifiers: Array[Global.Modifier]
 var balance: int
 var health: int
+var ammo: int
 
+func getfollowers():
+	var following = 0
+	for anomaly in Global.chamber.anomalies:
+		if anomaly.alive and anomaly.following:
+			following += 1
+	return following
+
+func maxammo():
+	return Global.ifmod(12, 18, Global.Modifier.MOREAMMO)
 
 func currentblock():
 	return Global.chamber.voxmap[floor(position)]
@@ -42,8 +52,10 @@ func _ready():
 	Global.player = self
 	$Camera3D/RayCast3D.add_exception(self)
 	score = {Anomaly.AnomColor.BLUE: 0, Anomaly.AnomColor.CYAN: 0, Anomaly.AnomColor.MAGENTA: 0}
+	modifiers = []
 	balance = 0
 	health = 6
+	ammo = 0
 	timesinceground = 0
 	terminalinuse = null
 	jumpsleft = 0
@@ -52,6 +64,7 @@ func _physics_process(delta: float):
 	handlecam(delta)
 	movementinput(delta)
 	useequipment(delta)
+	reload()
 	considerfocusing()
 	otherphysics(delta)
 	belikelumi()
@@ -97,7 +110,16 @@ func useequipment(delta: float):
 		if terminalinuse != null:
 			stopusingterminal()
 		else:
-			$Camera3D/HandPos/Pistol.fire()
+			var target = $Camera3D/RayCast3D.get_collider()
+			if target is Computer:
+				if Global.dist(target.position, $Camera3D/RayCast3D.global_position) <= 1.5:
+					useterminal(target)
+			if terminalinuse == null:
+				$Camera3D/HandPos/Pistol.fire()
+
+func reload():
+	if getfollowers() == 0:
+		ammo = maxammo()
 
 func considerfocusing():
 	if Input.is_action_just_pressed("leftclick"):

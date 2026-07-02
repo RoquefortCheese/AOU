@@ -387,6 +387,7 @@ func _input(event: InputEvent):
 func updatestatlabel():
 	$StatLabel.text = ""
 	$StatLabel.text += updatehealth() + "\n"
+	$StatLabel.text += updateammo() + "\n"
 	$StatLabel.text += updatecompass() + "\n"
 	$StatLabel.text += updatesonar() + "\n"
 
@@ -416,6 +417,9 @@ func OoOoOo(quantity: String, amount: int):
 func updatehealth():
 	return OoOoOo("Health", Global.player.health)
 
+func updateammo():
+	return OoOoOo("Ammo", ceil(Global.player.ammo * 6. / Global.player.maxammo()))
+
 func updatecompass():
 	#var prox = 1 - min(1, Global.dist(Global.player.position, door.position) / (approxsidelen() * sqrt(3)))
 	var playerangle = fmod(Global.player.get_node("Camera3D").rotation.y, TAU)
@@ -425,8 +429,4 @@ func updatecompass():
 	return OoOoOo("Compass", floor(angdiff / PI * 7))
 
 func updatesonar():
-	var following = 0
-	for anomaly in anomalies:
-		if anomaly.alive and anomaly.following:
-			following += 1
-	return OoOoOo("Sonar", min(following, 6))
+	return OoOoOo("Sonar", min(Global.player.getfollowers(), 6))

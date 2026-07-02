@@ -5,7 +5,7 @@ enum MeshType {AIR, CUBE, PLANT}
 @export var materials: Dictionary[Vox, Material]
 @export var meshtypes: Dictionary[Vox, MeshType]
 
-enum Modifier {DOORPLANT, PILLARVINE, MORESPACE, LESSSPACE, FASTANOMS, FLOATY, MOREANOMS, SQUASH, STRETCH, SORTANOMS, REGEN, RUNNING, DOUBLEJUMP, HYPERBLUE, HYPERCYAN, HYPERMAGENTA, ISLANDS}
+enum Modifier {DOORPLANT, PILLARVINE, MORESPACE, LESSSPACE, FASTANOMS, FLOATY, MOREANOMS, SQUASH, STRETCH, SORTANOMS, REGEN, RUNNING, DOUBLEJUMP, HYPERBLUE, HYPERCYAN, HYPERMAGENTA, ISLANDS, MOREAMMO}
 const modcosts: Dictionary[Modifier, int] = {
 	Modifier.DOORPLANT: 2,
 	Modifier.PILLARVINE: 4,
@@ -24,6 +24,7 @@ const modcosts: Dictionary[Modifier, int] = {
 	Modifier.HYPERCYAN: -2,
 	Modifier.HYPERMAGENTA: -2,
 	Modifier.ISLANDS: 1,
+	Modifier.MOREAMMO: 3,
 }
 const modcolors: Dictionary[Modifier, Anomaly.AnomColor] = {
 	Modifier.DOORPLANT: Anomaly.AnomColor.BLUE,
@@ -43,6 +44,7 @@ const modcolors: Dictionary[Modifier, Anomaly.AnomColor] = {
 	Modifier.HYPERCYAN: Anomaly.AnomColor.MAGENTA,
 	Modifier.HYPERMAGENTA: Anomaly.AnomColor.MAGENTA,
 	Modifier.ISLANDS: Anomaly.AnomColor.BLUE,
+	Modifier.MOREAMMO: Anomaly.AnomColor.MAGENTA,
 }
 var modnames: Dictionary[Modifier, String] = {
 	Modifier.DOORPLANT: "DoorPlant",
@@ -62,9 +64,10 @@ var modnames: Dictionary[Modifier, String] = {
 	Modifier.HYPERCYAN: "HyperCyan",
 	Modifier.HYPERMAGENTA: "HyperMagenta",
 	Modifier.ISLANDS: "Islands",
+	Modifier.MOREAMMO: "MoreAmmo",
 }
 var moddescs: Dictionary[Modifier, String] = {
-	Modifier.DOORPLANT: "Blue plants that grow next to doors.",
+	Modifier.DOORPLANT: "Blue plants grow next to doors.",
 	Modifier.PILLARVINE: "Tall vines that can be climbed.",
 	Modifier.MORESPACE: "More open caves.",
 	Modifier.LESSSPACE: "More constricted caves.",
@@ -81,6 +84,7 @@ var moddescs: Dictionary[Modifier, String] = {
 	Modifier.HYPERCYAN: "Cyan anomalies move much faster.",
 	Modifier.HYPERMAGENTA: "Magenta anomalies deal more damage.",
 	Modifier.ISLANDS: "More floating terrain.",
+	Modifier.MOREAMMO: "More ammunition.",
 }
 var incompatibilities: Array[Vector2] = [
 	Vector2(Modifier.MORESPACE, Modifier.LESSSPACE),

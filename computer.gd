@@ -3,7 +3,7 @@ class_name Computer
 
 const charsperline = 63
 const maxlines = 35
-enum TerminalClass {INFO, RESTORATION, MOD}
+enum TerminalClass {RESTORATION, MOD}
 @export var classnames: Dictionary[TerminalClass, String]
 
 @export var allowedchars: Array[Key]
@@ -86,53 +86,12 @@ func help():
 	terminalstring += tabbed("clear:") + "Clears the terminal.\n"
 	terminalstring += tabbed("exit:") + "Exits the terminal.\n"
 	match termclass:
-		TerminalClass.INFO:
-			terminalstring += tabbed("info [data]:") + "Outputs the requested data.\n"
-			terminalstring += tabbed("infolist:") + "Outputs the list of available data.\n"
 		TerminalClass.RESTORATION:
 			terminalstring += tabbed("restore:") + "Restores three hitpoints. Usable once.\n"
 		TerminalClass.MOD:
 			terminalstring += tabbed("modlist:") + "Outputs available modifiers.\n"
 			terminalstring += tabbed("about [mod]:") + "Outputs the modifier description.\n"
 			terminalstring += tabbed("add [mod]:") + "Adds the requested modifier.\n"
-	terminalstring += "\n"
-
-func info(args: Array[String]):
-	match args[1]:
-		"doordist":
-			terminalstring += str(floor(Global.dist(position, Global.chamber.door.position) * 1000) / 1000)
-		"numterms":
-			terminalstring += str(len(Global.chamber.computers))
-		"numanoms":
-			var count = 0
-			for anomaly in Global.chamber.anomalies:
-				if anomaly.alive:
-					count += 1
-			terminalstring += str(count)
-		"numdead":
-			var count = 0
-			for anomaly in Global.chamber.anomalies:
-				if not anomaly.alive:
-					count += 1
-			terminalstring += str(count)
-		"chamindex":
-			terminalstring += str(Global.chamberindex)
-		"seed":
-			terminalstring += str(Global.worldseed)
-		_:
-			terminalstring += "Invalid argument. For a list of arguments, use \"infolist\"."
-	terminalstring += "\n\n"
-
-func infolist():
-	terminalstring += "\n"
-	if termclass != TerminalClass.INFO:
-		terminalstring += "Note: The \"info\" command is not available on this terminal.\n"
-	terminalstring += tabbed("doordist:") + "The distance from this terminal to the door.\n"
-	terminalstring += tabbed("numterms:") + "The amount of terminals in this chamber.\n"
-	terminalstring += tabbed("numanoms:") + "The amount of alive anomalies in this chamber.\n"
-	terminalstring += tabbed("numdead:") + "The amount of dead anomalies in this chamber.\n"
-	terminalstring += tabbed("chamindex:") + "The index of the current chamber.\n"
-	terminalstring += tabbed("seed:") + "The current world seed.\n"
 	terminalstring += "\n"
 
 func restore():
@@ -244,12 +203,6 @@ func runinput():
 			"exit":
 				if argquant(args, 1):
 					Global.player.stopusingterminal()
-			"info":
-				if argquant(args, 2) and classfilter(TerminalClass.INFO):
-					info(args)
-			"infolist":
-				if argquant(args, 1):
-					infolist()
 			"restore":
 				if argquant(args, 1) and classfilter(TerminalClass.RESTORATION):
 					restore()

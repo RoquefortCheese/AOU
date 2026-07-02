@@ -163,3 +163,7 @@ func die(source: Vector3, shot: bool):
 			Global.player.score[color] += 1
 		for box in boxes:
 			box.mesh.material.albedo_color *= 0.25
+		if shot:
+			$ShotAudioPlayer.play()
+		else:
+			$ContactAudioPlayer.play()
