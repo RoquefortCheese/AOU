@@ -50,26 +50,3 @@ meshtypes = Dictionary[int, int]({
 3: 2,
 4: 2
 })
-modnames = Dictionary[int, String]({
-0: "DoorPlant",
-1: "PillarVine",
-2: "MoreSpace",
-3: "LessSpace",
-4: "FastAnoms",
-5: "Floaty",
-6: "MoreAnoms",
-7: "Squash",
-8: "Stretch",
-9: "SortAnoms"
-})
-moddescs = Dictionary[int, String]({
-0: "Blue plants that grow next to doors.",
-1: "Tall vines that can be climbed.",
-2: "More open caves.",
-3: "More constricted caves.",
-4: "Anomalies move much faster.",
-5: "Less gravity.",
-6: "Significantly more anomalies.",
-7: "Caves compressed vertically.",
-8: "Caves stretched vertically."
-})

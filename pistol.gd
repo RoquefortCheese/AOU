@@ -3,7 +3,7 @@ extends Node3D
 var ray: RayCast3D
 
 func fire():
-	var ray = Global.player.get_node("Camera3D/RayCast3D")
+	ray = Global.player.get_node("Camera3D/RayCast3D")
 	if ray.is_colliding():
 		var target = ray.get_collider()
 		if target is Anomaly:

@@ -18,22 +18,6 @@ var termclass: TerminalClass
 func inuse():
 	return Global.player.terminalinuse == self
 
-func create(termclass: TerminalClass):
-	self.termclass = termclass
-	match termclass:
-		TerminalClass.RESTORATION:
-			otherstuff[OtherStuff.SPENT] = false
-		TerminalClass.MOD:
-			otherstuff[OtherStuff.MODS] = []
-			var shuffledmods = Global.chamber.diceshuffle(Global.Modifier.values())
-			for mod in shuffledmods:
-				if mod not in Global.player.modifiers:
-					otherstuff[OtherStuff.MODS].append(mod)
-					if len(otherstuff[OtherStuff.MODS]) == 3:
-						break
-	clear()
-	newcommand()
-
 func argquant(args: Array[String], quantity: int):
 	if len(args) < quantity:
 		terminalstring += "Not enough arguments.\n\n"
@@ -62,9 +46,31 @@ func existentmod(modname: String):
 func infoname(mod: Global.Modifier):
 	var output = ""
 	output += tabbed(Anomaly.colname[Global.modcolors[mod]], 8) + "| "
-	output += tabbed(str(Global.modcosts[mod]), 3) + "| "
+	output += Global.padnumstring(Global.modcosts[mod], 1, 0, true) + " | "
 	output += Global.modnames[mod]
 	return output
+
+func compatible(mod: Global.Modifier):
+	for playermod in Global.player.modifiers:
+		if Vector2(mod, playermod) in Global.incompatibilities or Vector2(playermod, mod) in Global.incompatibilities:
+			return false
+	return true
+
+func create(termclass: TerminalClass):
+	self.termclass = termclass
+	match termclass:
+		TerminalClass.RESTORATION:
+			otherstuff[OtherStuff.SPENT] = false
+		TerminalClass.MOD:
+			otherstuff[OtherStuff.MODS] = []
+			var shuffledmods = Global.chamber.diceshuffle(Global.Modifier.values())
+			for mod in shuffledmods:
+				if mod not in Global.player.modifiers and compatible(mod):
+					otherstuff[OtherStuff.MODS].append(mod)
+					if len(otherstuff[OtherStuff.MODS]) == 3:
+						break
+	clear()
+	newcommand()
 
 func clear():
 	terminalstring = ""
@@ -84,7 +90,7 @@ func help():
 			terminalstring += tabbed("info [data]:") + "Outputs the requested data.\n"
 			terminalstring += tabbed("infolist:") + "Outputs the list of available data.\n"
 		TerminalClass.RESTORATION:
-			terminalstring += tabbed("restore:") + "Restores two hitpoints. Usable once.\n"
+			terminalstring += tabbed("restore:") + "Restores three hitpoints. Usable once.\n"
 		TerminalClass.MOD:
 			terminalstring += tabbed("modlist:") + "Outputs available modifiers.\n"
 			terminalstring += tabbed("about [mod]:") + "Outputs the modifier description.\n"
@@ -133,7 +139,7 @@ func restore():
 	if otherstuff[OtherStuff.SPENT]:
 		terminalstring += "You have already used this terminal to restore.\n\n"
 		return
-	Global.player.impacthealth(2)
+	Global.player.impacthealth(3)
 	otherstuff[OtherStuff.SPENT] = true
 	terminalstring += "Your health has been restored!\n\n"
 
@@ -159,11 +165,14 @@ func add(args: Array[String]):
 	if mod in Global.player.modifiers:
 		terminalstring += "This modifier has already been purchased.\n\n"
 		return
+	if not compatible(mod):
+		terminalstring += "This modifier is incompatible with your current modifiers.\n\n"
+		return
 	if len(Global.player.modifiers) == Global.maxmods:
 		terminalstring += "Cannot exceed the max amount of modifiers.\n\n"
 		return
-	if Global.modcosts[mod] > Global.player.balance:
-		terminalstring += "Insufficient balance.\n\n"
+	if abs(Global.player.balance + Global.modcosts[mod]) > 4:
+		terminalstring += "Balance cannot exceed ±4.\n\n"
 		return
 	Global.player.modifiers.append(mod)
 	Global.player.balance -= Global.modcosts[mod]

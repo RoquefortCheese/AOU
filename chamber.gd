@@ -358,6 +358,8 @@ func anomalize():
 		anomalies[i].create(colorder[Global.ifmod(i % 3, floor(i * 3. / len(anomalies)), Global.Modifier.SORTANOMS)])
 
 func welcomeplayer():
+	Global.player.pan = Vector3.UP * randf() * TAU
+	Global.player.get_node("Camera3D").rotation = Global.player.pan
 	Global.player.process_mode = Node.PROCESS_MODE_ALWAYS
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
@@ -382,6 +384,7 @@ func updatestatlabel():
 	$StatLabel.text = ""
 	$StatLabel.text += updatehealth() + "\n"
 	$StatLabel.text += updatecompass() + "\n"
+	$StatLabel.text += updatesonar() + "\n"
 
 func updatescorelabel():
 	$ScoreLabel.text = ""
@@ -401,7 +404,7 @@ func updatemodlabel():
 func updatebalancelabel():
 	$BalanceLabel.text = ""
 	$BalanceLabel.text += "Balance: "
-	$BalanceLabel.text += Global.padnumstring(Global.player.balance, 3)
+	$BalanceLabel.text += Global.padnumstring(Global.player.balance, 1, 0, true)
 
 func OoOoOo(quantity: String, amount: int):
 	return quantity + ":" + " ".repeat(8 - len(quantity)) + "O".repeat(amount) + "o".repeat(6 - amount)
@@ -416,3 +419,10 @@ func updatecompass():
 	var diff = playerangle - doorangle
 	var angdiff = min(abs(diff - TAU), abs(diff), abs(diff + TAU))
 	return OoOoOo("Compass", floor(angdiff / PI * 7))
+
+func updatesonar():
+	var following = 0
+	for anomaly in anomalies:
+		if anomaly.alive and anomaly.following:
+			following += 1
+	return OoOoOo("Sonar", min(following, 6))

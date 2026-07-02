@@ -31,12 +31,15 @@ var spinvels: Dictionary[MeshInstance3D, Vector3]
 var acceleration: Vector3
 var color: AnomColor
 var offset: float
+var timedead: float
+var undead: bool
 
 func create(color: AnomColor):
 	self.alive = true
 	self.color = color
 	following = false
 	offset = randf() * TAU
+	undead = false
 	for i in 3:
 		var box = MeshInstance3D.new()
 		box.mesh = boxmesh.duplicate_deep()
@@ -54,6 +57,7 @@ func _physics_process(delta: float):
 		hover()
 	else:
 		fall()
+		mayberegen(delta)
 	commit()
 	domath(delta)
 	move_and_slide()
@@ -115,6 +119,15 @@ func fall():
 	if not is_on_floor():
 		acceleration.y = fallconst
 
+func mayberegen(delta: float):
+	timedead += delta
+	if Global.Modifier.REGEN in Global.player.modifiers:
+		if timedead >= 20:
+			alive = true
+			undead = true
+			for box in boxes:
+				box.mesh.material.albedo_color /= 0.25
+
 func commit():
 	for axis in 3:
 		if abs(acceleration[axis]) <= committhresh:
@@ -139,7 +152,8 @@ func die(source: Vector3, shot: bool):
 	velocity += (position - source).normalized() * knockbackconst
 	if alive:
 		alive = false
-		if following and shot:
+		timedead = 0
+		if following and shot and not undead:
 			Global.player.score[color] += 1
 		for box in boxes:
 			box.mesh.material.albedo_color *= 0.25

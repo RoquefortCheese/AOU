@@ -2,27 +2,32 @@ extends CharacterBody3D
 class_name Player
 
 const sensitivity = 0.005
-const jumpspeed = 10
+const jumpspeed = 12
 const cruisespeed = 8
 const friction = -6
+const coyotetime = 0.25
 const acc = cruisespeed * -friction
 
+var pan: Vector3
+var timesinceground: float
+var terminalinuse: Computer
+var jumpsleft: int
+
 var score: Dictionary[Anomaly.AnomColor, int]
-var modifiers: Array[Global.Modifier] = []
+var modifiers: Array[Global.Modifier] = [Global.Modifier.DOUBLEJUMP]
 var balance: int
 var health: int
-var terminalinuse: Computer
-var pan: Vector3
+
 
 func currentblock():
 	return Global.chamber.voxmap[floor(position)]
 
 func scoremult(color: Anomaly.AnomColor):
-	var scoremult = 1
+	var mult = 1
 	for mod in modifiers:
 		if Global.modcolors[mod] == color:
-			scoremult *= 2 ** (Global.modcosts[color] / -4.)
-	return scoremult
+			mult *= 2 ** (Global.modcosts[color] / -4.)
+	return mult
 
 func productscore(color: Anomaly.AnomColor):
 	return int(score[color] * scoremult(color))
@@ -35,13 +40,13 @@ func totalscore():
 
 func _ready():
 	Global.player = self
-	$Camera3D.rotation.y = randf() * PI * 2
-	pan = $Camera3D.rotation
 	$Camera3D/RayCast3D.add_exception(self)
 	score = {Anomaly.AnomColor.BLUE: 0, Anomaly.AnomColor.CYAN: 0, Anomaly.AnomColor.MAGENTA: 0}
 	balance = 0
 	health = 6
+	timesinceground = 0
 	terminalinuse = null
+	jumpsleft = 0
 
 func _physics_process(delta: float):
 	handlecam(delta)
@@ -62,10 +67,15 @@ func movementinput(delta: float):
 			direction += Vector3.LEFT
 		if Input.is_action_pressed("right"):
 			direction += Vector3.RIGHT
+		if is_on_floor() or currentblock() == Global.Vox.PILLARVINE:
+			jumpsleft = Global.ifmod(1, 2, Global.Modifier.DOUBLEJUMP)
+		if timesinceground >= coyotetime and not currentblock() == Global.Vox.PILLARVINE:
+			jumpsleft = min(Global.ifmod(0, 1, Global.Modifier.DOUBLEJUMP), jumpsleft)
 		if Input.is_action_just_pressed("jump"):
-			if is_on_floor() or currentblock() == Global.Vox.PILLARVINE:
+			if jumpsleft != 0:
 				velocity.y = jumpspeed
-		direction = direction.rotated(Vector3.UP, $Camera3D.rotation.y).normalized() * acc * delta
+				jumpsleft -= 1
+		direction = direction.rotated(Vector3.UP, $Camera3D.rotation.y).normalized() * acc * Global.ifmod(1, 1.25, Global.Modifier.RUNNING) * delta
 		velocity.x += direction.x
 		velocity.z += direction.z
 
@@ -94,8 +104,11 @@ func considerfocusing():
 		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
 func otherphysics(delta: float):
-	if not is_on_floor():
+	if is_on_floor():
+		timesinceground = 0
+	else:
 		velocity.y -= Global.ifmod(12, 8, Global.Modifier.FLOATY) * delta
+		timesinceground += delta
 	velocity.x *= exp(friction) ** delta
 	velocity.z *= exp(friction) ** delta
 	if currentblock() == Global.Vox.PILLARVINE:
