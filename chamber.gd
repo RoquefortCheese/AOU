@@ -72,7 +72,7 @@ func spawnpoint():
 		var point = ground(randomair()) + Vector3(0.5, 0, 0.5)
 		var distanced = true
 		for entity in entities:
-			if Global.dist(point, entity.position) < (16 if entity == Global.player else 4):
+			if Global.dist(point, entity.position) < (24 if entity == Global.player else 4):
 				distanced = false
 		if distanced:
 			return point
@@ -128,9 +128,9 @@ func metaterragen():
 	noise.seed = dice.randi()
 	noise.noise_type = FastNoiseLite.TYPE_SIMPLEX
 	noise.frequency = 0.2 / sqrt(size) * 2 ** dice.randf_range(-0.5, 0.5)
-	if Global.Modifier.LESSSPACE in Global.player.modifiers:
+	if Global.hasmod(Global.Modifier.LESSSPACE):
 		noise.frequency *= 2
-	if Global.Modifier.MORESPACE in Global.player.modifiers:
+	if Global.hasmod(Global.Modifier.MORESPACE):
 		noise.frequency *= 0.5
 	noise.fractal_octaves = 4
 
@@ -142,7 +142,10 @@ func actualterragen():
 				var spheubedist = 0
 				for axis in 3:
 					spheubedist += ((point[axis] + 0.5) * 2 / size - 1) ** 4
-				if rescale(noise.get_noise_3d(x + 0.5, (y + 0.5) * Global.ifmod(1, 2, Global.Modifier.SQUASH) * Global.ifmod(1, 0.5, Global.Modifier.STRETCH), z + 0.5), 0, 1) < spheubedist * 0.5 + 0.5 or (min(x, y, z) == 0 or max(x, y, z) == size - 1):
+				var noiseval = noise.get_noise_3d(x + 0.5, (y + 0.5) * Global.ifmod(1, 2, Global.Modifier.SQUASH) * Global.ifmod(1, 0.5, Global.Modifier.STRETCH), z + 0.5)
+				if Global.hasmod(Global.Modifier.ISLANDS):
+					noiseval = asin(abs(noiseval) * -2 + 1) * 2 / PI
+				if rescale(noiseval, 0, 1) < spheubedist * 0.5 + 0.5 or (min(x, y, z) == 0 or max(x, y, z) == size - 1):
 					setvox(point, Global.Vox.STONE)
 				else:
 					setvox(point, Global.Vox.AIR)
@@ -180,7 +183,7 @@ func placeplayer():
 	entities.append(Global.player)
 
 func featureterrain():
-	if Global.Modifier.DOORPLANT in Global.player.modifiers:
+	if Global.hasmod(Global.Modifier.DOORPLANT):
 		var cuberadius = approxsidelen() * sqrt(3) / 4
 		for x in range(floor(doorpos.x - cuberadius), ceil(doorpos.x + cuberadius) + 1):
 			for y in range(floor(doorpos.y - cuberadius), ceil(doorpos.y + cuberadius) + 1):
@@ -188,7 +191,7 @@ func featureterrain():
 					var point = Vector3(x, y, z)
 					if point == ground(point) and randf() < 0.25:
 						setvox(point, Global.Vox.DOORPLANT)
-	if Global.Modifier.PILLARVINE in Global.player.modifiers:
+	if Global.hasmod(Global.Modifier.PILLARVINE):
 		var candidates = []
 		var finalvines = []
 		for x in size:
@@ -356,6 +359,7 @@ func anomalize():
 	anomalies.sort_custom(func(one, two): return one.position.y > two.position.y)
 	for i in len(anomalies):
 		anomalies[i].create(colorder[Global.ifmod(i % 3, floor(i * 3. / len(anomalies)), Global.Modifier.SORTANOMS)])
+	print(len(anomalies))
 
 func welcomeplayer():
 	Global.player.pan = Vector3.UP * randf() * TAU

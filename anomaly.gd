@@ -17,8 +17,8 @@ const repelconst = 6
 const fallconst = -12
 const heightfriction = -4
 const flatfriction = -1
-const noticeradius = 16
-const followradius = 32
+const noticeradius = 20
+const followradius = 30
 const committhresh = 0.25
 const steppingconst = 1
 const knockbackconst = 2
@@ -99,9 +99,9 @@ func hover():
 func follow():
 	var diff = Global.player.position - position
 	var distance = diff.length()
-	if not following and distance <= noticeradius:
+	if not following and (distance <= noticeradius or (Global.hasmod(Global.Modifier.HYPERBLUE) and color == AnomColor.BLUE)):
 		following = true
-	if following and distance > followradius:
+	if following and distance > followradius and not (Global.hasmod(Global.Modifier.HYPERBLUE) and color == AnomColor.BLUE):
 		following = false
 	if following:
 		acceleration += Global.flatten(diff).normalized() * followconst
@@ -109,11 +109,13 @@ func follow():
 			acceleration += Vector3.UP * flyconst
 
 func spaceout():
-	for anomaly in Global.chamber.anomalies:
-		if anomaly != self and anomaly.alive:
-			var diff = position - anomaly.position
-			if diff.length() >= 2 ** -4.: 
-				acceleration += Global.flatten(diff.normalized() * repelconst / diff.length() ** 2)
+	if following:
+		for anomaly in Global.chamber.anomalies:
+			if anomaly != self and anomaly.alive:
+				var diff = position - anomaly.position
+				var length = diff.length()
+				if length < 2 ** 4 and length >= 2 ** -4.:
+					acceleration += Global.flatten(diff.normalized() * repelconst / length ** 2)
 
 func fall():
 	if not is_on_floor():
@@ -121,7 +123,7 @@ func fall():
 
 func mayberegen(delta: float):
 	timedead += delta
-	if Global.Modifier.REGEN in Global.player.modifiers:
+	if Global.hasmod(Global.Modifier.REGEN):
 		if timedead >= 20:
 			alive = true
 			undead = true
@@ -137,8 +139,10 @@ func domath(delta: float):
 	velocity.y *= exp(heightfriction) ** delta
 	velocity.x *= exp(flatfriction) ** delta
 	velocity.z *= exp(flatfriction) ** delta
-	if Global.Modifier.FASTANOMS in Global.player.modifiers:
+	if Global.hasmod(Global.Modifier.FASTANOMS):
 		acceleration *= 1.5
+	if Global.hasmod(Global.Modifier.HYPERCYAN) and color == AnomColor.CYAN:
+		acceleration *= 2
 	velocity += acceleration * delta
 
 func maybetouch():
@@ -146,6 +150,8 @@ func maybetouch():
 		if get_slide_collision(i).get_collider() == Global.player:
 			die(Global.player.position, false)
 			Global.player.impacthealth(-1)
+			if Global.hasmod(Global.Modifier.HYPERMAGENTA) and color == AnomColor.MAGENTA:
+				Global.player.impacthealth(-1)
 			break
 
 func die(source: Vector3, shot: bool):

@@ -65,7 +65,7 @@ func create(termclass: TerminalClass):
 			otherstuff[OtherStuff.MODS] = []
 			var shuffledmods = Global.chamber.diceshuffle(Global.Modifier.values())
 			for mod in shuffledmods:
-				if mod not in Global.player.modifiers and compatible(mod):
+				if not Global.hasmod(mod) and compatible(mod):
 					otherstuff[OtherStuff.MODS].append(mod)
 					if len(otherstuff[OtherStuff.MODS]) == 3:
 						break
@@ -162,7 +162,7 @@ func add(args: Array[String]):
 	if mod not in otherstuff[OtherStuff.MODS]:
 		terminalstring += "This modifier is unavailable at this terminal.\n\n"
 		return
-	if mod in Global.player.modifiers:
+	if Global.hasmod(mod):
 		terminalstring += "This modifier has already been purchased.\n\n"
 		return
 	if not compatible(mod):

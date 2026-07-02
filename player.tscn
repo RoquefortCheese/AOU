@@ -38,7 +38,7 @@ fov = 90.0
 target_position = Vector3(0, 0, -2048)
 
 [node name="HandPos" type="Node3D" parent="Camera3D" unique_id=405499242]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.4, -0.2, -0.4)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.4, -0.2, -0.5)
 
 [node name="Pistol" parent="Camera3D/HandPos" unique_id=778629940 instance=ExtResource("2_hqtel")]
 

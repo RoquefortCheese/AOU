@@ -5,7 +5,7 @@ enum MeshType {AIR, CUBE, PLANT}
 @export var materials: Dictionary[Vox, Material]
 @export var meshtypes: Dictionary[Vox, MeshType]
 
-enum Modifier {DOORPLANT, PILLARVINE, MORESPACE, LESSSPACE, FASTANOMS, FLOATY, MOREANOMS, SQUASH, STRETCH, SORTANOMS, REGEN, RUNNING, DOUBLEJUMP}
+enum Modifier {DOORPLANT, PILLARVINE, MORESPACE, LESSSPACE, FASTANOMS, FLOATY, MOREANOMS, SQUASH, STRETCH, SORTANOMS, REGEN, RUNNING, DOUBLEJUMP, HYPERBLUE, HYPERCYAN, HYPERMAGENTA, ISLANDS}
 const modcosts: Dictionary[Modifier, int] = {
 	Modifier.DOORPLANT: 2,
 	Modifier.PILLARVINE: 4,
@@ -20,10 +20,14 @@ const modcosts: Dictionary[Modifier, int] = {
 	Modifier.REGEN: -3,
 	Modifier.RUNNING: 3,
 	Modifier.DOUBLEJUMP: 4,
+	Modifier.HYPERBLUE: -2,
+	Modifier.HYPERCYAN: -2,
+	Modifier.HYPERMAGENTA: -2,
+	Modifier.ISLANDS: 1,
 }
 const modcolors: Dictionary[Modifier, Anomaly.AnomColor] = {
 	Modifier.DOORPLANT: Anomaly.AnomColor.BLUE,
-	Modifier.PILLARVINE: Anomaly.AnomColor.CYAN,
+	Modifier.PILLARVINE: Anomaly.AnomColor.BLUE,
 	Modifier.MORESPACE: Anomaly.AnomColor.BLUE,
 	Modifier.LESSSPACE: Anomaly.AnomColor.BLUE,
 	Modifier.FASTANOMS: Anomaly.AnomColor.MAGENTA,
@@ -35,6 +39,10 @@ const modcolors: Dictionary[Modifier, Anomaly.AnomColor] = {
 	Modifier.REGEN: Anomaly.AnomColor.MAGENTA,
 	Modifier.RUNNING: Anomaly.AnomColor.CYAN,
 	Modifier.DOUBLEJUMP: Anomaly.AnomColor.CYAN,
+	Modifier.HYPERBLUE: Anomaly.AnomColor.MAGENTA,
+	Modifier.HYPERCYAN: Anomaly.AnomColor.MAGENTA,
+	Modifier.HYPERMAGENTA: Anomaly.AnomColor.MAGENTA,
+	Modifier.ISLANDS: Anomaly.AnomColor.BLUE,
 }
 var modnames: Dictionary[Modifier, String] = {
 	Modifier.DOORPLANT: "DoorPlant",
@@ -50,13 +58,17 @@ var modnames: Dictionary[Modifier, String] = {
 	Modifier.REGEN: "Regen",
 	Modifier.RUNNING: "Running",
 	Modifier.DOUBLEJUMP: "DoubleJump",
+	Modifier.HYPERBLUE: "HyperBlue",
+	Modifier.HYPERCYAN: "HyperCyan",
+	Modifier.HYPERMAGENTA: "HyperMagenta",
+	Modifier.ISLANDS: "Islands",
 }
 var moddescs: Dictionary[Modifier, String] = {
 	Modifier.DOORPLANT: "Blue plants that grow next to doors.",
 	Modifier.PILLARVINE: "Tall vines that can be climbed.",
 	Modifier.MORESPACE: "More open caves.",
 	Modifier.LESSSPACE: "More constricted caves.",
-	Modifier.FASTANOMS: "Anomalies move much faster.",
+	Modifier.FASTANOMS: "Anomalies move faster.",
 	Modifier.FLOATY: "Less gravity.",
 	Modifier.MOREANOMS: "Significantly more anomalies.",
 	Modifier.SQUASH: "Caves compressed vertically.",
@@ -65,6 +77,10 @@ var moddescs: Dictionary[Modifier, String] = {
 	Modifier.REGEN: "Anomalies revive after some time.",
 	Modifier.RUNNING: "Faster movement.",
 	Modifier.DOUBLEJUMP: "Jump in the air.",
+	Modifier.HYPERBLUE: "Blue anomalies always know where you are.",
+	Modifier.HYPERCYAN: "Cyan anomalies move much faster.",
+	Modifier.HYPERMAGENTA: "Magenta anomalies deal more damage.",
+	Modifier.ISLANDS: "More floating terrain.",
 }
 var incompatibilities: Array[Vector2] = [
 	Vector2(Modifier.MORESPACE, Modifier.LESSSPACE),
@@ -82,6 +98,9 @@ const pm = [-1, 1]
 
 func time():
 	return (Time.get_ticks_msec() - chamber.starttime) / 1000
+
+func hasmod(modifier: Modifier):
+	return modifier in player.modifiers
 
 func ifmod(default: Variant, modified: Variant, modifier: Modifier):
 	return default if modifier not in player.modifiers else modified

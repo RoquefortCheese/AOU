@@ -1,48 +1,12 @@
-[gd_scene format=4 uid="uid://cd55ua6sp41hp"]
+[gd_scene format=3 uid="uid://cd55ua6sp41hp"]
 
 [ext_resource type="Script" uid="uid://dum7hxs2t1hc0" path="res://pistol.gd" id="1_08c3m"]
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_slxnk"]
-resource_name = "Material"
-cull_mode = 2
-albedo_color = Color(0.62745106, 0.62745106, 0.62745106, 1)
-metallic = 1.0
-roughness = 0.5
-
-[sub_resource type="ArrayMesh" id="ArrayMesh_pxiqu"]
-_surfaces = [{
-"aabb": AABB(-0.03125, -0.062499996, -0.09375, 0.06250001, 0.12499999, 0.15625),
-"format": 34359742465,
-"index_count": 108,
-"index_data": PackedByteArray("AAABAAIAAAADAAEABAADAAAAAAAFAAQABQAGAAQABAAGAAMABwAFAAAABwAAAAIABQAIAAYABwAIAAUACAADAAYABwAJAAgACQADAAgABwACAAoACQAHAAoAAwAJAAsACQAKAAsAAwALAAEADAAKAAIADQALAAoADQAKAAwADgABAAsADgALAA0ADwACAAEADwABAA4ADAACAA8AEAAOAA0AEQAMAA8AEgAPAA4AEQAPABIAEgAOABAAEwAMABEAEwARABIAEwANAAwAEwASABAAEAANABMA"),
-"name": "Material",
-"primitive": 3,
-"uv_scale": Vector4(0, 0, 0, 0),
-"vertex_count": 20,
-"vertex_data": PackedByteArray("/P//PP//fz0AAIA9/P//vP//fz0AAMC9AgAAPf//fz0AAMC9AAAAvf//fz0AAIA9/P//PP//f70AAIA9AAAAPf//f70uvTsxAAAAvf//f70AAIA9AAAAPQAAAAAuvTsxAAAAvf//f70uvTuxAAAAvQAAAAAuvTuxAgAAPQAAAAAAAMC9/P//vAAAAAAAAMC9BACAPP//fzwAAMC9+P9/vP//fzwAAMC9+P9/vP//Pz0AAMC9BACAPP//Pz0AAMC9AACAvP//Pz0AAAA9/P9/PP//fzwAAAA9/P9/PP//Pz0AAAA9AACAvP//fzwAAAA9")
-}]
-blend_shape_mode = 0
-
-[sub_resource type="ArrayMesh" id="ArrayMesh_08c3m"]
-resource_name = "pistol_Cube"
-_surfaces = [{
-"aabb": AABB(-0.03125, -0.062499996, -0.09375, 0.06250001, 0.12499999, 0.15625),
-"attribute_data": PackedByteArray("AAAgPwAAAD8AAGA/AACAPgAAYD8AAAA/AAAgPwAAgD4AAMA+AAAAPgAAID8AAIA+AADAPgAAgD4AAMA+AAAAAAAAAD8AAAAAAAAgPwAAAACK+Ac/7A5wP3YHGD8U8U8/dwcYP+wOcD+L+Ac/FPFPPwAAgD4AAAA/AADAPgAAgD4AAMA+AAAAPwAAgD4AAIA+AADAPgAAAD8AACA/AACAPgAAID8AAAA/AADAPgAAgD4AAMA+AABAPwAAID8AAEA/AAAAPwAAQD8AACA/AAAAPwAAwD4AACA/AADAPgAAAD8AAAA+AAAAPwAAgD4AAIA+AACAPgAAAD8AAAA+AACAPgAAwD4AAIA/AAAAPwAAQD8AAAA/AACAPwAAwD4AAEA/wRMaP4EndD8AAAA/AACAP0DsBT+BJ3Q/AAAAPwAAQD8AACA/AACAP0DsBT9/2Es/wBMaP3/YSz8AACA/AABAP3cHGD/sDnA/QOwFP4EndD+K+Ac/7A5wP8ETGj+BJ3Q/dgcYPxTxTz/BExo/gSd0P3cHGD/sDnA/wBMaP3/YSz+L+Ac/FPFPP8ATGj9/2Es/dgcYPxTxTz9A7AU/f9hLP4r4Bz/sDnA/QOwFP3/YSz+L+Ac/FPFPP0DsBT+BJ3Q/"),
-"format": 34359742487,
-"index_count": 108,
-"index_data": PackedByteArray("AAABAAIAAAADAAEABAAFAAYABwAFAAQABQAHAAgABQAIAAkACgALAAwACgANAAsADgAPABAADgARAA8AEgATABQAEgAVABMAFgAXABgAFgAZABcAFgAaABkAGQAaABsAHAAdAB4AHAAfAB0AIAAhACIAIAAjACEAJAAlACYAJgAlACcAJAAoACUAJgAnACkAKgAoACQAKQAnACsAKgArACgAKQArACoALAAtAC4ALAAvAC0AMAAxADIAMAAzADEANAA1ADYANAA3ADUAOAA5ADoAOAA7ADkA"),
-"material": SubResource("StandardMaterial3D_slxnk"),
-"name": "Material",
-"primitive": 3,
-"uv_scale": Vector4(0, 0, 0, 0),
-"vertex_count": 60,
-"vertex_data": PackedByteArray("/P//PP//fz0AAIA9/P//vP//fz0AAMC9AgAAPf//fz0AAMC9AAAAvf//fz0AAIA9AAAAvf//f70uvTuxAAAAvf//fz0AAIA9AAAAvf//f70AAIA9AAAAvQAAAAAuvTux/P//vAAAAAAAAMC9/P//vP//fz0AAMC9AACAvP//fzwAAAA9/P9/PP//Pz0AAAA9AACAvP//Pz0AAAA9/P9/PP//fzwAAAA9AAAAPf//f70uvTsxAAAAvf//f70AAIA9/P//PP//f70AAIA9AAAAvf//f70uvTux/P//PP//f70AAIA9AAAAvf//fz0AAIA9/P//PP//fz0AAIA9AAAAvf//f70AAIA9AAAAPQAAAAAuvTsxAgAAPf//fz0AAMC9AgAAPQAAAAAAAMC9/P//PP//fz0AAIA9AAAAPf//f70uvTsx/P//PP//f70AAIA9AAAAPQAAAAAuvTsxAAAAvf//f70uvTuxAAAAPf//f70uvTsxAAAAvQAAAAAuvTuxAAAAvQAAAAAuvTuxAgAAPQAAAAAAAMC9/P//vAAAAAAAAMC9AAAAPQAAAAAuvTsx+P9/vP//Pz0AAMC9/P//vAAAAAAAAMC9+P9/vP//fzwAAMC9AgAAPQAAAAAAAMC9/P//vP//fz0AAMC9BACAPP//fzwAAMC9BACAPP//Pz0AAMC9AgAAPf//fz0AAMC9AACAvP//Pz0AAAA9+P9/vP//fzwAAMC9AACAvP//fzwAAAA9+P9/vP//Pz0AAMC9/P9/PP//Pz0AAAA9+P9/vP//Pz0AAMC9AACAvP//Pz0AAAA9BACAPP//Pz0AAMC9/P9/PP//fzwAAAA9BACAPP//Pz0AAMC9/P9/PP//Pz0AAAA9BACAPP//fzwAAMC9AACAvP//fzwAAAA9BACAPP//fzwAAMC9/P9/PP//fzwAAAA9+P9/vP//fzwAAMC9/3//////////f/////////9//////////3////////8AAP9//390+gAA/3+2mv//AAD/f/9///8AAP9/nLX//wAA/38Bn///AAD/f/9//////////3//////////f/////////9//////////3////9/AAD/f/+//38AAP9//7//fwAA/3//v/9/AAD/f/+//3//f/9/////f/9//3////9//3//f////3//f/9///////9/k5f//////3/MzP//////f////7////9/Naj//////3//f3T6////f/9//////////38AgP//////fwCA//////9/AID//////38AgP9/AAD//////38AAP//////fwAA//////9/AAD//////////9ZqavX/////fo6/+P/////siQj7/////254Nvz/////bng2/P/////Wamr1/////+yJCPv/////fo6/+P///3//f///////f/9///////9//3///////3//f////38AAP//j/7/fwAAAAD1/v9/AAD//wT+/38AAAAAaf4AAP9//3///wAA/3//f///AAD/f/9///8AAP9//3////9////egv+//3///+x9/7//f///84P/v/9////TfP+/")
-}]
-shadow_mesh = SubResource("ArrayMesh_pxiqu")
+[ext_resource type="ArrayMesh" uid="uid://mnci0qcyga8d" path="res://pistol.glb" id="2_bttkv"]
 
 [node name="Pistol" type="Node3D" unique_id=778629940]
 script = ExtResource("1_08c3m")
 
 [node name="PistolModel" type="MeshInstance3D" parent="." unique_id=847140344]
+transform = Transform3D(-2.7538174e-09, 0, -0.063, 0, 0.063, 0, 0.063, 0, -2.7538174e-09, 0, 0, 0)
 cast_shadow = 0
-mesh = SubResource("ArrayMesh_08c3m")
+mesh = ExtResource("2_bttkv")

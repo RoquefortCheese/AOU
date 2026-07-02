@@ -14,7 +14,7 @@ var terminalinuse: Computer
 var jumpsleft: int
 
 var score: Dictionary[Anomaly.AnomColor, int]
-var modifiers: Array[Global.Modifier] = [Global.Modifier.DOUBLEJUMP]
+var modifiers: Array[Global.Modifier] = [Global.Modifier.ISLANDS, Global.Modifier.MOREANOMS]
 var balance: int
 var health: int
 
