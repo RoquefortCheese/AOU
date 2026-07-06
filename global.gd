@@ -5,7 +5,7 @@ enum MeshType {AIR, CUBE, PLANT}
 @export var materials: Dictionary[Vox, Material]
 @export var meshtypes: Dictionary[Vox, MeshType]
 
-enum Modifier {DOORPLANT, PILLARVINE, MORESPACE, LESSSPACE, FASTANOMS, FLOATY, MOREANOMS, SQUASH, STRETCH, SORTANOMS, REGEN, RUNNING, DOUBLEJUMP, HYPERBLUE, HYPERCYAN, HYPERMAGENTA, ISLANDS, MOREAMMO}
+enum Modifier {DOORPLANT, PILLARVINE, MORESPACE, LESSSPACE, FASTANOMS, FLOATY, MOREANOMS, SQUASH, STRETCH, SORTANOMS, REGEN, RUNNING, DOUBLEJUMP, HYPERBLUE, HYPERCYAN, HYPERMAGENTA, ISLANDS, MOREAMMO, FASTRELOAD}
 const modcosts: Dictionary[Modifier, int] = {
 	Modifier.DOORPLANT: 2,
 	Modifier.PILLARVINE: 4,
@@ -25,6 +25,7 @@ const modcosts: Dictionary[Modifier, int] = {
 	Modifier.HYPERMAGENTA: -2,
 	Modifier.ISLANDS: 1,
 	Modifier.MOREAMMO: 3,
+	Modifier.FASTRELOAD: 3,
 }
 const modcolors: Dictionary[Modifier, Anomaly.AnomColor] = {
 	Modifier.DOORPLANT: Anomaly.AnomColor.BLUE,
@@ -45,6 +46,7 @@ const modcolors: Dictionary[Modifier, Anomaly.AnomColor] = {
 	Modifier.HYPERMAGENTA: Anomaly.AnomColor.MAGENTA,
 	Modifier.ISLANDS: Anomaly.AnomColor.BLUE,
 	Modifier.MOREAMMO: Anomaly.AnomColor.MAGENTA,
+	Modifier.FASTRELOAD: Anomaly.AnomColor.MAGENTA,
 }
 var modnames: Dictionary[Modifier, String] = {
 	Modifier.DOORPLANT: "DoorPlant",
@@ -65,6 +67,7 @@ var modnames: Dictionary[Modifier, String] = {
 	Modifier.HYPERMAGENTA: "HyperMagenta",
 	Modifier.ISLANDS: "Islands",
 	Modifier.MOREAMMO: "MoreAmmo",
+	Modifier.FASTRELOAD: "FastReload",
 }
 var moddescs: Dictionary[Modifier, String] = {
 	Modifier.DOORPLANT: "Blue plants grow next to doors.",
@@ -85,6 +88,7 @@ var moddescs: Dictionary[Modifier, String] = {
 	Modifier.HYPERMAGENTA: "Magenta anomalies deal more damage.",
 	Modifier.ISLANDS: "More floating terrain.",
 	Modifier.MOREAMMO: "More ammunition.",
+	Modifier.FASTRELOAD: "Faster reload time."
 }
 var incompatibilities: Array[Vector2] = [
 	Vector2(Modifier.MORESPACE, Modifier.LESSSPACE),

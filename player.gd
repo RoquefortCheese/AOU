@@ -6,10 +6,12 @@ const jumpspeed = 12
 const cruisespeed = 8
 const friction = -6
 const coyotetime = 0.25
+const reloadtime = 15
 const acc = cruisespeed * -friction
 
 var pan: Vector3
 var timesinceground: float
+var timesinceempty: float
 var terminalinuse: Computer
 var jumpsleft: int
 
@@ -55,7 +57,7 @@ func _ready():
 	modifiers = []
 	balance = 0
 	health = 6
-	ammo = 0
+	ammo = maxammo()
 	timesinceground = 0
 	terminalinuse = null
 	jumpsleft = 0
@@ -64,7 +66,7 @@ func _physics_process(delta: float):
 	handlecam(delta)
 	movementinput(delta)
 	useequipment(delta)
-	reload()
+	reload(delta)
 	considerfocusing()
 	otherphysics(delta)
 	belikelumi()
@@ -117,9 +119,13 @@ func useequipment(delta: float):
 			if terminalinuse == null:
 				$Camera3D/HandPos/Pistol.fire()
 
-func reload():
-	if getfollowers() == 0:
+func reload(delta: float):
+	if ammo != 0:
+		timesinceempty = 0
+	timesinceempty += delta
+	if ammo != maxammo() and (getfollowers() == 0 or timesinceempty >= reloadtime * Global.ifmod(1, 0.5, Global.Modifier.FASTRELOAD)):
 		ammo = maxammo()
+		$ReloadAudioPlayer.play()
 
 func considerfocusing():
 	if Input.is_action_just_pressed("leftclick"):

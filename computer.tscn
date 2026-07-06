@@ -65,11 +65,6 @@ orientation = 2
 
 [node name="Computer" type="StaticBody3D" unique_id=1676356701]
 script = ExtResource("1_gcbbq")
-classnames = Dictionary[int, String]({
-0: "info",
-1: "restoration",
-2: "mod"
-})
 allowedchars = Array[int]([48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 32])
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=154767974]

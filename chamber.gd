@@ -422,11 +422,17 @@ func updateammo():
 
 func updatecompass():
 	#var prox = 1 - min(1, Global.dist(Global.player.position, door.position) / (approxsidelen() * sqrt(3)))
-	var playerangle = fmod(Global.player.get_node("Camera3D").rotation.y, TAU)
-	var doorangle = atan2(door.position.x - Global.player.position.x, door.position.z - Global.player.position.z)
-	var diff = playerangle - doorangle
-	var angdiff = min(abs(diff - TAU), abs(diff), abs(diff + TAU))
-	return OoOoOo("Compass", floor(angdiff / PI * 7))
+	#var playerangle = fmod(Global.player.get_node("Camera3D").rotation.y, TAU)
+	#var doorangle = atan2(door.position.x - Global.player.position.x, door.position.z - Global.player.position.z)
+	#var diff = playerangle - doorangle
+	#var angdiff = min(abs(diff - TAU), abs(diff), abs(diff + TAU))
+	#return OoOoOo("Compass", floor(angdiff / PI * 7))
+	var camera = Global.player.get_node("Camera3D")
+	var camangle = camera.get_node("CamVector").global_position - camera.global_position
+	var doorangle = (door.position - Global.player.position).normalized()
+	var angdiff = (doorangle - camangle).length() * 0.5
+	return OoOoOo("Compass", (1 - angdiff) * 7)
+		# why do angle math when you can use rotated vectors?  :D
 
 func updatesonar():
 	return OoOoOo("Sonar", min(Global.player.getfollowers(), 6))

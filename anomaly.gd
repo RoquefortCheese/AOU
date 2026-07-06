@@ -156,6 +156,10 @@ func maybetouch():
 
 func die(source: Vector3, shot: bool):
 	velocity += (position - source).normalized() * knockbackconst
+	if shot:
+		$ShotAudioPlayer.play()
+	else:
+		$ContactAudioPlayer.play()
 	if alive:
 		alive = false
 		timedead = 0
@@ -163,7 +167,3 @@ func die(source: Vector3, shot: bool):
 			Global.player.score[color] += 1
 		for box in boxes:
 			box.mesh.material.albedo_color *= 0.25
-		if shot:
-			$ShotAudioPlayer.play()
-		else:
-			$ContactAudioPlayer.play()

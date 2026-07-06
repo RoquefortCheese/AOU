@@ -4,7 +4,10 @@ class_name Computer
 const charsperline = 63
 const maxlines = 35
 enum TerminalClass {RESTORATION, MOD}
-@export var classnames: Dictionary[TerminalClass, String]
+const classnames: Dictionary[TerminalClass, String] = {
+	TerminalClass.RESTORATION: "restoration",
+	TerminalClass.MOD: "mod",
+}
 
 @export var allowedchars: Array[Key]
 var terminalstring: String
@@ -130,7 +133,7 @@ func add(args: Array[String]):
 	if len(Global.player.modifiers) == Global.maxmods:
 		terminalstring += "Cannot exceed the max amount of modifiers.\n\n"
 		return
-	if abs(Global.player.balance + Global.modcosts[mod]) > 4:
+	if abs(Global.player.balance - Global.modcosts[mod]) > 4:
 		terminalstring += "Balance cannot exceed ±4.\n\n"
 		return
 	Global.player.modifiers.append(mod)

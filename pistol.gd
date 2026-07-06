@@ -2,13 +2,15 @@ extends Node3D
 
 func fire():
 	if Global.player.ammo == 0:
+		$NoAmmoAudioPlayer.play()
 		return
 	Global.player.ammo -= 1
 	var ray = Global.player.get_node("Camera3D/RayCast3D")
 	var target = ray.get_collider()
 	if target is Anomaly:
-		if Global.player.ammo != 0:
-			target.die(global_position, true)
+		target.die(global_position, true)
+	else:
+		$MissedShotAudioPlayer.play()
 
 
 func _process(delta: float):
