@@ -240,10 +240,9 @@ func placedoor():
 	add_child(door)
 
 func placecomputers():
-	var classorder = diceshuffle(Computer.TerminalClass.values())
-	for i in int(len(air) * 2 ** -15.):
+	for termclass in Computer.TerminalClass.values():
 		var computer = compscene.instantiate()
-		computer.create(classorder[i % len(classorder)])
+		computer.create(termclass)
 		var pos
 		var spin
 		while true:

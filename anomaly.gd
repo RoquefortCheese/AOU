@@ -99,9 +99,9 @@ func hover():
 func follow():
 	var diff = Global.player.position - position
 	var distance = diff.length()
-	if not following and (distance <= noticeradius or (Global.hasmod(Global.Modifier.HYPERBLUE) and color == AnomColor.BLUE)):
+	if not following and (distance <= noticeradius * Global.ifmod(1, 2, Global.Modifier.ALERTANOMS) or (Global.hasmod(Global.Modifier.HYPERBLUE) and color == AnomColor.BLUE)):
 		following = true
-	if following and distance > followradius and not (Global.hasmod(Global.Modifier.HYPERBLUE) and color == AnomColor.BLUE):
+	if following and distance > followradius * Global.ifmod(1, 1.5, Global.Modifier.ALERTANOMS) and not (Global.hasmod(Global.Modifier.HYPERBLUE) and color == AnomColor.BLUE):
 		following = false
 	if following:
 		acceleration += Global.flatten(diff).normalized() * followconst
@@ -139,10 +139,10 @@ func domath(delta: float):
 	velocity.y *= exp(heightfriction) ** delta
 	velocity.x *= exp(flatfriction) ** delta
 	velocity.z *= exp(flatfriction) ** delta
-	if Global.hasmod(Global.Modifier.FASTANOMS):
-		acceleration *= 1.5
 	if Global.hasmod(Global.Modifier.HYPERCYAN) and color == AnomColor.CYAN:
 		acceleration *= 2
+	elif Global.hasmod(Global.Modifier.FASTANOMS):
+		acceleration *= 1.5
 	velocity += acceleration * delta
 
 func maybetouch():
@@ -151,6 +151,8 @@ func maybetouch():
 			die(Global.player.position, false)
 			Global.player.impacthealth(-1)
 			if Global.hasmod(Global.Modifier.HYPERMAGENTA) and color == AnomColor.MAGENTA:
+				Global.player.impacthealth(-2)
+			elif Global.hasmod(Global.Modifier.MOREOUCH):
 				Global.player.impacthealth(-1)
 			break
 

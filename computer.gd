@@ -102,7 +102,7 @@ func restore():
 	if otherstuff[OtherStuff.SPENT]:
 		terminalstring += "You have already used this terminal to restore.\n\n"
 		return
-	Global.player.impacthealth(3)
+	Global.player.impacthealth(4)
 	otherstuff[OtherStuff.SPENT] = true
 	terminalstring += "Your health has been restored!\n\n"
 

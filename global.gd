@@ -5,7 +5,7 @@ enum MeshType {AIR, CUBE, PLANT}
 @export var materials: Dictionary[Vox, Material]
 @export var meshtypes: Dictionary[Vox, MeshType]
 
-enum Modifier {DOORPLANT, PILLARVINE, MORESPACE, LESSSPACE, FASTANOMS, FLOATY, MOREANOMS, SQUASH, STRETCH, SORTANOMS, REGEN, RUNNING, DOUBLEJUMP, HYPERBLUE, HYPERCYAN, HYPERMAGENTA, ISLANDS, MOREAMMO, FASTRELOAD}
+enum Modifier {DOORPLANT, PILLARVINE, MORESPACE, LESSSPACE, FASTANOMS, FLOATY, MOREANOMS, SQUASH, STRETCH, SORTANOMS, REGEN, RUNNING, DOUBLEJUMP, HYPERBLUE, HYPERCYAN, HYPERMAGENTA, ISLANDS, MOREAMMO, FASTRELOAD, ALERTANOMS, MOREOUCH}
 const modcosts: Dictionary[Modifier, int] = {
 	Modifier.DOORPLANT: -2,
 	Modifier.PILLARVINE: -4,
@@ -26,6 +26,8 @@ const modcosts: Dictionary[Modifier, int] = {
 	Modifier.ISLANDS: -1,
 	Modifier.MOREAMMO: -3,
 	Modifier.FASTRELOAD: -3,
+	Modifier.ALERTANOMS: 4,
+	Modifier.MOREOUCH: 4,
 }
 const modcolors: Dictionary[Modifier, Anomaly.AnomColor] = {
 	Modifier.DOORPLANT: Anomaly.AnomColor.BLUE,
@@ -47,6 +49,8 @@ const modcolors: Dictionary[Modifier, Anomaly.AnomColor] = {
 	Modifier.ISLANDS: Anomaly.AnomColor.BLUE,
 	Modifier.MOREAMMO: Anomaly.AnomColor.MAGENTA,
 	Modifier.FASTRELOAD: Anomaly.AnomColor.MAGENTA,
+	Modifier.ALERTANOMS: Anomaly.AnomColor.MAGENTA,
+	Modifier.MOREOUCH: Anomaly.AnomColor.CYAN,
 }
 var modnames: Dictionary[Modifier, String] = {
 	Modifier.DOORPLANT: "DoorPlant",
@@ -68,6 +72,8 @@ var modnames: Dictionary[Modifier, String] = {
 	Modifier.ISLANDS: "Islands",
 	Modifier.MOREAMMO: "MoreAmmo",
 	Modifier.FASTRELOAD: "FastReload",
+	Modifier.ALERTANOMS: "AlertAnoms",
+	Modifier.MOREOUCH: "MoreOuch",
 }
 var moddescs: Dictionary[Modifier, String] = {
 	Modifier.DOORPLANT: "Blue plants grow next to doors.",
@@ -88,7 +94,9 @@ var moddescs: Dictionary[Modifier, String] = {
 	Modifier.HYPERMAGENTA: "Magenta anomalies deal more damage.",
 	Modifier.ISLANDS: "More floating terrain.",
 	Modifier.MOREAMMO: "More ammunition.",
-	Modifier.FASTRELOAD: "Faster reload time."
+	Modifier.FASTRELOAD: "Faster reload time.",
+	Modifier.ALERTANOMS: "Anomalies sense you from farther away.",
+	Modifier.MOREOUCH: "Anomalies deal more damage.",
 }
 var incompatibilities: Array[Vector2] = [
 	Vector2(Modifier.MORESPACE, Modifier.LESSSPACE),
