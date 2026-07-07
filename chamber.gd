@@ -80,16 +80,15 @@ func spawnpoint():
 func approxsidelen():
 	return len(air) ** (1 / 3.)
 
-func create(dice: RandomNumberGenerator):
+func create():
 	print("starting!")
 	Global.chamber = self
-	self.dice = dice
 	terragen()
 	print("terra genned!")
 	if not goodfloodfill():
 		print("regenerating...")
 		resetvars()
-		create(dice)
+		create()
 		return
 	placefeatures()
 	print("features placed!")
@@ -365,7 +364,6 @@ func welcomeplayer():
 	Global.player.pan = Vector3.UP * randf() * TAU
 	Global.player.get_node("Camera3D").rotation = Global.player.pan
 	Global.player.process_mode = Node.PROCESS_MODE_ALWAYS
-	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
 func _process(delta: float):
 	updatestatlabel()

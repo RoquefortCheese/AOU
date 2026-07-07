@@ -29,7 +29,8 @@ func loadchamber():
 	for i in 2:
 		await get_tree().process_frame
 	var chamber = chamberscene.instantiate()
-	chamber.create(dice)
+	chamber.dice = dice
+	chamber.create()
 	add_child(chamber)
 	$AmbientLoadingShader.process_mode = Node.PROCESS_MODE_DISABLED
 	$AmbientLoadingShader.visible = false
@@ -37,6 +38,5 @@ func loadchamber():
 func enterdoor():
 	$Player.process_mode = Node.PROCESS_MODE_DISABLED
 	Global.chamber.process_mode = Node.PROCESS_MODE_DISABLED
-	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	Global.chamberindex += 1
 	loadchamber()

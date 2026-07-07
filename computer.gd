@@ -95,6 +95,7 @@ func help():
 			terminalstring += tabbed("modlist:") + "Outputs available modifiers.\n"
 			terminalstring += tabbed("about [mod]:") + "Outputs the modifier description.\n"
 			terminalstring += tabbed("add [mod]:") + "Adds the requested modifier.\n"
+			terminalstring += tabbed("del [mod]:") + "Deletes the requested modifier.\n"
 	terminalstring += "\n"
 
 func restore():
@@ -133,12 +134,26 @@ func add(args: Array[String]):
 	if len(Global.player.modifiers) == Global.maxmods:
 		terminalstring += "Cannot exceed the max amount of modifiers.\n\n"
 		return
-	if abs(Global.player.balance - Global.modcosts[mod]) > 4:
+	if abs(Global.player.balance + Global.modcosts[mod]) > 4:
 		terminalstring += "Balance cannot exceed ±4.\n\n"
 		return
 	Global.player.modifiers.append(mod)
-	Global.player.balance -= Global.modcosts[mod]
+	Global.player.balance += Global.modcosts[mod]
 	terminalstring += Global.modnames[mod] + " added!\n\n"
+
+func del(args: Array[String]):
+	var mod = existentmod(args[1])
+	if mod == null:
+		return
+	if mod not in Global.player.modifiers:
+		terminalstring += "You do not have this modifier.\n\n"
+		return
+	if abs(Global.player.balance - Global.modcosts[mod]) > 4:
+		terminalstring += "Balance cannot exceed ±4.\n\n"
+		return
+	Global.player.modifiers.erase(mod)
+	Global.player.balance -= Global.modcosts[mod]
+	terminalstring += Global.modnames[mod] + " deleted!\n\n"
 
 func _process(delta: float):
 	writeoutput()
@@ -218,5 +233,8 @@ func runinput():
 			"add":
 				if argquant(args, 2) and classfilter(TerminalClass.MOD):
 					add(args)
+			"del":
+				if argquant(args, 2) and classfilter(TerminalClass.MOD):
+					del(args)
 	currentinput = ""
 	newcommand()
