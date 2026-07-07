@@ -148,7 +148,8 @@ func belikelumi():
 	for i in get_slide_collision_count():
 		if get_slide_collision(i).get_collider() == Global.chamber.door:
 			stopusingterminal()
-			Global.world.enterdoor()
+			Global.chamberindex += 1
+			Global.world.loadchamber()
 			break
 
 func impacthealth(amount: int):

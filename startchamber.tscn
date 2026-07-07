@@ -1,0 +1,7 @@
+[gd_scene format=3 uid="uid://b4glfjf2okdqw"]
+
+[ext_resource type="PackedScene" uid="uid://dsk4v1c4280oc" path="res://chamber.tscn" id="1_hayg0"]
+[ext_resource type="Script" uid="uid://cdvgn8o88pmcn" path="res://startchamber.gd" id="2_ww8ql"]
+
+[node name="Chamber" unique_id=684829429 instance=ExtResource("1_hayg0")]
+script = ExtResource("2_ww8ql")

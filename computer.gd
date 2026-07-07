@@ -3,11 +3,13 @@ class_name Computer
 
 const charsperline = 63
 const maxlines = 35
-enum TerminalClass {RESTORATION, MOD}
+enum TerminalClass {RESTORATION, MOD, START}
 const classnames: Dictionary[TerminalClass, String] = {
 	TerminalClass.RESTORATION: "restoration",
 	TerminalClass.MOD: "mod",
+	TerminalClass.START: "start"
 }
+const normalclasses: Array[TerminalClass] = [TerminalClass.RESTORATION, TerminalClass.MOD]
 
 @export var allowedchars: Array[Key]
 var terminalstring: String
@@ -66,7 +68,7 @@ func create(termclass: TerminalClass):
 			otherstuff[OtherStuff.SPENT] = false
 		TerminalClass.MOD:
 			otherstuff[OtherStuff.MODS] = []
-			var shuffledmods = Global.chamber.diceshuffle(Global.Modifier.values())
+			var shuffledmods = Global.diceshuffle(Global.Modifier.values())
 			for mod in shuffledmods:
 				if not Global.hasmod(mod) and compatible(mod):
 					otherstuff[OtherStuff.MODS].append(mod)

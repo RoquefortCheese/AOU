@@ -13,14 +13,15 @@ const floatconst = 4
 const wobbleconst = 4
 const followconst = 6
 const flyconst = 32
+const steppingconst = 1
 const repelconst = 6
 const fallconst = -12
+const wanderconst = 3
 const heightfriction = -4
 const flatfriction = -1
 const noticeradius = 20
-const followradius = 30
+const followbuffer = 1.5
 const committhresh = 0.25
-const steppingconst = 1
 const knockbackconst = 2
 @export var boxmesh: BoxMesh
 
@@ -33,6 +34,8 @@ var color: AnomColor
 var offset: float
 var timedead: float
 var undead: bool
+var tamed: bool
+var wandergoal: Vector2
 
 func create(color: AnomColor):
 	self.alive = true
@@ -40,6 +43,7 @@ func create(color: AnomColor):
 	following = false
 	offset = randf() * TAU
 	undead = false
+	tamed = false
 	for i in 3:
 		var box = MeshInstance3D.new()
 		box.mesh = boxmesh.duplicate_deep()
@@ -99,17 +103,28 @@ func hover():
 func follow():
 	var diff = Global.player.position - position
 	var distance = diff.length()
-	if not following and (distance <= noticeradius * Global.ifmod(1, 2, Global.Modifier.ALERTANOMS) or (Global.hasmod(Global.Modifier.HYPERBLUE) and color == AnomColor.BLUE)):
+	var actualnoticeradius = noticeradius
+	if tamed:
+		actualnoticeradius = 4
+	elif color == AnomColor.BLUE and Global.hasmod(Global.Modifier.HYPERBLUE):
+		actualnoticeradius = INF
+	elif Global.hasmod(Global.Modifier.ALERTANOMS):
+		actualnoticeradius *= 2
+	if not following and distance <= actualnoticeradius:
 		following = true
-	if following and distance > followradius * Global.ifmod(1, 1.5, Global.Modifier.ALERTANOMS) and not (Global.hasmod(Global.Modifier.HYPERBLUE) and color == AnomColor.BLUE):
+	if following and distance > actualnoticeradius * followbuffer:
 		following = false
 	if following:
 		acceleration += Global.flatten(diff).normalized() * followconst
 		if flying():
 			acceleration += Vector3.UP * flyconst
+	elif tamed:
+		if wandergoal == null or randf() < 0.02:
+			wandergoal = Vector2(randf_range(1, StartChamber.anomroomsize), randf_range(1, StartChamber.anomroomsize))
+		acceleration += Global.flatten(Vector3(wandergoal.x, 0, wandergoal.y) - position).normalized() * wanderconst
 
 func spaceout():
-	if following:
+	if following or tamed:
 		for anomaly in Global.chamber.anomalies:
 			if anomaly != self and anomaly.alive:
 				var diff = position - anomaly.position

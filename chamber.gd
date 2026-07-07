@@ -16,7 +16,6 @@ const bases = {
 }
 var plantbases = [bases[Vector3.LEFT].rotated(Vector3.UP, PI / 4), bases[Vector3.FORWARD].rotated(Vector3.UP, PI / 4)]
 var size: int
-var dice: RandomNumberGenerator
 var voxmap: Dictionary[Vector3, Global.Vox]
 var air: Dictionary[Vector3, bool]  # once again no sets {._.}
 var noise: FastNoiseLite
@@ -31,17 +30,6 @@ var starttime: float
 func rescale(value: float, minval: float, maxval: float):
 	return value * (maxval - minval) / 2 + (maxval + minval) / 2
 
-func dicechoose(array: Array):
-	return array[dice.randi_range(0, len(array) - 1)]
-
-func diceshuffle(array: Array):
-	var copy = array.duplicate()
-	var newarray = []
-	while len(copy) != 0:
-		var index = floor(dice.randf() * len(copy))
-		newarray.append(copy.pop_at(index))
-	return newarray
-
 func setvox(point: Vector3, voxtype: Global.Vox):
 	voxmap[point] = voxtype
 	if voxtype == Global.Vox.AIR and point not in air:
@@ -50,7 +38,7 @@ func setvox(point: Vector3, voxtype: Global.Vox):
 		air.erase(point)
 
 func randomair():
-	return dicechoose(air.keys())
+	return Global.dicechoose(air.keys())
 
 func issolid(point: Vector3):
 	return point not in voxmap or Global.meshtypes[voxmap[point]] == Global.MeshType.CUBE
@@ -122,11 +110,11 @@ func terragen():
 	fillsmallgaps()
 
 func metaterragen():
-	size = floor(2 ** dice.randf_range(6, 7)) ###
+	size = floor(2 ** Global.dice.randf_range(6, 7)) ###
 	noise = FastNoiseLite.new()
-	noise.seed = dice.randi()
+	noise.seed = Global.dice.randi()
 	noise.noise_type = FastNoiseLite.TYPE_SIMPLEX
-	noise.frequency = 0.2 / sqrt(size) * 2 ** dice.randf_range(-0.5, 0.5)
+	noise.frequency = 0.2 / sqrt(size) * 2 ** Global.dice.randf_range(-0.5, 0.5)
 	if Global.hasmod(Global.Modifier.LESSSPACE):
 		noise.frequency *= 2
 	if Global.hasmod(Global.Modifier.MORESPACE):
@@ -174,7 +162,8 @@ func goodfloodfill():
 func placefeatures():
 	placelights()
 	placeplayer()
-	placethings()
+	placedoor()
+	placecomputers()
 	featureterrain()
 
 func placeplayer():
@@ -217,10 +206,6 @@ func featureterrain():
 			for point in vine:
 				setvox(point, Global.Vox.PILLARVINE)
 
-func placethings():
-	placedoor()
-	placecomputers()
-
 func placedoor():
 	door = doorscene.instantiate()
 	var furthest
@@ -240,14 +225,14 @@ func placedoor():
 	add_child(door)
 
 func placecomputers():
-	for termclass in Computer.TerminalClass.values():
+	for termclass in Computer.normalclasses:
 		var computer = compscene.instantiate()
 		computer.create(termclass)
 		var pos
 		var spin
 		while true:
 			pos = spawnpoint()
-			spin = PI / 2 * floor(dice.randf() * 4)
+			spin = PI / 2 * floor(Global.dice.randf() * 4)
 			var userpos = pos - Vector3(0.5, 0, 0.5) + Vector3.BACK.rotated(Vector3.UP, spin)
 			if issolid(userpos + Vector3.DOWN) and not issolid(userpos) and not issolid(userpos + Vector3.UP):
 				break
@@ -280,7 +265,7 @@ func placelights():
 		for i in lightquant:
 			var point
 			while true:
-				point = dicechoose(nooks)
+				point = Global.dicechoose(nooks)
 				if point not in lights:
 					break
 			lights.append(point)
@@ -293,7 +278,7 @@ func placelights():
 			besttry = lights
 	for point in besttry:
 		var light = OmniLight3D.new()
-		light.omni_range = approxsidelen() * 2 ** dice.randf_range(-1, 1)
+		light.omni_range = approxsidelen() * 2 ** Global.dice.randf_range(-1, 1)
 		light.light_energy = 4
 		light.position = point + Vector3.ONE / 2.
 		add_child(light)
@@ -331,7 +316,7 @@ func createmeshes():
 					if meshtype == Global.MeshType.CUBE:
 						for disp in cardinals:
 							var npoint = point + disp
-							if not issolid(npoint):
+							if (not issolid(npoint) or (npoint in voxmap and voxmap[npoint] == Global.Vox.GLASS and voxtype != Global.Vox.GLASS)):
 								st.append_from(face, 0, Transform3D(bases[disp], point + disp / 2. + Vector3.ONE / 2.))
 					if meshtype == Global.MeshType.PLANT:
 						for basis in plantbases:
@@ -347,7 +332,7 @@ func createmeshes():
 				add_child(meshinstance)
 
 func anomalize():
-	var colorder = diceshuffle(Anomaly.AnomColor.values())
+	var colorder = Global.diceshuffle(Anomaly.AnomColor.values())
 	for i in int(len(air) * 2 ** Global.ifmod(-12.5, -11.5, Global.Modifier.MOREANOMS)): #(-11 - 3 * 2 ** (Global.chamberindex * -0.1)):
 		var anomaly = anomscene.instantiate()
 		anomaly.position = spawnpoint() + Vector3.UP
@@ -357,7 +342,6 @@ func anomalize():
 	anomalies.sort_custom(func(one, two): return one.position.y > two.position.y)
 	for i in len(anomalies):
 		anomalies[i].create(colorder[Global.ifmod(i % 3, floor(i * 3. / len(anomalies)), Global.Modifier.SORTANOMS)])
-	print(len(anomalies))
 
 func welcomeplayer():
 	Global.player.pan = Vector3.UP * randf() * TAU
@@ -371,7 +355,7 @@ func _process(delta: float):
 	updatebalancelabel()
 
 func _input(event: InputEvent):
-	if Global.player.terminalinuse == null:
+	if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED and Global.player.terminalinuse == null:
 		if event.is_action_pressed("stattoggle"):
 			$StatLabel.visible = not $StatLabel.visible
 		if event.is_action_pressed("scoretoggle"):
@@ -380,6 +364,10 @@ func _input(event: InputEvent):
 			$ModLabel.visible = not $ModLabel.visible
 		if event.is_action_pressed("balancetoggle"):
 			$BalanceLabel.visible = not $BalanceLabel.visible
+		if event.is_action_pressed("forcecontinue"):
+			for color in 3:
+				Global.player.score[color] = max(0, Global.player.score[color] - 8)
+			Global.world.loadchamber()
 
 func updatestatlabel():
 	$StatLabel.text = ""

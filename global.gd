@@ -1,6 +1,6 @@
 extends Node
 
-enum Vox {AIR, STONE, LIGHT, PILLARVINE, DOORPLANT}
+enum Vox {AIR, STONE, LIGHT, GLASS, PILLARVINE, DOORPLANT}
 enum MeshType {AIR, CUBE, PLANT}
 @export var materials: Dictionary[Vox, Material]
 @export var meshtypes: Dictionary[Vox, MeshType]
@@ -105,6 +105,7 @@ var incompatibilities: Array[Vector2] = [
 const maxmods: int = 6
 
 var worldseed: int
+var dice: RandomNumberGenerator
 var player: Player
 var world: World
 var chamber: Chamber
@@ -120,6 +121,17 @@ func hasmod(modifier: Modifier):
 
 func ifmod(default: Variant, modified: Variant, modifier: Modifier):
 	return default if modifier not in player.modifiers else modified
+
+func dicechoose(array: Array):
+	return array[dice.randi_range(0, len(array) - 1)]
+
+func diceshuffle(array: Array):
+	var copy = array.duplicate()
+	var newarray = []
+	while len(copy) != 0:
+		var index = floor(dice.randf() * len(copy))
+		newarray.append(copy.pop_at(index))
+	return newarray
 
 static func dist(point1: Vector3, point2: Vector3):
 	return (point2 - point1).length()
