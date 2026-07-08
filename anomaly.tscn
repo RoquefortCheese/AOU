@@ -36,12 +36,14 @@ visible = false
 mesh = SubResource("SphereMesh_c1slk")
 
 [node name="ContactAudioPlayer" type="AudioStreamPlayer3D" parent="." unique_id=1450338378]
+process_mode = 3
 stream = ExtResource("2_knx40")
 volume_db = 2.0
 unit_size = 8.0
 max_db = 4.0
 
 [node name="ShotAudioPlayer" type="AudioStreamPlayer3D" parent="." unique_id=1372050014]
+process_mode = 3
 stream = ExtResource("3_f85fg")
 volume_db = 2.0
 unit_size = 8.0

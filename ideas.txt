@@ -1,14 +1,9 @@
-ideas!!!
-
-player gets to choose a new cave feature at the end of each level
-
-potential features:
-	water (healing?)
-	flowers near the door
-	bounce pads
-	healing/score plants near lights
-	beneficial ruins
-	less gravity
-	higher/lower noise freq
-	higher/lower cave size
-	higher/lower anomaly freq
+todo:
+	if multi-instantiation bugs still happen, fix them (race conditions, yay!)
+	add / balance modifiers
+	add music
+	update sfx and sound architecture
+	maybe fix levelgen freeze
+	add more commands for start and end terminals
+	add more normal terminal types
+	

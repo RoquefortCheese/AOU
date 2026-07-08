@@ -17,6 +17,7 @@ var jumpsleft: int
 
 var score: Dictionary[Anomaly.AnomColor, int]
 var modifiers: Array[Global.Modifier]
+var alive: bool
 var balance: int
 var health: int
 var ammo: int
@@ -38,7 +39,7 @@ func scoremult(color: Anomaly.AnomColor):
 	var mult = 1
 	for mod in modifiers:
 		if Global.modcolors[mod] == color:
-			mult *= 2 ** (Global.modcosts[color] / -4.)
+			mult *= 2 ** (Global.modcosts[color] / 4.)
 	return mult
 
 func productscore(color: Anomaly.AnomColor):
@@ -55,6 +56,7 @@ func _ready():
 	$Camera3D/RayCast3D.add_exception(self)
 	score = {Anomaly.AnomColor.BLUE: 0, Anomaly.AnomColor.CYAN: 0, Anomaly.AnomColor.MAGENTA: 0}
 	modifiers = []
+	alive = true
 	balance = 0
 	health = 6
 	ammo = maxammo()
@@ -151,11 +153,13 @@ func belikelumi():
 			break
 
 func impacthealth(amount: int):
-	health = min(health + amount, 6)
-	if health < 0:
-		die()
+	if alive:
+		health = min(health + amount, 6)
+		if health < 0:
+			die()
 
 func die():
+	alive = false
 	Global.world.finish()
 
 func _input(event: InputEvent):

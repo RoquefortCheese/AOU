@@ -93,12 +93,14 @@ func help():
 	terminalstring += tabbed("exit:") + "Exits the terminal.\n"
 	match termclass:
 		TerminalClass.RESTORATION:
-			terminalstring += tabbed("restore:") + "Restores three hitpoints. Usable once.\n"
+			terminalstring += tabbed("restore:") + "Restores two hitpoints. Usable once.\n"
 		TerminalClass.MOD:
 			terminalstring += tabbed("modlist:") + "Outputs available modifiers.\n"
 			terminalstring += tabbed("about [mod]:") + "Outputs the modifier description.\n"
 			terminalstring += tabbed("add [mod]:") + "Adds the requested modifier.\n"
 			terminalstring += tabbed("del [mod]:") + "Deletes the requested modifier.\n"
+		TerminalClass.START:
+			terminalstring += tabbed("seed [int]:") + "Sets the world seed to the given number.\n"
 		TerminalClass.END:
 			terminalstring += tabbed("restart:") + "Starts a new run.\n"
 	terminalstring += "\n"
@@ -107,7 +109,7 @@ func restore():
 	if otherstuff[OtherStuff.SPENT]:
 		terminalstring += "You have already used this terminal to restore.\n\n"
 		return
-	Global.player.impacthealth(4)
+	Global.player.impacthealth(2)
 	otherstuff[OtherStuff.SPENT] = true
 	terminalstring += "Your health has been restored!\n\n"
 
@@ -159,6 +161,17 @@ func del(args: Array[String]):
 	Global.player.modifiers.erase(mod)
 	Global.player.balance -= Global.modcosts[mod]
 	terminalstring += Global.modnames[mod] + " deleted!\n\n"
+
+func setseed(args: Array[String]):
+	var seedstring = args[1]
+	var seedint
+	if seedstring.is_valid_int():
+		seedint = int(seedstring)
+	else:
+		terminalstring += "Seed will be converted to an integer.\n"
+		seedint = seedstring.hash()
+	Global.world.setseed(seedint)
+	terminalstring += "\n"
 
 func restart():
 	get_tree().current_scene.newgame()
@@ -244,6 +257,9 @@ func runinput():
 			"del":
 				if argquant(args, 2) and classfilter(TerminalClass.MOD):
 					del(args)
+			"seed":
+				if argquant(args, 2) and classfilter(TerminalClass.START):
+					setseed(args)
 			"restart":
 				if argquant(args, 1) and classfilter(TerminalClass.END):
 					restart()

@@ -4,10 +4,13 @@ class_name World
 @export var chamberscene: PackedScene
 @export var interchamberscene: PackedScene
 
+func setseed(seed: int):
+	Global.worldseed = seed
+	Global.dice.seed = seed
+
 func setglobals():
-	Global.worldseed = randi()
 	Global.dice = RandomNumberGenerator.new()
-	Global.dice.seed = Global.worldseed
+	setseed(randi())
 	Global.player = $Player
 	Global.world = self
 	Global.chamber = null

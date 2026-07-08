@@ -59,4 +59,5 @@ transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 1
 mesh = SubResource("CapsuleMesh_hqtel")
 
 [node name="ReloadAudioPlayer" type="AudioStreamPlayer" parent="." unique_id=1441300152]
+process_mode = 3
 stream = ExtResource("5_2hs0m")
