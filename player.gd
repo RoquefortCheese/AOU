@@ -147,9 +147,7 @@ func otherphysics(delta: float):
 func belikelumi():
 	for i in get_slide_collision_count():
 		if get_slide_collision(i).get_collider() == Global.chamber.door:
-			stopusingterminal()
-			Global.chamberindex += 1
-			Global.world.loadchamber()
+			Global.world.enterdoor()
 			break
 
 func impacthealth(amount: int):
@@ -158,8 +156,7 @@ func impacthealth(amount: int):
 		die()
 
 func die():
-	health = 0 ####
-	print("oh no!!!")
+	Global.world.finish()
 
 func _input(event: InputEvent):
 	if event is InputEventMouseMotion:

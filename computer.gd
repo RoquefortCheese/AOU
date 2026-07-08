@@ -3,11 +3,12 @@ class_name Computer
 
 const charsperline = 63
 const maxlines = 35
-enum TerminalClass {RESTORATION, MOD, START}
+enum TerminalClass {RESTORATION, MOD, START, END}
 const classnames: Dictionary[TerminalClass, String] = {
 	TerminalClass.RESTORATION: "restoration",
 	TerminalClass.MOD: "mod",
-	TerminalClass.START: "start"
+	TerminalClass.START: "start",
+	TerminalClass.END: "end",
 }
 const normalclasses: Array[TerminalClass] = [TerminalClass.RESTORATION, TerminalClass.MOD]
 
@@ -98,6 +99,8 @@ func help():
 			terminalstring += tabbed("about [mod]:") + "Outputs the modifier description.\n"
 			terminalstring += tabbed("add [mod]:") + "Adds the requested modifier.\n"
 			terminalstring += tabbed("del [mod]:") + "Deletes the requested modifier.\n"
+		TerminalClass.END:
+			terminalstring += tabbed("restart:") + "Starts a new run.\n"
 	terminalstring += "\n"
 
 func restore():
@@ -156,6 +159,9 @@ func del(args: Array[String]):
 	Global.player.modifiers.erase(mod)
 	Global.player.balance -= Global.modcosts[mod]
 	terminalstring += Global.modnames[mod] + " deleted!\n\n"
+
+func restart():
+	get_tree().current_scene.newgame()
 
 func _process(delta: float):
 	writeoutput()
@@ -238,5 +244,8 @@ func runinput():
 			"del":
 				if argquant(args, 2) and classfilter(TerminalClass.MOD):
 					del(args)
+			"restart":
+				if argquant(args, 1) and classfilter(TerminalClass.END):
+					restart()
 	currentinput = ""
 	newcommand()

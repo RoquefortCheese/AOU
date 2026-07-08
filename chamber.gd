@@ -365,9 +365,7 @@ func _input(event: InputEvent):
 		if event.is_action_pressed("balancetoggle"):
 			$BalanceLabel.visible = not $BalanceLabel.visible
 		if event.is_action_pressed("forcecontinue"):
-			for color in 3:
-				Global.player.score[color] = max(0, Global.player.score[color] - 8)
-			Global.world.loadchamber()
+			Global.world.phasewarp()
 
 func updatestatlabel():
 	$StatLabel.text = ""
@@ -400,7 +398,7 @@ func OoOoOo(quantity: String, amount: int):
 	return quantity + ":" + " ".repeat(8 - len(quantity)) + "O".repeat(amount) + "o".repeat(6 - amount)
 
 func updatehealth():
-	return OoOoOo("Health", Global.player.health)
+	return OoOoOo("Health", max(0, Global.player.health))
 
 func updateammo():
 	return OoOoOo("Ammo", ceil(Global.player.ammo * 6. / Global.player.maxammo()))
@@ -412,6 +410,8 @@ func updatecompass():
 	#var diff = playerangle - doorangle
 	#var angdiff = min(abs(diff - TAU), abs(diff), abs(diff + TAU))
 	#return OoOoOo("Compass", floor(angdiff / PI * 7))
+	if door == null:
+		return OoOoOo("Compass", 6)
 	var camera = Global.player.get_node("Camera3D")
 	var camangle = camera.get_node("CamVector").global_position - camera.global_position
 	var doorangle = (door.position - Global.player.position).normalized()

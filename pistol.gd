@@ -1,4 +1,5 @@
 extends Node3D
+class_name Pistol
 
 func fire():
 	if Global.player.ammo == 0:

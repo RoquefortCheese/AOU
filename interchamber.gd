@@ -1,10 +1,23 @@
 extends Chamber
-class_name StartChamber
+class_name IntermissionChamber
+
+enum IntermissionClass {START, END}
 
 const roomsize = 16
-const ceilheight = 13
 const anomroomsize = 8
 const playerdisp = 10
+
+var interclass: IntermissionClass
+var doorcorner: int
+
+func incorner(object: Node3D, reference: Vector3, spin: bool, corner: int):
+	var axis = corner * 2
+	object.position = Vector3.ZERO
+	object.position[axis] = anomroomsize + reference.z
+	if spin:
+		object.look_at_from_position(object.position, Vector3.ZERO)
+	object.position[2 - axis] = reference.x
+	object.position.y = reference.y
 
 func spawnpoint():
 	while true:
@@ -29,7 +42,7 @@ func terragen():
 		for y in size:
 			for z in size:
 				var point = Vector3(x, y, z)
-				if min(x, y, z) == 0 or max(x, z) == size - 1 or y >= ceilheight:
+				if min(x, y, z) == 0 or max(x, y, z) == size - 1:
 					setvox(point, Global.Vox.STONE)
 				elif point not in voxmap or voxmap[point] != Global.Vox.GLASS:
 					setvox(point, Global.Vox.AIR)
@@ -40,35 +53,37 @@ func goodfloodfill():
 func placelights():
 	for x in [2, anomroomsize - 2]:
 		for z in [2, anomroomsize - 2]:
-			var point = Vector3(x, 0, z)
-			var light = OmniLight3D.new()
-			light.omni_range = roomsize * 2
-			light.light_energy = 4
-			light.position = point + Vector3.ONE / 2.
-			add_child(light)
-			setvox(point, Global.Vox.LIGHT)
+			for y in [0, size - 1]:
+				var point = Vector3(x, y, z)
+				var light = OmniLight3D.new()
+				light.omni_range = roomsize * 2
+				light.light_energy = 2
+				light.position = point + Vector3.ONE / 2.
+				add_child(light)
+				setvox(point, Global.Vox.LIGHT)
 
 func placeplayer():
-	Global.player.position = Vector3(playerdisp, 1, playerdisp)
+	doorcorner = int(Global.dice.randf() * 2)
+	incorner(Global.player, Vector3(2.5, 1, 4), false, 1 - doorcorner)
 	entities.append(Global.player)
 
 func placedoor():
+	if interclass == IntermissionClass.END:
+		return
 	door = doorscene.instantiate()
-	door.position = Vector3(size - 3, 1, size - 3)
+	add_child(door)
+	incorner(door, Vector3(3, 1, 2.5), false, doorcorner)
 	doorpos = door.position - Vector3(0.5, 0, 0.5)
 	entities.append(door)
-	add_child(door)
 
 func placecomputers():
 	var axis = int(randf() * 2) * 2
 	var computer = compscene.instantiate()
-	computer.create(Computer.TerminalClass.START)
+	computer.create({IntermissionClass.START: Computer.TerminalClass.START, IntermissionClass.END: Computer.TerminalClass.END}[interclass])
+	add_child(computer)
+	incorner(computer, Vector3(3, 3, 2.5), true, 1 - doorcorner)
 	entities.append(computer)
 	computers.append(computer)
-	add_child(computer)
-	computer.position = Vector3(2.5, 3, 2.5)
-	computer.position[axis] += anomroomsize
-	computer.look_at_from_position(computer.position, Vector3(2.5, 3, 2.5))
 
 func anomalize():
 	for i in 2:

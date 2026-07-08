@@ -1,0 +1,7 @@
+[gd_scene format=3 uid="uid://bekyfp1cdcb2n"]
+
+[ext_resource type="PackedScene" uid="uid://dsk4v1c4280oc" path="res://chamber.tscn" id="1_nsbym"]
+[ext_resource type="Script" uid="uid://d0w82eywq8lqb" path="res://interchamber.gd" id="2_jdys1"]
+
+[node name="Chamber" unique_id=684829429 instance=ExtResource("1_nsbym")]
+script = ExtResource("2_jdys1")

@@ -5,5 +5,4 @@
 
 [node name="Main" type="Node" unique_id=837627659]
 script = ExtResource("1_0xm2m")
-
-[node name="World" parent="." unique_id=784559713 instance=ExtResource("1_ig7tw")]
+worldscene = ExtResource("1_ig7tw")

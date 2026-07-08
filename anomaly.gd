@@ -120,7 +120,7 @@ func follow():
 			acceleration += Vector3.UP * flyconst
 	elif tamed:
 		if wandergoal == null or randf() < 0.02:
-			wandergoal = Vector2(randf_range(1, StartChamber.anomroomsize), randf_range(1, StartChamber.anomroomsize))
+			wandergoal = Vector2(randf_range(1, IntermissionChamber.anomroomsize), randf_range(1, IntermissionChamber.anomroomsize))
 		acceleration += Global.flatten(Vector3(wandergoal.x, 0, wandergoal.y) - position).normalized() * wanderconst
 
 func spaceout():
