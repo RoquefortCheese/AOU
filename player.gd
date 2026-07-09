@@ -55,7 +55,7 @@ func _ready():
 	Global.player = self
 	$Camera3D/RayCast3D.add_exception(self)
 	score = {Anomaly.AnomColor.BLUE: 0, Anomaly.AnomColor.CYAN: 0, Anomaly.AnomColor.MAGENTA: 0}
-	modifiers = []
+	modifiers = [Global.Modifier.MOREANOMS, Global.Modifier.MORESPACE]
 	alive = true
 	balance = 0
 	health = 6
@@ -160,6 +160,7 @@ func impacthealth(amount: int):
 
 func die():
 	alive = false
+	Global.finishcause = "You died."
 	Global.world.finish()
 
 func _input(event: InputEvent):

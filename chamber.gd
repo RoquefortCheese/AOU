@@ -355,7 +355,7 @@ func _process(delta: float):
 	updatestatlabel()
 	updatescorelabel()
 	updatemodlabel()
-	updatebalancelabel()
+	updatemetalabel()
 
 func _input(event: InputEvent):
 	if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED and Global.player.terminalinuse == null:
@@ -365,8 +365,8 @@ func _input(event: InputEvent):
 			$ScoreLabel.visible = not $ScoreLabel.visible
 		if event.is_action_pressed("modtoggle"):
 			$ModLabel.visible = not $ModLabel.visible
-		if event.is_action_pressed("balancetoggle"):
-			$BalanceLabel.visible = not $BalanceLabel.visible
+		if event.is_action_pressed("metatoggle"):
+			$MetaLabel.visible = not $MetaLabel.visible
 		if event.is_action_pressed("forcecontinue"):
 			Global.world.phasewarp()
 
@@ -389,13 +389,13 @@ func updatescorelabel():
 
 func updatemodlabel():
 	$ModLabel.text = ""
-	for mod in Global.player.modifiers:
+	for mod in Global.player.modifiers:  # line breaks before the start of the line for bottom-up labels
 		$ModLabel.text += "\n" + Global.modnames[mod]
 
-func updatebalancelabel():
-	$BalanceLabel.text = ""
-	$BalanceLabel.text += "Balance: "
-	$BalanceLabel.text += Global.padnumstring(Global.player.balance, 1, 0, true)
+func updatemetalabel():
+	$MetaLabel.text = ""
+	$MetaLabel.text += "\n" + Global.padnumstring(Global.player.balance, 1, 0, true) + ": Balance"
+	$MetaLabel.text += "\n" + Global.padnumstring(Global.chamberindex, 4) + ": Chamber"
 
 func OoOoOo(quantity: String, amount: int):
 	return quantity + ":" + " ".repeat(8 - len(quantity)) + "O".repeat(amount) + "o".repeat(6 - amount)

@@ -114,6 +114,7 @@ const settingnames: Dictionary[Setting, String] = {
 var worldseed: int
 var dice: RandomNumberGenerator
 var settings: Dictionary[Setting, bool]
+var finishcause: String
 var player: Player
 var world: World
 var chamber: Chamber

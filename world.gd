@@ -16,6 +16,7 @@ func setglobals():
 	for setting in Global.Setting.values():
 		print(setting)
 		Global.settings[setting] = false
+	Global.finishcause = ""
 	Global.player = $Player
 	Global.world = self
 	Global.chamber = null
@@ -37,6 +38,7 @@ func phasewarp():  # why is it called phase warp? because it warps your phase, o
 func enterdoor():
 	Global.chamberindex += 1
 	if not Global.settings[Global.Setting.INFINITE] and Global.chamberindex == finitelimit + 1:
+		Global.finishcause = "You completed all " + str(finitelimit) + " chambers."
 		finish()
 		return
 	loadchamber()

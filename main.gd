@@ -25,3 +25,7 @@ func _input(event: InputEvent):
 				world.process_mode = Node.PROCESS_MODE_INHERIT
 			else:
 				world.process_mode = Node.PROCESS_MODE_DISABLED
+	if event.is_action_pressed("forceend"):
+		if world != null:
+			Global.finishcause = "You chose to end the game."
+			world.finish()

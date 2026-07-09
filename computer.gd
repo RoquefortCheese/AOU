@@ -104,6 +104,8 @@ func help():
 			terminalstring += tabbed("seed [int]:") + "Sets the world seed to the given number.\n"
 			terminalstring += tabbed("set [x] [bool]:") + "Enables or disables a game setting.\n"
 		TerminalClass.END:
+			terminalstring += tabbed("cause:") + "Displays the cause of the end of the run.\n"
+			terminalstring += tabbed("score:") + "Displays your total final score.\n"
 			terminalstring += tabbed("restart:") + "Starts a new run.\n"
 	terminalstring += "\n"
 
@@ -209,6 +211,12 @@ func tingset(args: Array[String]):
 		_:
 			terminalstring += Global.settingnames[setting] + " " + {true: "enabled", false: "disabled"}[value] + "!\n\n"
 
+func cod():
+	terminalstring += Global.finishcause + "\n\n"
+
+func showscore():
+	terminalstring += str(Global.player.totalscore()) + "\n\n"
+
 func restart():
 	get_tree().current_scene.newgame()
 
@@ -302,6 +310,12 @@ func runinput():
 			"set":
 				if argquant(args, 3) and classfilter(TerminalClass.START):
 					tingset(args)
+			"cause":
+				if argquant(args, 1) and classfilter(TerminalClass.END):
+					cod()
+			"score":
+				if argquant(args, 1) and classfilter(TerminalClass.END):
+					showscore()
 			"restart":
 				if argquant(args, 1) and classfilter(TerminalClass.END):
 					restart()
