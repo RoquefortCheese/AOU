@@ -4,6 +4,8 @@ class_name World
 @export var chamberscene: PackedScene
 @export var interchamberscene: PackedScene
 
+const finitelimit = 8
+
 func setseed(seed: int):
 	Global.worldseed = seed
 	Global.dice.seed = seed
@@ -11,6 +13,9 @@ func setseed(seed: int):
 func setglobals():
 	Global.dice = RandomNumberGenerator.new()
 	setseed(randi())
+	for setting in Global.Setting.values():
+		print(setting)
+		Global.settings[setting] = false
 	Global.player = $Player
 	Global.world = self
 	Global.chamber = null
@@ -31,6 +36,9 @@ func phasewarp():  # why is it called phase warp? because it warps your phase, o
 
 func enterdoor():
 	Global.chamberindex += 1
+	if not Global.settings[Global.Setting.INFINITE] and Global.chamberindex == finitelimit + 1:
+		finish()
+		return
 	loadchamber()
 
 func loadchamber(isinter: bool = false, interclass: IntermissionChamber.IntermissionClass = -1):
@@ -39,7 +47,7 @@ func loadchamber(isinter: bool = false, interclass: IntermissionChamber.Intermis
 	if Global.chamber != null:
 		Global.chamber.process_mode = Node.PROCESS_MODE_DISABLED
 	print("Chamber #" + str(Global.chamberindex))
-	$AmbientLoadingShader.process_mode = Node.PROCESS_MODE_ALWAYS
+	$AmbientLoadingShader.process_mode = Node.PROCESS_MODE_INHERIT
 	$AmbientLoadingShader.visible = true
 	$AmbientLoadingShader.material.set_shader_parameter("displacement", randf())
 	if Global.chamber != null:

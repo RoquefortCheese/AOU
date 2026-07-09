@@ -104,8 +104,16 @@ var incompatibilities: Array[Vector2] = [
 ]
 const maxmods: int = 6
 
+enum Setting {SEEDED, INFINITE, SIMPLE}
+const settingnames: Dictionary[Setting, String] = {
+	Setting.SEEDED: "Seeded",
+	Setting.INFINITE: "Infinite",
+	Setting.SIMPLE: "Simple",
+}
+
 var worldseed: int
 var dice: RandomNumberGenerator
+var settings: Dictionary[Setting, bool]
 var player: Player
 var world: World
 var chamber: Chamber

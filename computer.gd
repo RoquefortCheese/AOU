@@ -81,8 +81,8 @@ func create(termclass: TerminalClass):
 func clear():
 	terminalstring = ""
 	terminalstring += "Welcome to CrowderOS! This is a(n) " + classnames[termclass] + "-class terminal.\n"
-	terminalstring += "Enter a command. For a list of commands, enter \"help\".\n"
-	terminalstring += "To exit, left-click or enter \"exit\".\n\n"
+	terminalstring += "Enter a command. For a list of commands, enter [help].\n"
+	terminalstring += "To exit, left-click or enter [exit].\n\n"
 	inputhistory = []
 	historyscroll = 0
 
@@ -91,6 +91,7 @@ func help():
 	terminalstring += tabbed("help:") + "Displays this dialog.\n"
 	terminalstring += tabbed("clear:") + "Clears the terminal.\n"
 	terminalstring += tabbed("exit:") + "Exits the terminal.\n"
+	terminalstring += tabbed("settings:") + "Displays game settings.\n"
 	match termclass:
 		TerminalClass.RESTORATION:
 			terminalstring += tabbed("restore:") + "Restores two hitpoints. Usable once.\n"
@@ -101,8 +102,19 @@ func help():
 			terminalstring += tabbed("del [mod]:") + "Deletes the requested modifier.\n"
 		TerminalClass.START:
 			terminalstring += tabbed("seed [int]:") + "Sets the world seed to the given number.\n"
+			terminalstring += tabbed("set [x] [bool]:") + "Enables or disables a game setting.\n"
 		TerminalClass.END:
 			terminalstring += tabbed("restart:") + "Starts a new run.\n"
+	terminalstring += "\n"
+
+func showsettings():
+	terminalstring += "\n"
+	for setting in Global.Setting.values():
+		terminalstring += tabbed(Global.settingnames[setting] + ":")
+		terminalstring += str(Global.settings[setting])
+		if setting == Global.Setting.SEEDED:
+			terminalstring += " [" + str(Global.worldseed) + "]"
+		terminalstring += "\n"
 	terminalstring += "\n"
 
 func restore():
@@ -168,10 +180,34 @@ func setseed(args: Array[String]):
 	if seedstring.is_valid_int():
 		seedint = int(seedstring)
 	else:
-		terminalstring += "Seed will be converted to an integer.\n"
+		terminalstring += "Input will be converted to an integer.\n"
 		seedint = seedstring.hash()
 	Global.world.setseed(seedint)
-	terminalstring += "\n"
+	Global.settings[Global.Setting.SEEDED] = true
+	terminalstring += "Seed set!\n\n"
+
+func tingset(args: Array[String]):
+	var setting = args[1].to_upper()
+	var value = args[2].to_lower()
+	if setting not in Global.Setting:
+		terminalstring += "Nonexistent setting.\n\n"
+		return
+	if value not in ["true", "false"]:
+		terminalstring += "Value must be either true or false.\n\n"
+		return
+	setting = Global.Setting[setting]
+	value = {"true": true, "false": false}[value]  # riveting stuff here
+	if setting == Global.Setting.SEEDED:
+		if value == true:
+			terminalstring += "To set a seed, use the [seed] command.\n\n"
+			return
+		Global.world.setseed(randi())
+	Global.settings[setting] = value
+	match setting:
+		Global.Setting.SEEDED:
+			terminalstring += "World seed rerandomized!\n\n"
+		_:
+			terminalstring += Global.settingnames[setting] + " " + {true: "enabled", false: "disabled"}[value] + "!\n\n"
 
 func restart():
 	get_tree().current_scene.newgame()
@@ -242,6 +278,9 @@ func runinput():
 			"exit":
 				if argquant(args, 1):
 					Global.player.stopusingterminal()
+			"settings":
+				if argquant(args, 1):
+					showsettings()
 			"restore":
 				if argquant(args, 1) and classfilter(TerminalClass.RESTORATION):
 					restore()
@@ -260,6 +299,9 @@ func runinput():
 			"seed":
 				if argquant(args, 2) and classfilter(TerminalClass.START):
 					setseed(args)
+			"set":
+				if argquant(args, 3) and classfilter(TerminalClass.START):
+					tingset(args)
 			"restart":
 				if argquant(args, 1) and classfilter(TerminalClass.END):
 					restart()

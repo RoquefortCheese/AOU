@@ -225,7 +225,10 @@ func placedoor():
 	add_child(door)
 
 func placecomputers():
-	for termclass in Computer.normalclasses:
+	var classlist = Computer.normalclasses.duplicate()
+	if Global.settings[Global.Setting.SIMPLE]:
+		classlist.erase(Computer.TerminalClass.MOD)
+	for termclass in classlist:
 		var computer = compscene.instantiate()
 		computer.create(termclass)
 		var pos
@@ -346,7 +349,7 @@ func anomalize():
 func welcomeplayer():
 	Global.player.pan = Vector3.UP * randf() * TAU
 	Global.player.get_node("Camera3D").rotation = Global.player.pan
-	Global.player.process_mode = Node.PROCESS_MODE_ALWAYS
+	Global.player.process_mode = Node.PROCESS_MODE_INHERIT
 
 func _process(delta: float):
 	updatestatlabel()

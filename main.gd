@@ -16,6 +16,12 @@ func newgame():
 	add_child(world)
 	world.start()
 
-func _process(delta: float):
-	if Input.is_action_just_pressed("esc"):
+func _input(event: InputEvent):
+	if event.is_action_pressed("esc"):
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	if event.is_action_pressed("pause"):
+		if world != null:
+			if world.process_mode == Node.PROCESS_MODE_DISABLED:
+				world.process_mode = Node.PROCESS_MODE_INHERIT
+			else:
+				world.process_mode = Node.PROCESS_MODE_DISABLED

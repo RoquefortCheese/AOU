@@ -13,7 +13,6 @@ func fire():
 	else:
 		$MissedShotAudioPlayer.play()
 
-
 func _process(delta: float):
 	var time = Global.time()
 	position = Vector3(sin(time), sin(time * sqrt(2)), 0) * 0.0625
