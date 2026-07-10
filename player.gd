@@ -14,7 +14,6 @@ var timesinceground: float
 var timesinceempty: float
 var terminalinuse: Computer
 var jumpsleft: int
-var juststarted: bool
 
 var score: Dictionary[Anomaly.AnomColor, int]
 var modifiers: Array[Global.Modifier]
@@ -40,8 +39,8 @@ func maxjumps():
 		return 2
 	return 1
 
-func currentblock():
-	return Global.chamber.voxmap[floor(position)]
+func invine():
+	return Global.chamber.getvox(position) == Global.Vox.PILLARVINE
 
 func scoremult(color: Anomaly.AnomColor):
 	var mult = 1
@@ -92,14 +91,10 @@ func movementinput(delta: float):
 			direction += Vector3.LEFT
 		if Input.is_action_pressed("right"):
 			direction += Vector3.RIGHT
-		if is_on_floor() or currentblock() == Global.Vox.PILLARVINE:
+		if is_on_floor() or invine():
 			jumpsleft = maxjumps()
-		if timesinceground >= coyotetime and not currentblock() == Global.Vox.PILLARVINE:
+		if timesinceground >= coyotetime and not invine():
 			jumpsleft = min(maxjumps() - 1, jumpsleft)
-		if Input.is_action_just_pressed("jump"):
-			if jumpsleft != 0:
-				velocity.y = jumpspeed
-				jumpsleft -= 1
 		var finalacc = acc * Global.ifmod(1, 1.25, Global.Modifier.RUNNING) * Global.ifmod(1, 0.75, Global.Modifier.STROLLING)
 		direction = direction.rotated(Vector3.UP, $Camera3D.rotation.y).normalized() * finalacc * delta
 		velocity.x += direction.x
@@ -150,7 +145,7 @@ func otherphysics(delta: float):
 		timesinceground += delta
 	velocity.x *= exp(friction) ** delta
 	velocity.z *= exp(friction) ** delta
-	if currentblock() == Global.Vox.PILLARVINE:
+	if invine():
 		for axis in 3:
 			velocity[axis] *= exp(friction) ** delta
 	move_and_slide()
@@ -175,9 +170,10 @@ func die():
 func _input(event: InputEvent):
 	if event is InputEventMouseMotion:
 		if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
-			if not juststarted:
-				pan.y -= event.relative.x * sensitivity
-				pan.x -= event.relative.y * sensitivity
-				pan.x = clamp(pan.x, -PI / 2, PI / 2)
-			else:
-				juststarted = false
+			pan.y -= event.relative.x * sensitivity
+			pan.x -= event.relative.y * sensitivity
+			pan.x = clamp(pan.x, -PI / 2, PI / 2)
+	if event.is_action_pressed("jump") and terminalinuse == null:
+		if jumpsleft != 0:
+			velocity.y = jumpspeed
+			jumpsleft -= 1

@@ -166,10 +166,10 @@ func add(args: Array[String]):
 	if issue != null:
 		terminalstring += issue + "\n\n"
 		return
-	if len(Global.player.modifiers) == Global.maxmods:
+	if termclass == TerminalClass.MOD and len(Global.player.modifiers) == Global.maxmods:
 		terminalstring += "Cannot exceed the max amount of modifiers.\n\n"
 		return
-	if abs(Global.player.balance + Global.modcosts[mod]) > 4:
+	if termclass == TerminalClass.MOD and abs(Global.player.balance + Global.modcosts[mod]) > 4:
 		terminalstring += "Balance cannot exceed ±4.\n\n"
 		return
 	Global.player.modifiers.append(mod)

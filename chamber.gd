@@ -70,6 +70,12 @@ func spawnpoint():
 func approxsidelen():
 	return len(air) ** (1 / 3.)
 
+func getvox(point: Vector3):
+	var voxel = floor(point)
+	if voxel not in voxmap:
+		return null
+	return voxmap[voxel]
+
 func create():
 	print("starting!")
 	Global.chamber = self
@@ -176,13 +182,32 @@ func placeplayer():
 	entities.append(Global.player)
 
 func featureterrain():
+	var cuberadius = approxsidelen() * sqrt(3) / 4
+	if Global.hasmod(Global.Modifier.HIGHGRASS):
+		var grassnoise = FastNoiseLite.new()
+		grassnoise.seed = Global.dice.randi()
+		grassnoise.noise_type = FastNoiseLite.TYPE_SIMPLEX
+		grassnoise.frequency = noise.frequency
+		var thresh = 2 ** -2.5
+		for x in size:
+			for y in size:
+				for z in size:
+					var point = Vector3(x, y, z)
+					if point == ground(point):
+						var noiseval = grassnoise.get_noise_3d(x + 0.5, y + 0.5, z + 0.5)
+						if noiseval > thresh:
+							var maxheight = ceil((noiseval - thresh) / (1 - thresh) * 8)
+							for yy in range(y, y + maxheight):
+								var newpoint = Vector3(x, yy, z)
+								if not isair(newpoint):
+									break
+								setvox(newpoint, Global.Vox.HIGHGRASS)
 	if Global.hasmod(Global.Modifier.DOORPLANT):
-		var cuberadius = approxsidelen() * sqrt(3) / 4
 		for x in range(floor(doorpos.x - cuberadius), ceil(doorpos.x + cuberadius) + 1):
 			for y in range(floor(doorpos.y - cuberadius), ceil(doorpos.y + cuberadius) + 1):
 				for z in range(floor(doorpos.z - cuberadius), ceil(doorpos.z + cuberadius) + 1):
 					var point = Vector3(x, y, z)
-					if point == ground(point) and randf() < 0.25:
+					if point == ground(point) and isair(point) and randf() < 0.25:
 						setvox(point, Global.Vox.DOORPLANT)
 	if Global.hasmod(Global.Modifier.PILLARVINE):
 		var candidates = []
@@ -360,8 +385,8 @@ func spinplayer():
 	Global.player.get_node("Camera3D").rotation = Global.player.pan
 
 func startplayer():
+	Input.flush_buffered_events()
 	Global.player.process_mode = Node.PROCESS_MODE_INHERIT
-	Global.player.juststarted = true
 
 func _process(delta: float):
 	updatestatlabel()

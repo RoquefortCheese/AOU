@@ -47,6 +47,9 @@ func terragen():
 				elif point not in voxmap or voxmap[point] != Global.Vox.GLASS:
 					setvox(point, Global.Vox.AIR)
 
+func featureterrain():
+	return
+
 func goodfloodfill():
 	return true
 

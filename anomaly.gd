@@ -110,9 +110,9 @@ func follow():
 		actualnoticeradius = INF
 	elif Global.hasmod(Global.Modifier.ALERTANOMS):
 		actualnoticeradius *= 2
-	if not following and distance <= actualnoticeradius:
+	if distance <= actualnoticeradius:
 		following = true
-	if following and distance > actualnoticeradius * followbuffer:
+	if distance > actualnoticeradius * followbuffer or  Global.chamber.getvox(Global.player.position + Vector3.UP) == Global.Vox.HIGHGRASS:
 		following = false
 	if following:
 		acceleration += Global.flatten(diff).normalized() * followconst

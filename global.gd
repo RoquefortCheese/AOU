@@ -1,11 +1,11 @@
 extends Node
 
-enum Vox {AIR, STONE, LIGHT, GLASS, PILLARVINE, DOORPLANT}
+enum Vox {AIR, STONE, LIGHT, GLASS, PILLARVINE, DOORPLANT, HIGHGRASS}
 enum MeshType {AIR, CUBE, PLANT}
 @export var materials: Dictionary[Vox, Material]
 @export var meshtypes: Dictionary[Vox, MeshType]
 
-enum Modifier {DOORPLANT, PILLARVINE, MORESPACE, LESSSPACE, FASTANOMS, FLOATY, MOREANOMS, SQUASH, STRETCH, SORTANOMS, REGEN, RUNNING, DOUBLEJUMP, HYPERBLUE, HYPERCYAN, HYPERMAGENTA, ISLANDS, MOREAMMO, FASTRELOAD, ALERTANOMS, MOREOUCH, TRIPLEJUMP, STROLLING, SNIPER, SILVERLINE, MOREHEAL, LESSHEAL}
+enum Modifier {DOORPLANT, PILLARVINE, MORESPACE, LESSSPACE, FASTANOMS, FLOATY, MOREANOMS, SQUASH, STRETCH, SORTANOMS, REGEN, RUNNING, DOUBLEJUMP, HYPERBLUE, HYPERCYAN, HYPERMAGENTA, ISLANDS, MOREAMMO, FASTRELOAD, ALERTANOMS, MOREOUCH, TRIPLEJUMP, STROLLING, SNIPER, SILVERLINE, MOREHEAL, LESSHEAL, HIGHGRASS}
 const modcosts: Dictionary[Modifier, int] = {
 	Modifier.DOORPLANT: -2,
 	Modifier.PILLARVINE: -4,
@@ -34,6 +34,7 @@ const modcosts: Dictionary[Modifier, int] = {
 	Modifier.SILVERLINE: -2,
 	Modifier.MOREHEAL: -2,
 	Modifier.LESSHEAL: 2,
+	Modifier.HIGHGRASS: -3,
 }
 const modcolors: Dictionary[Modifier, Anomaly.AnomColor] = {
 	Modifier.DOORPLANT: Anomaly.AnomColor.BLUE,
@@ -63,6 +64,7 @@ const modcolors: Dictionary[Modifier, Anomaly.AnomColor] = {
 	Modifier.SILVERLINE: Anomaly.AnomColor.MAGENTA,
 	Modifier.MOREHEAL: Anomaly.AnomColor.MAGENTA,
 	Modifier.LESSHEAL: Anomaly.AnomColor.MAGENTA,
+	Modifier.HIGHGRASS: Anomaly.AnomColor.BLUE,
 }
 var modnames: Dictionary[Modifier, String] = {
 	Modifier.DOORPLANT: "DoorPlant",
@@ -92,9 +94,10 @@ var modnames: Dictionary[Modifier, String] = {
 	Modifier.SILVERLINE: "SilverLine",
 	Modifier.MOREHEAL: "MoreHeal",
 	Modifier.LESSHEAL: "LessHeal",
+	Modifier.HIGHGRASS: "HighGrass",
 }
 var moddescs: Dictionary[Modifier, String] = {
-	Modifier.DOORPLANT: "Blue plants grow next to doors.",
+	Modifier.DOORPLANT: "Blue plants that grow next to doors.",
 	Modifier.PILLARVINE: "Tall vines that can be climbed.",
 	Modifier.MORESPACE: "More open caves.",
 	Modifier.LESSSPACE: "More constricted caves.",
@@ -121,6 +124,7 @@ var moddescs: Dictionary[Modifier, String] = {
 	Modifier.SILVERLINE: "All anomaly deaths increase score.",
 	Modifier.MOREHEAL: "Restoration terminals heal more.",
 	Modifier.LESSHEAL: "Restoration terminals heal less.",
+	Modifier.HIGHGRASS: "High grass that can be hidden in.",
 }
 var incompatibilities: Array[Vector2] = [
 	Vector2(Modifier.MORESPACE, Modifier.LESSSPACE),
