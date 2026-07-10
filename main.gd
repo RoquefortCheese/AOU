@@ -20,12 +20,12 @@ func _input(event: InputEvent):
 	if event.is_action_pressed("esc"):
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	if event.is_action_pressed("pause"):
-		if world != null:
+		if world != null and Global.player.terminalinuse == null:
 			if world.process_mode == Node.PROCESS_MODE_DISABLED:
 				world.process_mode = Node.PROCESS_MODE_INHERIT
 			else:
 				world.process_mode = Node.PROCESS_MODE_DISABLED
-	if event.is_action_pressed("forceend"):
+	if event.is_action_pressed("forceend") and Global.player.terminalinuse == null:
 		if world != null:
 			Global.finishcause = "You chose to end the game."
 			world.finish()

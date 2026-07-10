@@ -33,8 +33,8 @@ func argquant(args: Array[String], quantity: int):
 		return false
 	return true
 
-func classfilter(rightclass: TerminalClass):
-	if termclass != rightclass:
+func classfilter(rightclasses: Array[TerminalClass]):
+	if termclass not in rightclasses:
 		terminalstring += "This command is not available for this terminal class.\n\n"
 		return false
 	return true
@@ -105,6 +105,9 @@ func help():
 		TerminalClass.START:
 			terminalstring += tabbed("seed [int]:") + "Sets the world seed to the given number.\n"
 			terminalstring += tabbed("set [x] [bool]:") + "Enables or disables a game setting.\n"
+			terminalstring += tabbed("about [mod]:") + "Outputs the modifier description.\n"
+			terminalstring += tabbed("add [mod]:") + "Adds the requested modifier.\n"
+			terminalstring += tabbed("del [mod]:") + "Deletes the requested modifier.\n"
 		TerminalClass.END:
 			terminalstring += tabbed("cause:") + "Displays the cause of the end of the run.\n"
 			terminalstring += tabbed("score:") + "Displays your total final score.\n"
@@ -150,11 +153,14 @@ func add(args: Array[String]):
 	var mod = existentmod(args[1])
 	if mod == null:
 		return
-	if mod not in otherstuff[OtherStuff.MODS]:
+	if termclass == TerminalClass.START and not Global.settings[Global.Setting.SIMPLE]:
+		terminalstring += "Mods can only be added here with [Simple] enabled.\n\n"
+		return
+	if termclass == TerminalClass.MOD and mod not in otherstuff[OtherStuff.MODS]:
 		terminalstring += "This modifier is unavailable at this terminal.\n\n"
 		return
 	if Global.hasmod(mod):
-		terminalstring += "This modifier has already been purchased.\n\n"
+		terminalstring += "This modifier has already been added.\n\n"
 		return
 	var issue = incompats(mod)
 	if issue != null:
@@ -212,6 +218,8 @@ func tingset(args: Array[String]):
 			terminalstring += "To set a seed, use the [seed] command.\n\n"
 			return
 		Global.world.setseed(randi())
+	if setting == Global.Setting.SIMPLE:
+		Global.player.modifiers = []
 	Global.settings[setting] = value
 	match setting:
 		Global.Setting.SEEDED:
@@ -298,34 +306,34 @@ func runinput():
 				if argquant(args, 1):
 					showsettings()
 			"restore":
-				if argquant(args, 1) and classfilter(TerminalClass.RESTORATION):
+				if argquant(args, 1) and classfilter([TerminalClass.RESTORATION]):
 					restore()
 			"modlist":
-				if argquant(args, 1) and classfilter(TerminalClass.MOD):
+				if argquant(args, 1) and classfilter([TerminalClass.MOD]):
 					modlist()
 			"about":
-				if argquant(args, 2) and classfilter(TerminalClass.MOD):
+				if argquant(args, 2) and classfilter([TerminalClass.MOD, TerminalClass.START]):
 					about(args)
 			"add":
-				if argquant(args, 2) and classfilter(TerminalClass.MOD):
+				if argquant(args, 2) and classfilter([TerminalClass.MOD, TerminalClass.START]):
 					add(args)
 			"del":
-				if argquant(args, 2) and classfilter(TerminalClass.MOD):
+				if argquant(args, 2) and classfilter([TerminalClass.MOD, TerminalClass.START]):
 					del(args)
 			"seed":
-				if argquant(args, 2) and classfilter(TerminalClass.START):
+				if argquant(args, 2) and classfilter([TerminalClass.START]):
 					setseed(args)
 			"set":
-				if argquant(args, 3) and classfilter(TerminalClass.START):
+				if argquant(args, 3) and classfilter([TerminalClass.START]):
 					tingset(args)
 			"cause":
-				if argquant(args, 1) and classfilter(TerminalClass.END):
+				if argquant(args, 1) and classfilter([TerminalClass.END]):
 					cod()
 			"score":
-				if argquant(args, 1) and classfilter(TerminalClass.END):
+				if argquant(args, 1) and classfilter([TerminalClass.END]):
 					showscore()
 			"restart":
-				if argquant(args, 1) and classfilter(TerminalClass.END):
+				if argquant(args, 1) and classfilter([TerminalClass.END]):
 					restart()
 	currentinput = ""
 	newcommand()

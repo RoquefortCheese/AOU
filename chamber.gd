@@ -341,7 +341,7 @@ func createmeshes():
 
 func anomalize():
 	var colorder = Global.diceshuffle(Anomaly.AnomColor.values())
-	for i in int(len(air) * 2 ** Global.ifmod(-12.5, -11.5, Global.Modifier.MOREANOMS)): #(-11 - 3 * 2 ** (Global.chamberindex * -0.1)):
+	for i in int(len(air) * 2 ** Global.ifmod(-12., -11., Global.Modifier.MOREANOMS)): #(-11 - 3 * 2 ** (Global.chamberindex * -0.1)):
 		var anomaly = anomscene.instantiate()
 		anomaly.position = spawnpoint() + Vector3.UP
 		anomalies.append(anomaly)

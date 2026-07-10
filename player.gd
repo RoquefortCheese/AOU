@@ -47,7 +47,7 @@ func scoremult(color: Anomaly.AnomColor):
 	var mult = 1
 	for mod in modifiers:
 		if Global.modcolors[mod] == color:
-			mult *= 2 ** (Global.modcosts[color] / 4.)
+			mult *= 2 ** (Global.modcosts[mod] / 4.)  # used to be modcosts[color]; this took embarrasingly long to notice
 	return mult
 
 func productscore(color: Anomaly.AnomColor):
@@ -63,7 +63,7 @@ func _ready():
 	Global.player = self
 	$Camera3D/RayCast3D.add_exception(self)
 	score = {Anomaly.AnomColor.BLUE: 0, Anomaly.AnomColor.CYAN: 0, Anomaly.AnomColor.MAGENTA: 0}
-	modifiers = [Global.Modifier.MOREHEAL]
+	modifiers = []
 	alive = true
 	balance = 0
 	health = 6
