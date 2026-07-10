@@ -11,7 +11,7 @@ const actualcolor = {
 
 const floatconst = 4
 const wobbleconst = 4
-const followconst = 6
+const followconst = 5
 const flyconst = 32
 const steppingconst = 1
 const repelconst = 6
@@ -180,7 +180,11 @@ func die(source: Vector3, shot: bool):
 	if alive:
 		alive = false
 		timedead = 0
-		if following and shot and not undead:
+		if following and (shot or Global.hasmod(Global.Modifier.SILVERLINE)) and not undead:
 			Global.player.score[color] += 1
+			Global.chamber.deltascore[color] += 1
+		if Global.hasmod(Global.Modifier.SNIPER):
+			if not following and Global.player.getfollowers() != 0:
+				Global.player.impacthealth(1)
 		for box in boxes:
 			box.mesh.material.albedo_color *= 0.25

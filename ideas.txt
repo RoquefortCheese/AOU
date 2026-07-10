@@ -6,3 +6,4 @@ todo:
 	maybe fix levelgen freeze
 	add more commands for start and end terminals
 	add more normal terminal types
+	add more game settings (maybe god mode?)

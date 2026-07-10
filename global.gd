@@ -5,7 +5,7 @@ enum MeshType {AIR, CUBE, PLANT}
 @export var materials: Dictionary[Vox, Material]
 @export var meshtypes: Dictionary[Vox, MeshType]
 
-enum Modifier {DOORPLANT, PILLARVINE, MORESPACE, LESSSPACE, FASTANOMS, FLOATY, MOREANOMS, SQUASH, STRETCH, SORTANOMS, REGEN, RUNNING, DOUBLEJUMP, HYPERBLUE, HYPERCYAN, HYPERMAGENTA, ISLANDS, MOREAMMO, FASTRELOAD, ALERTANOMS, MOREOUCH}
+enum Modifier {DOORPLANT, PILLARVINE, MORESPACE, LESSSPACE, FASTANOMS, FLOATY, MOREANOMS, SQUASH, STRETCH, SORTANOMS, REGEN, RUNNING, DOUBLEJUMP, HYPERBLUE, HYPERCYAN, HYPERMAGENTA, ISLANDS, MOREAMMO, FASTRELOAD, ALERTANOMS, MOREOUCH, TRIPLEJUMP, STROLLING, SNIPER, SILVERLINE, MOREHEAL, LESSHEAL}
 const modcosts: Dictionary[Modifier, int] = {
 	Modifier.DOORPLANT: -2,
 	Modifier.PILLARVINE: -4,
@@ -28,6 +28,12 @@ const modcosts: Dictionary[Modifier, int] = {
 	Modifier.FASTRELOAD: -3,
 	Modifier.ALERTANOMS: 4,
 	Modifier.MOREOUCH: 4,
+	Modifier.TRIPLEJUMP: -4,
+	Modifier.STROLLING: 3,
+	Modifier.SNIPER: -2,
+	Modifier.SILVERLINE: -2,
+	Modifier.MOREHEAL: -2,
+	Modifier.LESSHEAL: 2,
 }
 const modcolors: Dictionary[Modifier, Anomaly.AnomColor] = {
 	Modifier.DOORPLANT: Anomaly.AnomColor.BLUE,
@@ -51,6 +57,12 @@ const modcolors: Dictionary[Modifier, Anomaly.AnomColor] = {
 	Modifier.FASTRELOAD: Anomaly.AnomColor.MAGENTA,
 	Modifier.ALERTANOMS: Anomaly.AnomColor.MAGENTA,
 	Modifier.MOREOUCH: Anomaly.AnomColor.CYAN,
+	Modifier.TRIPLEJUMP: Anomaly.AnomColor.CYAN,
+	Modifier.STROLLING: Anomaly.AnomColor.CYAN,
+	Modifier.SNIPER: Anomaly.AnomColor.MAGENTA,
+	Modifier.SILVERLINE: Anomaly.AnomColor.MAGENTA,
+	Modifier.MOREHEAL: Anomaly.AnomColor.MAGENTA,
+	Modifier.LESSHEAL: Anomaly.AnomColor.MAGENTA,
 }
 var modnames: Dictionary[Modifier, String] = {
 	Modifier.DOORPLANT: "DoorPlant",
@@ -74,6 +86,12 @@ var modnames: Dictionary[Modifier, String] = {
 	Modifier.FASTRELOAD: "FastReload",
 	Modifier.ALERTANOMS: "AlertAnoms",
 	Modifier.MOREOUCH: "MoreOuch",
+	Modifier.TRIPLEJUMP: "TripleJump",
+	Modifier.STROLLING: "Strolling",
+	Modifier.SNIPER: "Sniper",
+	Modifier.SILVERLINE: "SilverLine",
+	Modifier.MOREHEAL: "MoreHeal",
+	Modifier.LESSHEAL: "LessHeal",
 }
 var moddescs: Dictionary[Modifier, String] = {
 	Modifier.DOORPLANT: "Blue plants grow next to doors.",
@@ -97,11 +115,22 @@ var moddescs: Dictionary[Modifier, String] = {
 	Modifier.FASTRELOAD: "Faster reload time.",
 	Modifier.ALERTANOMS: "Anomalies sense you from farther away.",
 	Modifier.MOREOUCH: "Anomalies deal more damage.",
+	Modifier.TRIPLEJUMP: "Airjump twice.",
+	Modifier.STROLLING: "Slower movement.",
+	Modifier.SNIPER: "Sniping while pursued restores health.",
+	Modifier.SILVERLINE: "All anomaly deaths increase score.",
+	Modifier.MOREHEAL: "Restoration terminals heal more.",
+	Modifier.LESSHEAL: "Restoration terminals heal less.",
 }
 var incompatibilities: Array[Vector2] = [
 	Vector2(Modifier.MORESPACE, Modifier.LESSSPACE),
 	Vector2(Modifier.SQUASH, Modifier.STRETCH),
+	Vector2(Modifier.RUNNING, Modifier.STROLLING),
+	Vector2(Modifier.MOREHEAL, Modifier.LESSHEAL),
 ]
+var prereqs: Dictionary[Modifier, Modifier] = {
+	Modifier.TRIPLEJUMP: Modifier.DOUBLEJUMP,
+}
 const maxmods: int = 6
 
 enum Setting {SEEDED, INFINITE, SIMPLE}

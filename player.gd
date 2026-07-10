@@ -14,6 +14,7 @@ var timesinceground: float
 var timesinceempty: float
 var terminalinuse: Computer
 var jumpsleft: int
+var juststarted: bool
 
 var score: Dictionary[Anomaly.AnomColor, int]
 var modifiers: Array[Global.Modifier]
@@ -31,6 +32,13 @@ func getfollowers():
 
 func maxammo():
 	return Global.ifmod(12, 18, Global.Modifier.MOREAMMO)
+
+func maxjumps():
+	if Global.hasmod(Global.Modifier.TRIPLEJUMP):
+		return 3
+	if Global.hasmod(Global.Modifier.DOUBLEJUMP):
+		return 2
+	return 1
 
 func currentblock():
 	return Global.chamber.voxmap[floor(position)]
@@ -55,7 +63,7 @@ func _ready():
 	Global.player = self
 	$Camera3D/RayCast3D.add_exception(self)
 	score = {Anomaly.AnomColor.BLUE: 0, Anomaly.AnomColor.CYAN: 0, Anomaly.AnomColor.MAGENTA: 0}
-	modifiers = [Global.Modifier.MOREANOMS, Global.Modifier.MORESPACE]
+	modifiers = [Global.Modifier.MOREHEAL]
 	alive = true
 	balance = 0
 	health = 6
@@ -85,14 +93,15 @@ func movementinput(delta: float):
 		if Input.is_action_pressed("right"):
 			direction += Vector3.RIGHT
 		if is_on_floor() or currentblock() == Global.Vox.PILLARVINE:
-			jumpsleft = Global.ifmod(1, 2, Global.Modifier.DOUBLEJUMP)
+			jumpsleft = maxjumps()
 		if timesinceground >= coyotetime and not currentblock() == Global.Vox.PILLARVINE:
-			jumpsleft = min(Global.ifmod(0, 1, Global.Modifier.DOUBLEJUMP), jumpsleft)
+			jumpsleft = min(maxjumps() - 1, jumpsleft)
 		if Input.is_action_just_pressed("jump"):
 			if jumpsleft != 0:
 				velocity.y = jumpspeed
 				jumpsleft -= 1
-		direction = direction.rotated(Vector3.UP, $Camera3D.rotation.y).normalized() * acc * Global.ifmod(1, 1.25, Global.Modifier.RUNNING) * delta
+		var finalacc = acc * Global.ifmod(1, 1.25, Global.Modifier.RUNNING) * Global.ifmod(1, 0.75, Global.Modifier.STROLLING)
+		direction = direction.rotated(Vector3.UP, $Camera3D.rotation.y).normalized() * finalacc * delta
 		velocity.x += direction.x
 		velocity.z += direction.z
 
@@ -166,6 +175,9 @@ func die():
 func _input(event: InputEvent):
 	if event is InputEventMouseMotion:
 		if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
-			pan.y -= event.relative.x * sensitivity
-			pan.x -= event.relative.y * sensitivity
-			pan.x = clamp(pan.x, -PI / 2, PI / 2)
+			if not juststarted:
+				pan.y -= event.relative.x * sensitivity
+				pan.x -= event.relative.y * sensitivity
+				pan.x = clamp(pan.x, -PI / 2, PI / 2)
+			else:
+				juststarted = false

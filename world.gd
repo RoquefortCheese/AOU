@@ -32,7 +32,7 @@ func finish():
 
 func phasewarp():  # why is it called phase warp? because it warps your phase, obviously.
 	for color in 3:
-		$Player.score[color] = max(0, Global.player.score[color] - 8)
+		$Player.score[color] = max(0, Global.player.score[color] - Global.chamber.deltascore[color] - 4)
 	loadchamber()
 
 func enterdoor():

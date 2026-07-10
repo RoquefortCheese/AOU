@@ -15,6 +15,7 @@ const bases = {
 	Vector3.BACK: Basis(Vector3.RIGHT, Vector3.BACK, Vector3.DOWN)
 }
 var plantbases = [bases[Vector3.LEFT].rotated(Vector3.UP, PI / 4), bases[Vector3.FORWARD].rotated(Vector3.UP, PI / 4)]
+
 var size: int
 var voxmap: Dictionary[Vector3, Global.Vox]
 var air: Dictionary[Vector3, bool]  # once again no sets {._.}
@@ -23,6 +24,7 @@ var surfacetools: Dictionary[Global.Vox, SurfaceTool]
 var entities: Array[PhysicsBody3D]
 var anomalies: Array[Anomaly]
 var computers: Array[Computer]
+var deltascore: Dictionary[Anomaly.AnomColor, int]
 var door: StaticBody3D
 var doorpos: Vector3
 var starttime: float
@@ -71,11 +73,11 @@ func approxsidelen():
 func create():
 	print("starting!")
 	Global.chamber = self
+	resetvars()
 	terragen()
 	print("terra genned!")
 	if not goodfloodfill():
 		print("regenerating...")
-		resetvars()
 		create()
 		return
 	placefeatures()
@@ -98,8 +100,11 @@ func resetvars():
 	surfacetools = {}
 	entities = []
 	anomalies = []
+	computers = []
+	deltascore = {Anomaly.AnomColor.BLUE: 0, Anomaly.AnomColor.CYAN: 0, Anomaly.AnomColor.MAGENTA: 0}
 	door = null
-	doorpos = Vector3(0, 0, 0)
+	doorpos = Vector3.ZERO
+	starttime = 0
 
 func terragen():
 	metaterragen()
@@ -347,9 +352,16 @@ func anomalize():
 		anomalies[i].create(colorder[Global.ifmod(i % 3, floor(i * 3. / len(anomalies)), Global.Modifier.SORTANOMS)])
 
 func welcomeplayer():
+	spinplayer()
+	startplayer()
+
+func spinplayer():
 	Global.player.pan = Vector3.UP * randf() * TAU
 	Global.player.get_node("Camera3D").rotation = Global.player.pan
+
+func startplayer():
 	Global.player.process_mode = Node.PROCESS_MODE_INHERIT
+	Global.player.juststarted = true
 
 func _process(delta: float):
 	updatestatlabel()

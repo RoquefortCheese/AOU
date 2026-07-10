@@ -101,8 +101,7 @@ func anomalize():
 			entities.append(anomaly)
 			add_child(anomaly)
 
-func welcomeplayer():
+func spinplayer():
 	var camera = Global.player.get_node("Camera3D")
 	camera.look_at(computers[0].position)
 	Global.player.pan = camera.rotation
-	Global.player.process_mode = Node.PROCESS_MODE_INHERIT

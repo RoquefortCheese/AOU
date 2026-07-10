@@ -56,11 +56,13 @@ func infoname(mod: Global.Modifier):
 	output += Global.modnames[mod]
 	return output
 
-func compatible(mod: Global.Modifier):
+func incompats(mod: Global.Modifier):
 	for playermod in Global.player.modifiers:
 		if Vector2(mod, playermod) in Global.incompatibilities or Vector2(playermod, mod) in Global.incompatibilities:
-			return false
-	return true
+			return "This mod conflicts with " + Global.modnames[playermod] + "."
+	if mod in Global.prereqs and Global.prereqs[mod] not in Global.player.modifiers:
+		return "This mod requires " + Global.modnames[Global.prereqs[mod]] + "."
+	return null
 
 func create(termclass: TerminalClass):
 	self.termclass = termclass
@@ -71,7 +73,7 @@ func create(termclass: TerminalClass):
 			otherstuff[OtherStuff.MODS] = []
 			var shuffledmods = Global.diceshuffle(Global.Modifier.values())
 			for mod in shuffledmods:
-				if not Global.hasmod(mod) and compatible(mod):
+				if not Global.hasmod(mod) and incompats(mod) == null:
 					otherstuff[OtherStuff.MODS].append(mod)
 					if len(otherstuff[OtherStuff.MODS]) == 3:
 						break
@@ -94,7 +96,7 @@ func help():
 	terminalstring += tabbed("settings:") + "Displays game settings.\n"
 	match termclass:
 		TerminalClass.RESTORATION:
-			terminalstring += tabbed("restore:") + "Restores two hitpoints. Usable once.\n"
+			terminalstring += tabbed("restore:") + "Restores some health. Usable once.\n"
 		TerminalClass.MOD:
 			terminalstring += tabbed("modlist:") + "Outputs available modifiers.\n"
 			terminalstring += tabbed("about [mod]:") + "Outputs the modifier description.\n"
@@ -123,7 +125,12 @@ func restore():
 	if otherstuff[OtherStuff.SPENT]:
 		terminalstring += "You have already used this terminal to restore.\n\n"
 		return
-	Global.player.impacthealth(2)
+	var healing = 3
+	if Global.hasmod(Global.Modifier.MOREHEAL):
+		healing += 1
+	if Global.hasmod(Global.Modifier.LESSHEAL):
+		healing -= 1
+	Global.player.impacthealth(healing)
 	otherstuff[OtherStuff.SPENT] = true
 	terminalstring += "Your health has been restored!\n\n"
 
@@ -149,8 +156,9 @@ func add(args: Array[String]):
 	if Global.hasmod(mod):
 		terminalstring += "This modifier has already been purchased.\n\n"
 		return
-	if not compatible(mod):
-		terminalstring += "This modifier is incompatible with your current modifiers.\n\n"
+	var issue = incompats(mod)
+	if issue != null:
+		terminalstring += issue + "\n\n"
 		return
 	if len(Global.player.modifiers) == Global.maxmods:
 		terminalstring += "Cannot exceed the max amount of modifiers.\n\n"
