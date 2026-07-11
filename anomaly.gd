@@ -11,7 +11,7 @@ const actualcolor = {
 
 const floatconst = 4
 const wobbleconst = 4
-const followconst = 5
+const followconst = 6
 const flyconst = 32
 const steppingconst = 1
 const repelconst = 6
@@ -98,17 +98,16 @@ func hover():
 		var error = grounddist - 1
 		acceleration.y += min(floatconst * error ** 2, 32) * -sign(error)
 	if not flying():
-		acceleration.y += wobbleconst * sin(Global.time() * PI + offset)
+		acceleration.y += wobbleconst * sin(Global.chamber.time * PI + offset)
 
 func follow():
 	var diff = Global.player.position - position
+	diff.y *= 2  # hopefully this should lead to less hidden followers
 	var distance = diff.length()
 	var actualnoticeradius = noticeradius
 	if tamed:
 		actualnoticeradius = 4
-	elif color == AnomColor.BLUE and Global.hasmod(Global.Modifier.HYPERBLUE):
-		actualnoticeradius = INF
-	elif Global.hasmod(Global.Modifier.ALERTANOMS):
+	elif Global.hasmod(Global.Modifier.ALERTANOMS) or (color == AnomColor.BLUE and Global.hasmod(Global.Modifier.ANOMFLAVOR)):
 		actualnoticeradius *= 2
 	if distance <= actualnoticeradius:
 		following = true
@@ -154,9 +153,7 @@ func domath(delta: float):
 	velocity.y *= exp(heightfriction) ** delta
 	velocity.x *= exp(flatfriction) ** delta
 	velocity.z *= exp(flatfriction) ** delta
-	if Global.hasmod(Global.Modifier.HYPERCYAN) and color == AnomColor.CYAN:
-		acceleration *= 2
-	elif Global.hasmod(Global.Modifier.FASTANOMS):
+	if Global.hasmod(Global.Modifier.FASTANOMS) or (color == AnomColor.CYAN and Global.hasmod(Global.Modifier.ANOMFLAVOR)):
 		acceleration *= 1.5
 	velocity += acceleration * delta
 
@@ -165,9 +162,7 @@ func maybetouch():
 		if get_slide_collision(i).get_collider() == Global.player:
 			die(Global.player.position, false)
 			Global.player.impacthealth(-1)
-			if Global.hasmod(Global.Modifier.HYPERMAGENTA) and color == AnomColor.MAGENTA:
-				Global.player.impacthealth(-2)
-			elif Global.hasmod(Global.Modifier.MOREOUCH):
+			if Global.hasmod(Global.Modifier.MOREOUCH) or (color == AnomColor.MAGENTA and Global.hasmod(Global.Modifier.ANOMFLAVOR)):
 				Global.player.impacthealth(-1)
 			break
 

@@ -5,7 +5,7 @@ enum MeshType {AIR, CUBE, PLANT}
 @export var materials: Dictionary[Vox, Material]
 @export var meshtypes: Dictionary[Vox, MeshType]
 
-enum Modifier {DOORPLANT, PILLARVINE, MORESPACE, LESSSPACE, FASTANOMS, FLOATY, MOREANOMS, SQUASH, STRETCH, SORTANOMS, REGEN, RUNNING, DOUBLEJUMP, HYPERBLUE, HYPERCYAN, HYPERMAGENTA, ISLANDS, MOREAMMO, FASTRELOAD, ALERTANOMS, MOREOUCH, TRIPLEJUMP, STROLLING, SNIPER, SILVERLINE, MOREHEAL, LESSHEAL, HIGHGRASS}
+enum Modifier {DOORPLANT, PILLARVINE, MORESPACE, LESSSPACE, FASTANOMS, FLOATY, MOREANOMS, SQUASH, STRETCH, SORTANOMS, REGEN, RUNNING, DOUBLEJUMP, ISLANDS, MOREAMMO, FASTRELOAD, ALERTANOMS, MOREOUCH, TRIPLEJUMP, STROLLING, SNIPER, SILVERLINE, MOREHEAL, LESSHEAL, HIGHGRASS, ANOMFLAVOR}
 const modcosts: Dictionary[Modifier, int] = {
 	Modifier.DOORPLANT: -2,
 	Modifier.PILLARVINE: -4,
@@ -20,9 +20,6 @@ const modcosts: Dictionary[Modifier, int] = {
 	Modifier.REGEN: 3,
 	Modifier.RUNNING: -3,
 	Modifier.DOUBLEJUMP: -4,
-	Modifier.HYPERBLUE: 2,
-	Modifier.HYPERCYAN: 2,
-	Modifier.HYPERMAGENTA: 2,
 	Modifier.ISLANDS: -1,
 	Modifier.MOREAMMO: -3,
 	Modifier.FASTRELOAD: -3,
@@ -35,6 +32,7 @@ const modcosts: Dictionary[Modifier, int] = {
 	Modifier.MOREHEAL: -2,
 	Modifier.LESSHEAL: 2,
 	Modifier.HIGHGRASS: -3,
+	Modifier.ANOMFLAVOR: 4,
 }
 const modcolors: Dictionary[Modifier, Anomaly.AnomColor] = {
 	Modifier.DOORPLANT: Anomaly.AnomColor.BLUE,
@@ -50,14 +48,11 @@ const modcolors: Dictionary[Modifier, Anomaly.AnomColor] = {
 	Modifier.REGEN: Anomaly.AnomColor.MAGENTA,
 	Modifier.RUNNING: Anomaly.AnomColor.CYAN,
 	Modifier.DOUBLEJUMP: Anomaly.AnomColor.CYAN,
-	Modifier.HYPERBLUE: Anomaly.AnomColor.MAGENTA,
-	Modifier.HYPERCYAN: Anomaly.AnomColor.MAGENTA,
-	Modifier.HYPERMAGENTA: Anomaly.AnomColor.MAGENTA,
 	Modifier.ISLANDS: Anomaly.AnomColor.BLUE,
 	Modifier.MOREAMMO: Anomaly.AnomColor.MAGENTA,
 	Modifier.FASTRELOAD: Anomaly.AnomColor.MAGENTA,
 	Modifier.ALERTANOMS: Anomaly.AnomColor.MAGENTA,
-	Modifier.MOREOUCH: Anomaly.AnomColor.CYAN,
+	Modifier.MOREOUCH: Anomaly.AnomColor.MAGENTA,
 	Modifier.TRIPLEJUMP: Anomaly.AnomColor.CYAN,
 	Modifier.STROLLING: Anomaly.AnomColor.CYAN,
 	Modifier.SNIPER: Anomaly.AnomColor.MAGENTA,
@@ -65,6 +60,7 @@ const modcolors: Dictionary[Modifier, Anomaly.AnomColor] = {
 	Modifier.MOREHEAL: Anomaly.AnomColor.MAGENTA,
 	Modifier.LESSHEAL: Anomaly.AnomColor.MAGENTA,
 	Modifier.HIGHGRASS: Anomaly.AnomColor.BLUE,
+	Modifier.ANOMFLAVOR: Anomaly.AnomColor.MAGENTA,
 }
 var modnames: Dictionary[Modifier, String] = {
 	Modifier.DOORPLANT: "DoorPlant",
@@ -80,9 +76,6 @@ var modnames: Dictionary[Modifier, String] = {
 	Modifier.REGEN: "Regen",
 	Modifier.RUNNING: "Running",
 	Modifier.DOUBLEJUMP: "DoubleJump",
-	Modifier.HYPERBLUE: "HyperBlue",
-	Modifier.HYPERCYAN: "HyperCyan",
-	Modifier.HYPERMAGENTA: "HyperMagenta",
 	Modifier.ISLANDS: "Islands",
 	Modifier.MOREAMMO: "MoreAmmo",
 	Modifier.FASTRELOAD: "FastReload",
@@ -95,6 +88,7 @@ var modnames: Dictionary[Modifier, String] = {
 	Modifier.MOREHEAL: "MoreHeal",
 	Modifier.LESSHEAL: "LessHeal",
 	Modifier.HIGHGRASS: "HighGrass",
+	Modifier.ANOMFLAVOR: "AnomFlavor",
 }
 var moddescs: Dictionary[Modifier, String] = {
 	Modifier.DOORPLANT: "Blue plants that grow next to doors.",
@@ -110,9 +104,6 @@ var moddescs: Dictionary[Modifier, String] = {
 	Modifier.REGEN: "Anomalies revive after some time.",
 	Modifier.RUNNING: "Faster movement.",
 	Modifier.DOUBLEJUMP: "Jump in the air.",
-	Modifier.HYPERBLUE: "Blue anomalies always know where you are.",
-	Modifier.HYPERCYAN: "Cyan anomalies move much faster.",
-	Modifier.HYPERMAGENTA: "Magenta anomalies deal more damage.",
 	Modifier.ISLANDS: "More floating terrain.",
 	Modifier.MOREAMMO: "More ammunition.",
 	Modifier.FASTRELOAD: "Faster reload time.",
@@ -125,6 +116,7 @@ var moddescs: Dictionary[Modifier, String] = {
 	Modifier.MOREHEAL: "Restoration terminals heal more.",
 	Modifier.LESSHEAL: "Restoration terminals heal less.",
 	Modifier.HIGHGRASS: "High grass that can be hidden in.",
+	Modifier.ANOMFLAVOR: "Applies other mods based on anom color.",
 }
 var incompatibilities: Array[Vector2] = [
 	Vector2(Modifier.MORESPACE, Modifier.LESSSPACE),
@@ -135,13 +127,18 @@ var incompatibilities: Array[Vector2] = [
 var prereqs: Dictionary[Modifier, Modifier] = {
 	Modifier.TRIPLEJUMP: Modifier.DOUBLEJUMP,
 }
-const maxmods: int = 6
+const maxmods: int = 8
 
 enum Setting {SEEDED, INFINITE, SIMPLE}
 const settingnames: Dictionary[Setting, String] = {
 	Setting.SEEDED: "Seeded",
 	Setting.INFINITE: "Infinite",
 	Setting.SIMPLE: "Simple",
+}
+const settingdescs: Dictionary[Setting, String] = {
+	Setting.SEEDED: "If enabled, a custom RNG seed has been set.",
+	Setting.INFINITE: "Unless enabled, the game ends after eight chambers.",
+	Setting.SIMPLE: "If enabled, no modifier terminals generate.",
 }
 
 var worldseed: int
@@ -154,9 +151,6 @@ var chamber: Chamber
 var chamberindex: int
 
 const pm = [-1, 1]
-
-func time():
-	return (Time.get_ticks_msec() - chamber.starttime) / 1000
 
 func hasmod(modifier: Modifier):
 	return modifier in player.modifiers

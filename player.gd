@@ -14,6 +14,7 @@ var timesinceground: float
 var timesinceempty: float
 var terminalinuse: Computer
 var jumpsleft: int
+var compassindex: int
 
 var score: Dictionary[Anomaly.AnomColor, int]
 var modifiers: Array[Global.Modifier]
@@ -70,6 +71,7 @@ func _ready():
 	timesinceground = 0
 	terminalinuse = null
 	jumpsleft = 0
+	compassindex = 0
 
 func _physics_process(delta: float):
 	handlecam(delta)
@@ -177,3 +179,5 @@ func _input(event: InputEvent):
 		if jumpsleft != 0:
 			velocity.y = jumpspeed
 			jumpsleft -= 1
+	if event.is_action_pressed("switchcompass") and terminalinuse == null:
+		compassindex += 1

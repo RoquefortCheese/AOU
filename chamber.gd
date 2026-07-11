@@ -27,7 +27,7 @@ var computers: Array[Computer]
 var deltascore: Dictionary[Anomaly.AnomColor, int]
 var door: StaticBody3D
 var doorpos: Vector3
-var starttime: float
+var time: float
 
 func rescale(value: float, minval: float, maxval: float):
 	return value * (maxval - minval) / 2 + (maxval + minval) / 2
@@ -96,7 +96,6 @@ func create():
 	welcomeplayer()
 	print("player welcomed!")
 	print("done!")
-	self.starttime = Time.get_ticks_msec()
 
 func resetvars():
 	size = 0
@@ -110,7 +109,7 @@ func resetvars():
 	deltascore = {Anomaly.AnomColor.BLUE: 0, Anomaly.AnomColor.CYAN: 0, Anomaly.AnomColor.MAGENTA: 0}
 	door = null
 	doorpos = Vector3.ZERO
-	starttime = 0
+	time = 0
 
 func terragen():
 	metaterragen()
@@ -383,6 +382,7 @@ func welcomeplayer():
 func spinplayer():
 	Global.player.pan = Vector3.UP * randf() * TAU
 	Global.player.get_node("Camera3D").rotation = Global.player.pan
+	Global.player.velocity = Vector3.ZERO
 
 func startplayer():
 	Input.flush_buffered_events()
@@ -393,6 +393,7 @@ func _process(delta: float):
 	updatescorelabel()
 	updatemodlabel()
 	updatemetalabel()
+	time += delta
 
 func _input(event: InputEvent):
 	if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED and Global.player.terminalinuse == null:
@@ -450,13 +451,36 @@ func updatecompass():
 	#var diff = playerangle - doorangle
 	#var angdiff = min(abs(diff - TAU), abs(diff), abs(diff + TAU))
 	#return OoOoOo("Compass", floor(angdiff / PI * 7))
-	if door == null:
-		return OoOoOo("Compass", 6)
 	var camera = Global.player.get_node("Camera3D")
+	var thing = null
+	var thingname
+	match Global.player.compassindex % 3:
+		0:
+			thingname = "Door"
+			thing = door
+		1:
+			thingname = "Comp"
+			var closest = INF
+			for computer in computers:
+				var distance = Global.dist(computer.position, camera.global_position)
+				if distance < closest:
+					closest = distance
+					thing = computer
+		2:
+			thingname = "Anom"
+			var closest = INF
+			for anomaly in anomalies:
+				if anomaly.alive and not anomaly.undead:
+					var distance = Global.dist(anomaly.position, camera.global_position)
+					if distance < closest:
+						closest = distance
+						thing = anomaly
+	if thing == null:
+		return OoOoOo(thingname, 0)
 	var camangle = camera.get_node("CamVector").global_position - camera.global_position
-	var doorangle = (door.position - Global.player.position).normalized()
-	var angdiff = (doorangle - camangle).length() * 0.5
-	return OoOoOo("Compass", (1 - angdiff) * 7)
+	var thingangle = (thing.position - camera.global_position).normalized()
+	var angdiff = (thingangle - camangle).length() * 0.5
+	return OoOoOo(thingname, sqrt(1 - angdiff) * 7)
 		# why do angle math when you can use rotated vectors?  :D
 
 func updatesonar():

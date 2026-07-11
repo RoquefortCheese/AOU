@@ -49,6 +49,13 @@ func existentmod(modname: String):
 		return null
 	return Global.Modifier[modname]
 
+func existentsetting(setting: String):
+	setting = setting.to_upper()
+	if setting not in Global.Setting:
+		terminalstring += "Nonexistent setting.\n\n"
+		return null
+	return Global.Setting[setting]
+
 func infoname(mod: Global.Modifier):
 	var output = ""
 	output += tabbed(Anomaly.colname[Global.modcolors[mod]], 8) + "| "
@@ -94,6 +101,7 @@ func help():
 	terminalstring += tabbed("clear:") + "Clears the terminal.\n"
 	terminalstring += tabbed("exit:") + "Exits the terminal.\n"
 	terminalstring += tabbed("settings:") + "Displays game settings.\n"
+	terminalstring += tabbed("info [setting]:") + "Outputs the setting description.\n"
 	match termclass:
 		TerminalClass.RESTORATION:
 			terminalstring += tabbed("restore:") + "Restores some health. Usable once.\n"
@@ -103,14 +111,14 @@ func help():
 			terminalstring += tabbed("add [mod]:") + "Adds the requested modifier.\n"
 			terminalstring += tabbed("del [mod]:") + "Deletes the requested modifier.\n"
 		TerminalClass.START:
-			terminalstring += tabbed("seed [int]:") + "Sets the world seed to the given number.\n"
 			terminalstring += tabbed("set [x] [bool]:") + "Enables or disables a game setting.\n"
+			terminalstring += tabbed("seed [int]:") + "Sets the world seed to the given number.\n"
 			terminalstring += tabbed("about [mod]:") + "Outputs the modifier description.\n"
 			terminalstring += tabbed("add [mod]:") + "Adds the requested modifier.\n"
 			terminalstring += tabbed("del [mod]:") + "Deletes the requested modifier.\n"
 		TerminalClass.END:
-			terminalstring += tabbed("cause:") + "Displays the cause of the end of the run.\n"
-			terminalstring += tabbed("score:") + "Displays your total final score.\n"
+			terminalstring += tabbed("cause:") + "Outputs the cause of the end of the run.\n"
+			terminalstring += tabbed("score:") + "Outputs your total final score.\n"
 			terminalstring += tabbed("restart:") + "Starts a new run.\n"
 	terminalstring += "\n"
 
@@ -123,6 +131,12 @@ func showsettings():
 			terminalstring += " [" + str(Global.worldseed) + "]"
 		terminalstring += "\n"
 	terminalstring += "\n"
+
+func info(args: Array[String]):
+	var setting = existentsetting(args[1])
+	if setting == null:
+		return
+	terminalstring += Global.settingdescs[setting] + "\n\n"
 
 func restore():
 	if otherstuff[OtherStuff.SPENT]:
@@ -203,15 +217,13 @@ func setseed(args: Array[String]):
 	terminalstring += "Seed set!\n\n"
 
 func tingset(args: Array[String]):
-	var setting = args[1].to_upper()
-	var value = args[2].to_lower()
-	if setting not in Global.Setting:
-		terminalstring += "Nonexistent setting.\n\n"
+	var setting = existentsetting(args[1])
+	if setting == null:
 		return
+	var value = args[2].to_lower()
 	if value not in ["true", "false"]:
 		terminalstring += "Value must be either true or false.\n\n"
 		return
-	setting = Global.Setting[setting]
 	value = {"true": true, "false": false}[value]  # riveting stuff here
 	if setting == Global.Setting.SEEDED:
 		if value == true:
@@ -245,7 +257,7 @@ func newcommand():
 func writeoutput():
 	var output = terminalstring + currentinput
 	if inuse():
-		if fmod(Global.time(), 1) < 0.5:
+		if fmod(Global.chamber.time, 1) < 0.5:
 			output += "_"
 	var lines = []
 	var nextline = ""
@@ -305,6 +317,9 @@ func runinput():
 			"settings":
 				if argquant(args, 1):
 					showsettings()
+			"info":
+				if argquant(args, 2):
+					info(args)
 			"restore":
 				if argquant(args, 1) and classfilter([TerminalClass.RESTORATION]):
 					restore()
@@ -320,12 +335,12 @@ func runinput():
 			"del":
 				if argquant(args, 2) and classfilter([TerminalClass.MOD, TerminalClass.START]):
 					del(args)
-			"seed":
-				if argquant(args, 2) and classfilter([TerminalClass.START]):
-					setseed(args)
 			"set":
 				if argquant(args, 3) and classfilter([TerminalClass.START]):
 					tingset(args)
+			"seed":
+				if argquant(args, 2) and classfilter([TerminalClass.START]):
+					setseed(args)
 			"cause":
 				if argquant(args, 1) and classfilter([TerminalClass.END]):
 					cod()
