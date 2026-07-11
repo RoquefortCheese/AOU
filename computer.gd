@@ -180,9 +180,6 @@ func add(args: Array[String]):
 	if issue != null:
 		terminalstring += issue + "\n\n"
 		return
-	if termclass == TerminalClass.MOD and len(Global.player.modifiers) == Global.maxmods:
-		terminalstring += "Cannot exceed the max amount of modifiers.\n\n"
-		return
 	if termclass == TerminalClass.MOD and abs(Global.player.balance + Global.modcosts[mod]) > 4:
 		terminalstring += "Balance cannot exceed ±4.\n\n"
 		return
@@ -197,6 +194,10 @@ func del(args: Array[String]):
 	if mod not in Global.player.modifiers:
 		terminalstring += "You do not have this modifier.\n\n"
 		return
+	for othermod in Global.player.modifiers:
+		if othermod in Global.prereqs and Global.prereqs[othermod] == mod:
+			terminalstring += "To delete this modifier you must delete " + Global.modnames[othermod] + ".\n\n"
+			return
 	if abs(Global.player.balance - Global.modcosts[mod]) > 4:
 		terminalstring += "Balance cannot exceed ±4.\n\n"
 		return

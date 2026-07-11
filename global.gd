@@ -5,7 +5,7 @@ enum MeshType {AIR, CUBE, PLANT}
 @export var materials: Dictionary[Vox, Material]
 @export var meshtypes: Dictionary[Vox, MeshType]
 
-enum Modifier {DOORPLANT, PILLARVINE, MORESPACE, LESSSPACE, FASTANOMS, FLOATY, MOREANOMS, SQUASH, STRETCH, SORTANOMS, REGEN, RUNNING, DOUBLEJUMP, ISLANDS, MOREAMMO, FASTRELOAD, ALERTANOMS, MOREOUCH, TRIPLEJUMP, STROLLING, SNIPER, SILVERLINE, MOREHEAL, LESSHEAL, HIGHGRASS, ANOMFLAVOR}
+enum Modifier {DOORPLANT, PILLARVINE, MORESPACE, LESSSPACE, FASTANOMS, FLOATY, MOREANOMS, SQUASH, STRETCH, SORTANOMS, REGEN, RUNNING, DOUBLEJUMP, ISLANDS, MOREAMMO, FASTRELOAD, ALERTANOMS, MOREOUCH, TRIPLEJUMP, STROLLING, SNIPER, SILVERLINE, MOREHEAL, LESSHEAL, HIGHGRASS, ANOMFLAVOR, DENSE, FALLDAMAGE, SQUISH}
 const modcosts: Dictionary[Modifier, int] = {
 	Modifier.DOORPLANT: -2,
 	Modifier.PILLARVINE: -4,
@@ -33,6 +33,9 @@ const modcosts: Dictionary[Modifier, int] = {
 	Modifier.LESSHEAL: 2,
 	Modifier.HIGHGRASS: -3,
 	Modifier.ANOMFLAVOR: 4,
+	Modifier.DENSE: 4,
+	Modifier.FALLDAMAGE: 2,
+	Modifier.SQUISH: 2,
 }
 const modcolors: Dictionary[Modifier, Anomaly.AnomColor] = {
 	Modifier.DOORPLANT: Anomaly.AnomColor.BLUE,
@@ -61,6 +64,9 @@ const modcolors: Dictionary[Modifier, Anomaly.AnomColor] = {
 	Modifier.LESSHEAL: Anomaly.AnomColor.MAGENTA,
 	Modifier.HIGHGRASS: Anomaly.AnomColor.BLUE,
 	Modifier.ANOMFLAVOR: Anomaly.AnomColor.MAGENTA,
+	Modifier.DENSE: Anomaly.AnomColor.CYAN,
+	Modifier.FALLDAMAGE: Anomaly.AnomColor.CYAN,
+	Modifier.SQUISH: Anomaly.AnomColor.BLUE,
 }
 var modnames: Dictionary[Modifier, String] = {
 	Modifier.DOORPLANT: "DoorPlant",
@@ -89,6 +95,9 @@ var modnames: Dictionary[Modifier, String] = {
 	Modifier.LESSHEAL: "LessHeal",
 	Modifier.HIGHGRASS: "HighGrass",
 	Modifier.ANOMFLAVOR: "AnomFlavor",
+	Modifier.DENSE: "Dense",
+	Modifier.FALLDAMAGE: "FallDamage",
+	Modifier.SQUISH: "Squish",
 }
 var moddescs: Dictionary[Modifier, String] = {
 	Modifier.DOORPLANT: "Blue plants that grow next to doors.",
@@ -117,17 +126,21 @@ var moddescs: Dictionary[Modifier, String] = {
 	Modifier.LESSHEAL: "Restoration terminals heal less.",
 	Modifier.HIGHGRASS: "High grass that can be hidden in.",
 	Modifier.ANOMFLAVOR: "Applies other mods based on anom color.",
+	Modifier.DENSE: "More gravity.",
+	Modifier.FALLDAMAGE: "Hitting the ground too fast hurts.",
+	Modifier.SQUISH: "Caves compressed vertically even more.",
 }
 var incompatibilities: Array[Vector2] = [
 	Vector2(Modifier.MORESPACE, Modifier.LESSSPACE),
 	Vector2(Modifier.SQUASH, Modifier.STRETCH),
 	Vector2(Modifier.RUNNING, Modifier.STROLLING),
 	Vector2(Modifier.MOREHEAL, Modifier.LESSHEAL),
+	Vector2(Modifier.FLOATY, Modifier.DENSE)
 ]
 var prereqs: Dictionary[Modifier, Modifier] = {
 	Modifier.TRIPLEJUMP: Modifier.DOUBLEJUMP,
+	Modifier.SQUISH: Modifier.SQUASH,
 }
-const maxmods: int = 8
 
 enum Setting {SEEDED, INFINITE, SIMPLE}
 const settingnames: Dictionary[Setting, String] = {

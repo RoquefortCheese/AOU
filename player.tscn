@@ -5,6 +5,7 @@
 [ext_resource type="Shader" uid="uid://bcmdwyjuyraxo" path="res://post.gdshader" id="2_onrkg"]
 [ext_resource type="AudioStream" uid="uid://civ4fir4hvcel" path="res://reload.wav" id="5_2hs0m"]
 [ext_resource type="Texture2D" uid="uid://crnr8scc3dp5g" path="res://icon.svg" id="5_sweqy"]
+[ext_resource type="AudioStream" uid="uid://dscpr6tu2avtd" path="res://ouch.wav" id="6_2hs0m"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_onrkg"]
 radius = 0.2
@@ -61,3 +62,7 @@ mesh = SubResource("CapsuleMesh_hqtel")
 [node name="ReloadAudioPlayer" type="AudioStreamPlayer" parent="." unique_id=1441300152]
 process_mode = 3
 stream = ExtResource("5_2hs0m")
+
+[node name="HitAudioPlayer" type="AudioStreamPlayer" parent="." unique_id=683763233]
+process_mode = 3
+stream = ExtResource("6_2hs0m")

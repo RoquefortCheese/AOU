@@ -1,7 +1,6 @@
 [gd_scene format=3 uid="uid://6ckuifqjy0ne"]
 
 [ext_resource type="Script" uid="uid://c3olph35n8pip" path="res://anomaly.gd" id="1_c1slk"]
-[ext_resource type="AudioStream" uid="uid://dscpr6tu2avtd" path="res://anomtouch.wav" id="2_knx40"]
 [ext_resource type="AudioStream" uid="uid://p46fcp81ebv2" path="res://anomshot.wav" id="3_f85fg"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_c1slk"]
@@ -34,13 +33,6 @@ shape = SubResource("SphereShape3D_c1slk")
 [node name="DebugHitboxVisual" type="MeshInstance3D" parent="." unique_id=1750258409]
 visible = false
 mesh = SubResource("SphereMesh_c1slk")
-
-[node name="ContactAudioPlayer" type="AudioStreamPlayer3D" parent="." unique_id=1450338378]
-process_mode = 3
-stream = ExtResource("2_knx40")
-volume_db = 2.0
-unit_size = 8.0
-max_db = 4.0
 
 [node name="ShotAudioPlayer" type="AudioStreamPlayer3D" parent="." unique_id=1372050014]
 process_mode = 3

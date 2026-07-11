@@ -139,7 +139,14 @@ func actualterragen():
 				var spheubedist = 0
 				for axis in 3:
 					spheubedist += ((point[axis] + 0.5) * 2 / size - 1) ** 4
-				var noiseval = noise.get_noise_3d(x + 0.5, (y + 0.5) * Global.ifmod(1, 2, Global.Modifier.SQUASH) * Global.ifmod(1, 0.5, Global.Modifier.STRETCH), z + 0.5)
+				var sampley = y + 0.5
+				if Global.hasmod(Global.Modifier.SQUASH):
+					sampley *= 2
+					if Global.hasmod(Global.Modifier.SQUISH):
+						sampley *= 2
+				if Global.hasmod(Global.Modifier.STRETCH):
+					sampley *= 0.5
+				var noiseval = noise.get_noise_3d(x + 0.5, sampley, z + 0.5)
 				if Global.hasmod(Global.Modifier.ISLANDS):
 					noiseval = asin(abs(noiseval) * -2 + 1) * 2 / PI
 				if rescale(noiseval, 0, 1) < spheubedist * 0.5 + 0.5 or (min(x, y, z) == 0 or max(x, y, z) == size - 1):
@@ -317,10 +324,31 @@ func placelights():
 		setvox(point, Global.Vox.LIGHT)
 
 func fillsmallgaps():
+	for axis in Global.diceshuffle([0, 2]):
+		for column in size:
+			for index in size - 1:
+				var streak = 0
+				for y in size:
+					var point = Vector3.UP * y
+					point[2 - axis] = column
+					point[axis] = index
+					var nextpoint = point
+					nextpoint[axis] += 1
+					if not issolid(point) and not issolid(nextpoint):
+						streak += 1
+					else:
+						if streak < 3:
+							for yy in range(y - streak, y):
+								var prevpoint = point
+								prevpoint.y = yy
+								setvox(prevpoint, Global.Vox.STONE)
+								#prevpoint[axis] += 1
+								#setvox(prevpoint, Global.Vox.GLASS)
+						streak = 0
 	for x in size:
 		for z in size:
 			var streak = 0
-			for y in size + 1:
+			for y in size:
 				var point = Vector3(x, y, z)
 				if not issolid(point):
 					streak += 1

@@ -14,6 +14,7 @@ var timesinceground: float
 var timesinceempty: float
 var terminalinuse: Computer
 var jumpsleft: int
+var fallvel: float
 var compassindex: int
 
 var score: Dictionary[Anomaly.AnomColor, int]
@@ -71,6 +72,7 @@ func _ready():
 	timesinceground = 0
 	terminalinuse = null
 	jumpsleft = 0
+	fallvel = 0
 	compassindex = 0
 
 func _physics_process(delta: float):
@@ -142,14 +144,22 @@ func considerfocusing():
 func otherphysics(delta: float):
 	if is_on_floor():
 		timesinceground = 0
+		if Global.hasmod(Global.Modifier.FALLDAMAGE):
+			impacthealth(min(0, floor((fallvel + 16) / 8)))
 	else:
-		velocity.y -= Global.ifmod(12, 8, Global.Modifier.FLOATY) * delta
+		var gravity = 12
+		if Global.hasmod(Global.Modifier.FLOATY):
+			gravity -= 3
+		if Global.hasmod(Global.Modifier.DENSE):
+			gravity += 3
+		velocity.y -= gravity * delta
 		timesinceground += delta
 	velocity.x *= exp(friction) ** delta
 	velocity.z *= exp(friction) ** delta
 	if invine():
 		for axis in 3:
 			velocity[axis] *= exp(friction) ** delta
+	fallvel = velocity.y
 	move_and_slide()
 
 func belikelumi():
@@ -160,6 +170,8 @@ func belikelumi():
 
 func impacthealth(amount: int):
 	if alive:
+		if amount < 0:
+			$HitAudioPlayer.play()
 		health = min(health + amount, 6)
 		if health < 0:
 			die()

@@ -138,7 +138,7 @@ func fall():
 func mayberegen(delta: float):
 	timedead += delta
 	if Global.hasmod(Global.Modifier.REGEN):
-		if timedead >= 20:
+		if timedead >= 60:
 			alive = true
 			undead = true
 			for box in boxes:
@@ -170,8 +170,6 @@ func die(source: Vector3, shot: bool):
 	velocity += (position - source).normalized() * knockbackconst
 	if shot:
 		$ShotAudioPlayer.play()
-	else:
-		$ContactAudioPlayer.play()
 	if alive:
 		alive = false
 		timedead = 0
