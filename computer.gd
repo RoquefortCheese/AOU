@@ -353,4 +353,3 @@ func runinput():
 					restart()
 	currentinput = ""
 	newcommand()
-#banana (secret)
