@@ -108,7 +108,9 @@ func follow():
 	if tamed:
 		actualnoticeradius = 4
 	elif Global.hasmod(Global.Modifier.ALERTANOMS) or (color == AnomColor.BLUE and Global.hasmod(Global.Modifier.ANOMFLAVOR)):
-		actualnoticeradius *= 2
+		actualnoticeradius *= 1.5
+		if Global.hasmod(Global.Modifier.HYPERSPICE):
+			actualnoticeradius = INF
 	if distance <= actualnoticeradius:
 		following = true
 	if distance > actualnoticeradius * followbuffer or  Global.chamber.getvox(Global.player.position + Vector3.UP) == Global.Vox.HIGHGRASS:
@@ -154,16 +156,17 @@ func domath(delta: float):
 	velocity.x *= exp(flatfriction) ** delta
 	velocity.z *= exp(flatfriction) ** delta
 	if Global.hasmod(Global.Modifier.FASTANOMS) or (color == AnomColor.CYAN and Global.hasmod(Global.Modifier.ANOMFLAVOR)):
-		acceleration *= 1.5
+		acceleration *= Global.ifmod(1.5, 2, Global.Modifier.HYPERSPICE)
 	velocity += acceleration * delta
 
 func maybetouch():
 	for i in get_slide_collision_count():
 		if get_slide_collision(i).get_collider() == Global.player:
 			die(Global.player.position, false)
-			Global.player.impacthealth(-1)
-			if Global.hasmod(Global.Modifier.MOREOUCH) or (color == AnomColor.MAGENTA and Global.hasmod(Global.Modifier.ANOMFLAVOR)):
-				Global.player.impacthealth(-1)
+			var damage = 1
+			if Global.hasmod(Global.Modifier.BADANOMS) or (color == AnomColor.MAGENTA and Global.hasmod(Global.Modifier.ANOMFLAVOR)):
+				damage = Global.ifmod(2, 3, Global.Modifier.HYPERSPICE)
+			Global.player.impacthealth(-damage)
 			break
 
 func die(source: Vector3, shot: bool):

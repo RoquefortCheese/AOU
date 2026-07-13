@@ -5,7 +5,7 @@ enum MeshType {AIR, CUBE, PLANT}
 @export var materials: Dictionary[Vox, Material]
 @export var meshtypes: Dictionary[Vox, MeshType]
 
-enum Modifier {DOORPLANT, PILLARVINE, MORESPACE, LESSSPACE, FASTANOMS, FLOATY, MOREANOMS, SQUASH, STRETCH, SORTANOMS, REGEN, RUNNING, DOUBLEJUMP, ISLANDS, MOREAMMO, FASTRELOAD, ALERTANOMS, MOREOUCH, TRIPLEJUMP, STROLLING, SNIPER, SILVERLINE, MOREHEAL, LESSHEAL, HIGHGRASS, ANOMFLAVOR, DENSE, FALLDAMAGE, SQUISH}
+enum Modifier {DOORPLANT, PILLARVINE, MORESPACE, LESSSPACE, FASTANOMS, FLOATY, MOREANOMS, SQUASH, STRETCH, SORTANOMS, REGEN, RUNNING, DOUBLEJUMP, ISLANDS, MOREAMMO, FASTRELOAD, ALERTANOMS, BADANOMS, TRIPLEJUMP, STROLLING, SNIPER, SILVERLINE, MOREHEAL, LESSHEAL, HIGHGRASS, ANOMFLAVOR, DENSE, FALLDAMAGE, SQUISH, HYPERSPICE}
 const modcosts: Dictionary[Modifier, int] = {
 	Modifier.DOORPLANT: -2,
 	Modifier.PILLARVINE: -4,
@@ -23,8 +23,8 @@ const modcosts: Dictionary[Modifier, int] = {
 	Modifier.ISLANDS: -1,
 	Modifier.MOREAMMO: -3,
 	Modifier.FASTRELOAD: -3,
-	Modifier.ALERTANOMS: 4,
-	Modifier.MOREOUCH: 4,
+	Modifier.ALERTANOMS: 2,
+	Modifier.BADANOMS: 4,
 	Modifier.TRIPLEJUMP: -4,
 	Modifier.STROLLING: 3,
 	Modifier.SNIPER: -2,
@@ -36,6 +36,7 @@ const modcosts: Dictionary[Modifier, int] = {
 	Modifier.DENSE: 4,
 	Modifier.FALLDAMAGE: 2,
 	Modifier.SQUISH: 2,
+	Modifier.HYPERSPICE: 4,
 }
 const modcolors: Dictionary[Modifier, Anomaly.AnomColor] = {
 	Modifier.DOORPLANT: Anomaly.AnomColor.BLUE,
@@ -55,7 +56,7 @@ const modcolors: Dictionary[Modifier, Anomaly.AnomColor] = {
 	Modifier.MOREAMMO: Anomaly.AnomColor.MAGENTA,
 	Modifier.FASTRELOAD: Anomaly.AnomColor.MAGENTA,
 	Modifier.ALERTANOMS: Anomaly.AnomColor.MAGENTA,
-	Modifier.MOREOUCH: Anomaly.AnomColor.MAGENTA,
+	Modifier.BADANOMS: Anomaly.AnomColor.MAGENTA,
 	Modifier.TRIPLEJUMP: Anomaly.AnomColor.CYAN,
 	Modifier.STROLLING: Anomaly.AnomColor.CYAN,
 	Modifier.SNIPER: Anomaly.AnomColor.MAGENTA,
@@ -67,6 +68,7 @@ const modcolors: Dictionary[Modifier, Anomaly.AnomColor] = {
 	Modifier.DENSE: Anomaly.AnomColor.CYAN,
 	Modifier.FALLDAMAGE: Anomaly.AnomColor.CYAN,
 	Modifier.SQUISH: Anomaly.AnomColor.BLUE,
+	Modifier.HYPERSPICE: Anomaly.AnomColor.MAGENTA,
 }
 var modnames: Dictionary[Modifier, String] = {
 	Modifier.DOORPLANT: "DoorPlant",
@@ -86,7 +88,7 @@ var modnames: Dictionary[Modifier, String] = {
 	Modifier.MOREAMMO: "MoreAmmo",
 	Modifier.FASTRELOAD: "FastReload",
 	Modifier.ALERTANOMS: "AlertAnoms",
-	Modifier.MOREOUCH: "MoreOuch",
+	Modifier.BADANOMS: "BadAnoms",
 	Modifier.TRIPLEJUMP: "TripleJump",
 	Modifier.STROLLING: "Strolling",
 	Modifier.SNIPER: "Sniper",
@@ -98,6 +100,7 @@ var modnames: Dictionary[Modifier, String] = {
 	Modifier.DENSE: "Dense",
 	Modifier.FALLDAMAGE: "FallDamage",
 	Modifier.SQUISH: "Squish",
+	Modifier.HYPERSPICE: "HyperSpice",
 }
 var moddescs: Dictionary[Modifier, String] = {
 	Modifier.DOORPLANT: "Blue plants that grow next to doors.",
@@ -117,7 +120,7 @@ var moddescs: Dictionary[Modifier, String] = {
 	Modifier.MOREAMMO: "More ammunition.",
 	Modifier.FASTRELOAD: "Faster reload time.",
 	Modifier.ALERTANOMS: "Anomalies sense you from farther away.",
-	Modifier.MOREOUCH: "Anomalies deal more damage.",
+	Modifier.BADANOMS: "Anomalies deal more damage.",
 	Modifier.TRIPLEJUMP: "Airjump twice.",
 	Modifier.STROLLING: "Slower movement.",
 	Modifier.SNIPER: "Sniping while pursued restores health.",
@@ -129,6 +132,7 @@ var moddescs: Dictionary[Modifier, String] = {
 	Modifier.DENSE: "More gravity.",
 	Modifier.FALLDAMAGE: "Hitting the ground too fast hurts.",
 	Modifier.SQUISH: "Caves compressed vertically even more.",
+	Modifier.HYPERSPICE: "AnomFlavor mods are stronger.",
 }
 var incompatibilities: Array[Vector2] = [
 	Vector2(Modifier.MORESPACE, Modifier.LESSSPACE),

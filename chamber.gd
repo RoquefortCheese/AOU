@@ -81,21 +81,22 @@ func create():
 	Global.chamber = self
 	resetvars()
 	terragen()
-	print("terra genned!")
+	#print("terra genned!")
 	if not goodfloodfill():
 		print("regenerating...")
 		create()
 		return
 	placefeatures()
-	print("features placed!")
-	print("cave aquifered!")
+	#print("features placed!")
+	#print("cave aquifered!")
 	createmeshes()
-	print("meshes created!")
+	#print("meshes created!")
 	anomalize()
-	print("anomalies materialized!")
+	#print("anomalies materialized!")
 	welcomeplayer()
-	print("player welcomed!")
-	print("done!")
+	#print("player welcomed!")
+	#print("done!")
+	print("sidelen: ", approxsidelen())
 
 func resetvars():
 	size = 0
@@ -434,7 +435,8 @@ func _input(event: InputEvent):
 		if event.is_action_pressed("metatoggle"):
 			$MetaLabel.visible = not $MetaLabel.visible
 		if event.is_action_pressed("forcecontinue"):
-			Global.world.phasewarp()
+			if Global.player.alive and not self is IntermissionChamber:
+				Global.world.phasewarp()
 
 func updatestatlabel():
 	$StatLabel.text = ""
