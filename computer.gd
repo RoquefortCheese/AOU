@@ -142,12 +142,7 @@ func restore():
 	if otherstuff[OtherStuff.SPENT]:
 		terminalstring += "You have already used this terminal to restore.\n\n"
 		return
-	var healing = 3
-	if Global.hasmod(Global.Modifier.MOREHEAL):
-		healing += 1
-	if Global.hasmod(Global.Modifier.LESSHEAL):
-		healing -= 1
-	Global.player.impacthealth(healing)
+	Global.player.impacthealth(Global.ifmod(3, 256, Global.Modifier.FULLHEAL))
 	otherstuff[OtherStuff.SPENT] = true
 	terminalstring += "Your health has been restored!\n\n"
 

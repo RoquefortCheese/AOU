@@ -396,13 +396,11 @@ func anomalize():
 	var colorder = Global.diceshuffle(Anomaly.AnomColor.values())
 	for i in int(len(air) * 2 ** Global.ifmod(-12., -11., Global.Modifier.MOREANOMS)): #(-11 - 3 * 2 ** (Global.chamberindex * -0.1)):
 		var anomaly = anomscene.instantiate()
+		anomaly.create(colorder[i % 3])
 		anomaly.position = spawnpoint() + Vector3.UP
 		anomalies.append(anomaly)
 		entities.append(anomaly)
 		add_child(anomaly)
-	anomalies.sort_custom(func(one, two): return one.position.y > two.position.y)
-	for i in len(anomalies):
-		anomalies[i].create(colorder[Global.ifmod(i % 3, floor(i * 3. / len(anomalies)), Global.Modifier.SORTANOMS)])
 
 func welcomeplayer():
 	spinplayer()

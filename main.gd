@@ -6,6 +6,26 @@ class_name Main
 var world: World
 
 func _ready():
+	
+	# don't mind this, just some atrocious spaghetti code to calculate numbers for dev purposes
+	var counts = {}
+	var costs = {}
+	var totalcount = 0
+	var totalcost = 0
+	for color in Anomaly.AnomColor.values():
+		counts[color] = 0
+		costs[color] = 0
+		for mod in Global.Modifier.values():
+			if Global.modcolors[mod] == color:
+				counts[color] += 1
+				totalcount += 1
+				costs[color] += Global.modcosts[mod]
+				totalcost += Global.modcosts[mod]
+		print(Anomaly.actualcolor[color].to_html() + " count: " + str(counts[color]))
+		print(Anomaly.actualcolor[color].to_html() + " cost: " + str(costs[color]))
+	print("total count: " + str(totalcount))
+	print("total cost: " + str(totalcost))
+	
 	newgame()
 
 func newgame():

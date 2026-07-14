@@ -32,7 +32,7 @@ func getfollowers():
 	return following
 
 func maxammo():
-	return Global.ifmod(12, 18, Global.Modifier.MOREAMMO)
+	return Global.ifmod(12, 24, Global.Modifier.MOREAMMO)
 
 func maxjumps():
 	if Global.hasmod(Global.Modifier.TRIPLEJUMP):
@@ -100,6 +100,8 @@ func movementinput(delta: float):
 		if timesinceground >= coyotetime and not invine():
 			jumpsleft = min(maxjumps() - 1, jumpsleft)
 		var finalacc = acc * Global.ifmod(1, 1.25, Global.Modifier.RUNNING) * Global.ifmod(1, 0.75, Global.Modifier.STROLLING)
+		if Global.hasmod(Global.Modifier.WALLRUN) and is_on_wall():
+			finalacc *= 2
 		direction = direction.rotated(Vector3.UP, $Camera3D.rotation.y).normalized() * finalacc * delta
 		velocity.x += direction.x
 		velocity.z += direction.z
@@ -133,7 +135,7 @@ func reload(delta: float):
 	if ammo != 0:
 		timesinceempty = 0
 	timesinceempty += delta
-	if ammo != maxammo() and (getfollowers() == 0 or timesinceempty >= reloadtime * Global.ifmod(1, 0.5, Global.Modifier.FASTRELOAD)):
+	if ammo != maxammo() and (getfollowers() == 0 or timesinceempty >= reloadtime):
 		ammo = maxammo()
 		$ReloadAudioPlayer.play()
 
@@ -189,7 +191,10 @@ func _input(event: InputEvent):
 			pan.x = clamp(pan.x, -PI / 2, PI / 2)
 	if event.is_action_pressed("jump") and terminalinuse == null:
 		if jumpsleft != 0:
-			velocity.y = jumpspeed
+			var finaljumpspeed = jumpspeed
+			if Global.hasmod(Global.Modifier.PLANTJUMP) and Global.meshtypes[Global.chamber.getvox(position)] == Global.MeshType.PLANT:
+				finaljumpspeed *= 2
+			velocity.y = finaljumpspeed
 			jumpsleft -= 1
 	if event.is_action_pressed("switchcompass") and terminalinuse == null:
 		compassindex += 1
