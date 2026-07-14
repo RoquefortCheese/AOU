@@ -23,6 +23,7 @@ var alive: bool
 var balance: int
 var health: int
 var ammo: int
+var acceleration: Vector3
 
 func getfollowers():
 	var following = 0
@@ -76,15 +77,17 @@ func _ready():
 	compassindex = 0
 
 func _physics_process(delta: float):
+	acceleration = Vector3.ZERO
 	handlecam(delta)
-	movementinput(delta)
-	useequipment(delta)
+	movementinput()
+	useequipment()
 	reload(delta)
 	considerfocusing()
 	otherphysics(delta)
+	domath(delta)
 	belikelumi()
 
-func movementinput(delta: float):
+func movementinput():
 	if terminalinuse == null:
 		var direction = Vector3.ZERO
 		if Input.is_action_pressed("forward"):
@@ -102,9 +105,7 @@ func movementinput(delta: float):
 		var finalacc = acc * Global.ifmod(1, 1.25, Global.Modifier.RUNNING) * Global.ifmod(1, 0.75, Global.Modifier.STROLLING)
 		if Global.hasmod(Global.Modifier.WALLRUN) and is_on_wall():
 			finalacc *= 2
-		direction = direction.rotated(Vector3.UP, $Camera3D.rotation.y).normalized() * finalacc * delta
-		velocity.x += direction.x
-		velocity.z += direction.z
+		acceleration = Global.flatten(direction.rotated(Vector3.UP, $Camera3D.rotation.y).normalized()) * finalacc
 
 func useterminal(terminal: Computer):
 	terminalinuse = terminal
@@ -119,7 +120,7 @@ func handlecam(delta: float):
 		$Camera3D.rotation[axis] += (pan[axis] - $Camera3D.rotation[axis]) * (1 - (2 ** 48) ** -delta)
 	$MeshInstance3D.rotation.y = $Camera3D.rotation.y + PI
 
-func useequipment(delta: float):
+func useequipment():
 	if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED and Input.is_action_just_pressed("leftclick"):
 		if terminalinuse != null:
 			stopusingterminal()
@@ -154,15 +155,23 @@ func otherphysics(delta: float):
 			gravity -= 3
 		if Global.hasmod(Global.Modifier.DENSE):
 			gravity += 3
-		velocity.y -= gravity * delta
+		acceleration.y -= gravity
 		timesinceground += delta
-	velocity.x *= exp(friction) ** delta
-	velocity.z *= exp(friction) ** delta
-	if invine():
-		for axis in 3:
-			velocity[axis] *= exp(friction) ** delta
+	if Global.hasmod(Global.Modifier.PHOTOFIELD):
+		for light in Global.chamber.lights:
+			var diff = position - light.position
+			acceleration += diff.normalized() * diff.length() ** -2 * 2 ** 9
 	fallvel = velocity.y
 	move_and_slide()
+
+func domath(delta: float):
+	if invine():
+		for axis in 3:
+			velocity[axis] *= exp(friction * 2) ** delta
+	else:
+		for axis in [0, 2]:
+			velocity[axis] *= exp(friction) ** delta
+	velocity += acceleration * delta
 
 func belikelumi():
 	for i in get_slide_collision_count():
@@ -174,6 +183,10 @@ func impacthealth(amount: int):
 	if alive:
 		if amount < 0:
 			$HitAudioPlayer.play()
+			if Global.hasmod(Global.Modifier.VENGEANCE):
+				for anomaly in Global.chamber.anomalies:
+					if Global.dist(position, anomaly.position) <= 6:
+						anomaly.die($Camera3D.position, true)
 		health = min(health + amount, 6)
 		if health < 0:
 			die()

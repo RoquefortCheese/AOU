@@ -63,12 +63,22 @@ func infoname(mod: Global.Modifier):
 	output += Global.modnames[mod]
 	return output
 
-func incompats(mod: Global.Modifier):
-	for playermod in Global.player.modifiers:
+
+
+func incompats(mod: Global.Modifier, others: Array[Global.Modifier]):
+	for playermod in others:
 		if Vector2(mod, playermod) in Global.incompatibilities or Vector2(playermod, mod) in Global.incompatibilities:
 			return "This mod conflicts with " + Global.modnames[playermod] + "."
-	if mod in Global.prereqs and Global.prereqs[mod] not in Global.player.modifiers:
-		return "This mod requires " + Global.modnames[Global.prereqs[mod]] + "."
+	if mod in Global.prereqs:
+		for reqset in Global.prereqs[mod]:
+			var fulfilled = false
+			for req in reqset:
+				if req in others:
+					fulfilled = true
+			if not fulfilled:
+				if len(reqset) == 1:
+					return "This mod requires " + Global.modnames[reqset[0]] + "."
+				return "This mod requires one of multiple others."
 	return null
 
 func create(termclass: TerminalClass):
@@ -80,7 +90,7 @@ func create(termclass: TerminalClass):
 			otherstuff[OtherStuff.MODS] = []
 			var shuffledmods = Global.diceshuffle(Global.Modifier.values())
 			for mod in shuffledmods:
-				if not Global.hasmod(mod) and incompats(mod) == null:
+				if not Global.hasmod(mod) and incompats(mod, Global.player.modifiers) == null:
 					otherstuff[OtherStuff.MODS].append(mod)
 					if len(otherstuff[OtherStuff.MODS]) == 3:
 						break
@@ -171,7 +181,7 @@ func add(args: Array[String]):
 	if Global.hasmod(mod):
 		terminalstring += "This modifier has already been added.\n\n"
 		return
-	var issue = incompats(mod)
+	var issue = incompats(mod, Global.player.modifiers)
 	if issue != null:
 		terminalstring += issue + "\n\n"
 		return
@@ -184,19 +194,21 @@ func add(args: Array[String]):
 
 func del(args: Array[String]):
 	var mod = existentmod(args[1])
+	var changedlist = Global.player.modifiers.duplicate()
+	changedlist.erase(mod)
 	if mod == null:
 		return
 	if mod not in Global.player.modifiers:
 		terminalstring += "You do not have this modifier.\n\n"
 		return
 	for othermod in Global.player.modifiers:
-		if othermod in Global.prereqs and Global.prereqs[othermod] == mod:
+		if incompats(othermod, changedlist) != null:
 			terminalstring += "To delete this modifier you must delete " + Global.modnames[othermod] + ".\n\n"
 			return
 	if abs(Global.player.balance - Global.modcosts[mod]) > 4:
 		terminalstring += "Balance cannot exceed ±4.\n\n"
 		return
-	Global.player.modifiers.erase(mod)
+	Global.player.modifiers = changedlist
 	Global.player.balance -= Global.modcosts[mod]
 	terminalstring += Global.modnames[mod] + " deleted!\n\n"
 

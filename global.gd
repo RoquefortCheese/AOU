@@ -1,11 +1,11 @@
 extends Node
 
-enum Vox {AIR, STONE, LIGHT, GLASS, PILLARVINE, DOORPLANT, HIGHGRASS}
+enum Vox {AIR, STONE, LIGHT, GLASS, PILLARVINE, DOORPLANT, HIGHGRASS, CORAL}
 enum MeshType {AIR, CUBE, PLANT}
 @export var materials: Dictionary[Vox, Material]
 @export var meshtypes: Dictionary[Vox, MeshType]
 
-enum Modifier {DOORPLANT, PILLARVINE, MORESPACE, LESSSPACE, FASTANOMS, FLOATY, MOREANOMS, SQUASH, STRETCH, REGEN, RUNNING, DOUBLEJUMP, ISLANDS, MOREAMMO, ALERTANOMS, BADANOMS, TRIPLEJUMP, STROLLING, SNIPER, SILVERLINE, FULLHEAL, HIGHGRASS, ANOMFLAVOR, DENSE, FALLDAMAGE, SQUISH, HYPERSPICE, WALLRUN, PLANTJUMP}
+enum Modifier {DOORPLANT, PILLARVINE, MORESPACE, LESSSPACE, FASTANOMS, FLOATY, MOREANOMS, SQUASH, STRETCH, REGEN, RUNNING, DOUBLEJUMP, ISLANDS, MOREAMMO, ALERTANOMS, BADANOMS, TRIPLEJUMP, STROLLING, SNIPER, SILVERLINE, FULLHEAL, HIGHGRASS, DENSE, FALLDAMAGE, SQUISH, HYPERSPICE, WALLRUN, PLANTJUMP, CORALBLEACH, PHOTOFIELD, VENGEANCE}
 const modcosts: Dictionary[Modifier, int] = {
 	Modifier.DOORPLANT: -2,
 	Modifier.PILLARVINE: -4,
@@ -29,13 +29,15 @@ const modcosts: Dictionary[Modifier, int] = {
 	Modifier.SILVERLINE: -2,
 	Modifier.FULLHEAL: -4,
 	Modifier.HIGHGRASS: -3,
-	Modifier.ANOMFLAVOR: 4,
 	Modifier.DENSE: 4,
 	Modifier.FALLDAMAGE: 3,
 	Modifier.SQUISH: 2,
 	Modifier.HYPERSPICE: 4,
 	Modifier.WALLRUN: -3,
 	Modifier.PLANTJUMP: -2,
+	Modifier.CORALBLEACH: 4,
+	Modifier.PHOTOFIELD: 2,
+	Modifier.VENGEANCE: -3,
 }
 const modcolors: Dictionary[Modifier, Anomaly.AnomColor] = {
 	Modifier.DOORPLANT: Anomaly.AnomColor.BLUE,
@@ -60,13 +62,15 @@ const modcolors: Dictionary[Modifier, Anomaly.AnomColor] = {
 	Modifier.SILVERLINE: Anomaly.AnomColor.MAGENTA,
 	Modifier.FULLHEAL: Anomaly.AnomColor.MAGENTA,
 	Modifier.HIGHGRASS: Anomaly.AnomColor.BLUE,
-	Modifier.ANOMFLAVOR: Anomaly.AnomColor.MAGENTA,
 	Modifier.DENSE: Anomaly.AnomColor.CYAN,
 	Modifier.FALLDAMAGE: Anomaly.AnomColor.CYAN,
 	Modifier.SQUISH: Anomaly.AnomColor.BLUE,
 	Modifier.HYPERSPICE: Anomaly.AnomColor.MAGENTA,
 	Modifier.WALLRUN: Anomaly.AnomColor.CYAN,
 	Modifier.PLANTJUMP: Anomaly.AnomColor.CYAN,
+	Modifier.CORALBLEACH: Anomaly.AnomColor.BLUE,
+	Modifier.PHOTOFIELD: Anomaly.AnomColor.CYAN,
+	Modifier.VENGEANCE: Anomaly.AnomColor.MAGENTA,
 }
 var modnames: Dictionary[Modifier, String] = {
 	Modifier.DOORPLANT: "DoorPlant",
@@ -91,13 +95,15 @@ var modnames: Dictionary[Modifier, String] = {
 	Modifier.SILVERLINE: "SilverLine",
 	Modifier.FULLHEAL: "FullHeal",
 	Modifier.HIGHGRASS: "HighGrass",
-	Modifier.ANOMFLAVOR: "AnomFlavor",
 	Modifier.DENSE: "Dense",
 	Modifier.FALLDAMAGE: "FallDamage",
 	Modifier.SQUISH: "Squish",
 	Modifier.HYPERSPICE: "HyperSpice",
 	Modifier.WALLRUN: "WallRun",
 	Modifier.PLANTJUMP: "PlantJump",
+	Modifier.CORALBLEACH: "CoralBleach",
+	Modifier.PHOTOFIELD: "PhotoField",
+	Modifier.VENGEANCE: "Vengeance",
 }
 var moddescs: Dictionary[Modifier, String] = {
 	Modifier.DOORPLANT: "Blue plants that grow next to doors.",
@@ -122,13 +128,15 @@ var moddescs: Dictionary[Modifier, String] = {
 	Modifier.SILVERLINE: "All anomaly deaths increase score.",
 	Modifier.FULLHEAL: "Restoration terminals heal fully.",
 	Modifier.HIGHGRASS: "High grass that can be hidden in.",
-	Modifier.ANOMFLAVOR: "Applies other mods based on anom color.",
 	Modifier.DENSE: "More gravity.",
 	Modifier.FALLDAMAGE: "Hitting the ground too fast hurts.",
 	Modifier.SQUISH: "Caves compressed vertically even more.",
-	Modifier.HYPERSPICE: "AnomFlavor mods are stronger.",
+	Modifier.HYPERSPICE: "_Anom mods are stronger.",
 	Modifier.WALLRUN: "Movement along walls is faster.",
 	Modifier.PLANTJUMP: "Jump higher when standing in plants.",
+	Modifier.CORALBLEACH: "Plants can bleach and hurt to touch.",
+	Modifier.PHOTOFIELD: "You are repelled from lights.",
+	Modifier.VENGEANCE: "Taking damage kills nearby anomalies.",
 }
 var incompatibilities: Array[Vector2] = [
 	Vector2(Modifier.MORESPACE, Modifier.LESSSPACE),
@@ -136,10 +144,12 @@ var incompatibilities: Array[Vector2] = [
 	Vector2(Modifier.RUNNING, Modifier.STROLLING),
 	Vector2(Modifier.FLOATY, Modifier.DENSE)
 ]
-var prereqs: Dictionary[Modifier, Modifier] = {
-	Modifier.TRIPLEJUMP: Modifier.DOUBLEJUMP,
-	Modifier.SQUISH: Modifier.SQUASH,
-}
+var prereqs: Dictionary[Modifier, Array] = {  # vals are Array[Array[Modifier]] but nested collection types are unsupported (why would they not be supported (this is silly (yes we do need triple-nested collections this is very necessary (but seriously why tho godot))))
+	Modifier.TRIPLEJUMP: [[Modifier.DOUBLEJUMP]],
+	Modifier.SQUISH: [[Modifier.SQUASH]],
+	Modifier.HYPERSPICE: [[Modifier.FASTANOMS, Modifier.ALERTANOMS, Modifier.BADANOMS]],
+	Modifier.CORALBLEACH: [[Modifier.DOORPLANT, Modifier.PILLARVINE, Modifier.HIGHGRASS]],
+}  # to get a key, at least one mod from each nested array in the value array must be present
 
 enum Setting {SEEDED, INFINITE, SIMPLE}
 const settingnames: Dictionary[Setting, String] = {

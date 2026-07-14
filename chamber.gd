@@ -21,8 +21,9 @@ var voxmap: Dictionary[Vector3, Global.Vox]
 var air: Dictionary[Vector3, bool]  # once again no sets {._.}
 var noise: FastNoiseLite
 var surfacetools: Dictionary[Global.Vox, SurfaceTool]
-var entities: Array[PhysicsBody3D]
+var entities: Array[Node3D]
 var anomalies: Array[Anomaly]
+var lights: Array[OmniLight3D]
 var computers: Array[Computer]
 var deltascore: Dictionary[Anomaly.AnomColor, int]
 var door: StaticBody3D
@@ -191,10 +192,8 @@ func placeplayer():
 func featureterrain():
 	var cuberadius = approxsidelen() * sqrt(3) / 4
 	if Global.hasmod(Global.Modifier.HIGHGRASS):
-		var grassnoise = FastNoiseLite.new()
+		var grassnoise = noise.duplicate(true)
 		grassnoise.seed = Global.dice.randi()
-		grassnoise.noise_type = FastNoiseLite.TYPE_SIMPLEX
-		grassnoise.frequency = noise.frequency
 		var thresh = 2 ** -2.5
 		for x in size:
 			for y in size:
@@ -242,6 +241,16 @@ func featureterrain():
 		for vine in finalvines:
 			for point in vine:
 				setvox(point, Global.Vox.PILLARVINE)
+	if Global.hasmod(Global.Modifier.CORALBLEACH):
+		var coralnoise = noise.duplicate(true)
+		coralnoise.seed = Global.dice.randi()
+		coralnoise.fractal_octaves = 1
+		for x in size:
+			for y in size:
+				for z in size:
+					var point = Vector3(x, y, z)
+					if Global.meshtypes[voxmap[point]] == Global.MeshType.PLANT and coralnoise.get_noise_3d(x, y, z) > 0.125:
+						setvox(point, Global.Vox.CORAL)
 
 func placedoor():
 	door = doorscene.instantiate()
@@ -321,6 +330,8 @@ func placelights():
 		light.omni_range = approxsidelen() * 2 ** Global.dice.randf_range(-1, 1)
 		light.light_energy = 4
 		light.position = point + Vector3.ONE / 2.
+		entities.append(light)
+		lights.append(light)
 		add_child(light)
 		setvox(point, Global.Vox.LIGHT)
 
@@ -394,7 +405,7 @@ func createmeshes():
 
 func anomalize():
 	var colorder = Global.diceshuffle(Anomaly.AnomColor.values())
-	for i in int(len(air) * 2 ** Global.ifmod(-12., -11., Global.Modifier.MOREANOMS)): #(-11 - 3 * 2 ** (Global.chamberindex * -0.1)):
+	for i in int(len(air) * 2 ** Global.ifmod(-12., -11., Global.Modifier.MOREANOMS)):
 		var anomaly = anomscene.instantiate()
 		anomaly.create(colorder[i % 3])
 		anomaly.position = spawnpoint() + Vector3.UP

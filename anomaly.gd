@@ -107,7 +107,7 @@ func follow():
 	var actualnoticeradius = noticeradius
 	if tamed:
 		actualnoticeradius = 4
-	elif Global.hasmod(Global.Modifier.ALERTANOMS) or (color == AnomColor.BLUE and Global.hasmod(Global.Modifier.ANOMFLAVOR)):
+	elif Global.hasmod(Global.Modifier.ALERTANOMS):
 		actualnoticeradius *= 1.5
 		if Global.hasmod(Global.Modifier.HYPERSPICE):
 			actualnoticeradius = INF
@@ -155,7 +155,7 @@ func domath(delta: float):
 	velocity.y *= exp(heightfriction) ** delta
 	velocity.x *= exp(flatfriction) ** delta
 	velocity.z *= exp(flatfriction) ** delta
-	if Global.hasmod(Global.Modifier.FASTANOMS) or (color == AnomColor.CYAN and Global.hasmod(Global.Modifier.ANOMFLAVOR)):
+	if Global.hasmod(Global.Modifier.FASTANOMS):
 		acceleration *= Global.ifmod(1.5, 2, Global.Modifier.HYPERSPICE)
 	velocity += acceleration * delta
 
@@ -164,7 +164,7 @@ func maybetouch():
 		if get_slide_collision(i).get_collider() == Global.player:
 			die(Global.player.position, false)
 			var damage = 1
-			if Global.hasmod(Global.Modifier.BADANOMS) or (color == AnomColor.MAGENTA and Global.hasmod(Global.Modifier.ANOMFLAVOR)):
+			if Global.hasmod(Global.Modifier.BADANOMS):
 				damage = Global.ifmod(2, 3, Global.Modifier.HYPERSPICE)
 			Global.player.impacthealth(-damage)
 			break
