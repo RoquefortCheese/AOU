@@ -71,6 +71,13 @@ func spawnpoint():
 func approxsidelen():
 	return len(air) ** (1 / 3.)
 
+func floorarea():
+	var area = 0
+	for point in voxmap:
+		if point == ground(point):
+			area += 1
+	return area
+
 func getvox(point: Vector3):
 	var voxel = floor(point)
 	if voxel not in voxmap:
@@ -98,6 +105,9 @@ func create():
 	#print("player welcomed!")
 	#print("done!")
 	print("sidelen: ", approxsidelen())
+	print("air: ", len(air))
+	print("floorarea: ", floorarea())
+	print("ratio: ", float(len(air)) / floorarea())
 
 func resetvars():
 	size = 0
@@ -127,10 +137,6 @@ func metaterragen():
 	noise.seed = Global.dice.randi()
 	noise.noise_type = FastNoiseLite.TYPE_SIMPLEX
 	noise.frequency = 0.2 / sqrt(size) * 2 ** Global.dice.randf_range(-0.5, 0.5)
-	if Global.hasmod(Global.Modifier.LESSSPACE):
-		noise.frequency *= 2
-	if Global.hasmod(Global.Modifier.MORESPACE):
-		noise.frequency *= 0.5
 	noise.fractal_octaves = 4
 
 func actualterragen():
@@ -149,8 +155,13 @@ func actualterragen():
 				if Global.hasmod(Global.Modifier.STRETCH):
 					sampley *= 0.5
 				var noiseval = noise.get_noise_3d(x + 0.5, sampley, z + 0.5)
-				if Global.hasmod(Global.Modifier.ISLANDS):
-					noiseval = asin(abs(noiseval) * -2 + 1) * 2 / PI
+				if Global.hasmod(Global.Modifier.ISLANDS) or Global.hasmod(Global.Modifier.TUNNELS):
+					var expfactor
+					if Global.hasmod(Global.Modifier.ISLANDS):
+						expfactor = 1.
+					if Global.hasmod(Global.Modifier.TUNNELS):
+						expfactor = -4.
+					noiseval = (2 ** (abs(noiseval) * expfactor) - 1) / (2 ** expfactor - 1) * -2 + 1
 				if rescale(noiseval, 0, 1) < spheubedist * 0.5 + 0.5 or (min(x, y, z) == 0 or max(x, y, z) == size - 1):
 					setvox(point, Global.Vox.STONE)
 				else:
@@ -195,26 +206,20 @@ func featureterrain():
 		var grassnoise = noise.duplicate(true)
 		grassnoise.seed = Global.dice.randi()
 		var thresh = 2 ** -2.5
-		for x in size:
-			for y in size:
-				for z in size:
-					var point = Vector3(x, y, z)
-					if point == ground(point):
-						var noiseval = grassnoise.get_noise_3d(x + 0.5, y + 0.5, z + 0.5)
-						if noiseval > thresh:
-							var maxheight = ceil((noiseval - thresh) / (1 - thresh) * 8)
-							for yy in range(y, y + maxheight):
-								var newpoint = Vector3(x, yy, z)
-								if not isair(newpoint):
-									break
-								setvox(newpoint, Global.Vox.HIGHGRASS)
+		for point in voxmap:
+			if point == ground(point):
+				var noiseval = grassnoise.get_noise_3d(point.x + 0.5, point.y + 0.5, point.z + 0.5)
+				if noiseval > thresh:
+					var maxheight = ceil((noiseval - thresh) / (1 - thresh) * 8)
+					for yy in range(point.y, point.y + maxheight):
+						var newpoint = Vector3(point.x, yy, point.z)
+						if not isair(newpoint):
+							break
+						setvox(newpoint, Global.Vox.HIGHGRASS)
 	if Global.hasmod(Global.Modifier.DOORPLANT):
-		for x in range(floor(doorpos.x - cuberadius), ceil(doorpos.x + cuberadius) + 1):
-			for y in range(floor(doorpos.y - cuberadius), ceil(doorpos.y + cuberadius) + 1):
-				for z in range(floor(doorpos.z - cuberadius), ceil(doorpos.z + cuberadius) + 1):
-					var point = Vector3(x, y, z)
-					if point == ground(point) and isair(point) and randf() < 0.25:
-						setvox(point, Global.Vox.DOORPLANT)
+		for point in voxmap:
+			if point == ground(point) and isair(point) and randf() < 0.25:
+				setvox(point, Global.Vox.DOORPLANT)
 	if Global.hasmod(Global.Modifier.PILLARVINE):
 		var candidates = []
 		var finalvines = []
@@ -245,12 +250,9 @@ func featureterrain():
 		var coralnoise = noise.duplicate(true)
 		coralnoise.seed = Global.dice.randi()
 		coralnoise.fractal_octaves = 1
-		for x in size:
-			for y in size:
-				for z in size:
-					var point = Vector3(x, y, z)
-					if Global.meshtypes[voxmap[point]] == Global.MeshType.PLANT and coralnoise.get_noise_3d(x, y, z) > 0.125:
-						setvox(point, Global.Vox.CORAL)
+		for point in voxmap:
+			if Global.meshtypes[voxmap[point]] == Global.MeshType.PLANT and coralnoise.get_noise_3d(point.x + 0.5, point.y + 0.5, point.z + 0.5) > 0.125:
+				setvox(point, Global.Vox.CORAL)
 
 func placedoor():
 	door = doorscene.instantiate()
@@ -306,7 +308,7 @@ func placelights():
 				isnook = false
 		if isnook:
 			nooks.append(point)
-	var lightquant = min(32, ceil(approxsidelen() * 0.5))
+	var lightquant = min(30, ceil(approxsidelen() * Global.ifmod(0.5, 0.25, Global.Modifier.DARKNESS)))
 	var bestlighting = -INF
 	var besttry
 	for attempt in 32:
@@ -327,13 +329,14 @@ func placelights():
 			besttry = lights
 	for point in besttry:
 		var light = OmniLight3D.new()
-		light.omni_range = approxsidelen() * 2 ** Global.dice.randf_range(-1, 1)
+		light.omni_range = approxsidelen() * 2 ** Global.dice.randf_range(-1, 1) * Global.ifmod(1, 0.25, Global.Modifier.DARKNESS)
 		light.light_energy = 4
 		light.position = point + Vector3.ONE / 2.
 		entities.append(light)
 		lights.append(light)
 		add_child(light)
 		setvox(point, Global.Vox.LIGHT)
+	Global.player.get_node("Camera3D/OmniLight3D").omni_range = Global.ifmod(0, 12, Global.Modifier.DARKNESS)
 
 func fillsmallgaps():
 	for axis in Global.diceshuffle([0, 2]):
@@ -377,22 +380,19 @@ func createmeshes():
 			st.begin(Mesh.PRIMITIVE_TRIANGLES)
 			st.set_material(Global.materials[voxtype])
 			surfacetools[voxtype] = st
-	for x in size:
-		for y in size:
-			for z in size:
-				var point = Vector3(x, y, z)
-				var voxtype = voxmap[point]
-				var meshtype = Global.meshtypes[voxtype]
-				if meshtype != Global.MeshType.AIR:
-					var st = surfacetools[voxtype]
-					if meshtype == Global.MeshType.CUBE:
-						for disp in cardinals:
-							var npoint = point + disp
-							if (not issolid(npoint) or (npoint in voxmap and voxmap[npoint] == Global.Vox.GLASS and voxtype != Global.Vox.GLASS)):
-								st.append_from(face, 0, Transform3D(bases[disp], point + disp / 2. + Vector3.ONE / 2.))
-					if meshtype == Global.MeshType.PLANT:
-						for basis in plantbases:
-							st.append_from(face, 0, Transform3D(basis, point + Vector3.ONE / 2.))
+	for point in voxmap:
+		var voxtype = voxmap[point]
+		var meshtype = Global.meshtypes[voxtype]
+		if meshtype != Global.MeshType.AIR:
+			var st = surfacetools[voxtype]
+			if meshtype == Global.MeshType.CUBE:
+				for disp in cardinals:
+					var npoint = point + disp
+					if (not issolid(npoint) or (npoint in voxmap and voxmap[npoint] == Global.Vox.GLASS and voxtype != Global.Vox.GLASS)):
+						st.append_from(face, 0, Transform3D(bases[disp], point + disp / 2. + Vector3.ONE / 2.))
+			if meshtype == Global.MeshType.PLANT:
+				for basis in plantbases:
+					st.append_from(face, 0, Transform3D(basis, point + Vector3.ONE / 2.))
 	for voxtype in Global.Vox.values():
 		if voxtype in surfacetools:
 			var st = surfacetools[voxtype]
@@ -405,7 +405,7 @@ func createmeshes():
 
 func anomalize():
 	var colorder = Global.diceshuffle(Anomaly.AnomColor.values())
-	for i in int(len(air) * 2 ** Global.ifmod(-12., -11., Global.Modifier.MOREANOMS)):
+	for i in int(floorarea() * 2 ** Global.ifmod(-8., -7., Global.Modifier.MOREANOMS)):
 		var anomaly = anomscene.instantiate()
 		anomaly.create(colorder[i % 3])
 		anomaly.position = spawnpoint() + Vector3.UP

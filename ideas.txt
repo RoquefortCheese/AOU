@@ -1,12 +1,7 @@
 todo:
-	if multi-instantiation bugs still happen, fix them (race conditions, yay!)
 	add / balance modifiers
-	add music
-	update sfx and sound architecture
-	maybe fix levelgen freeze
-	add more commands for start and end terminals
-	add more normal terminal types
-	add more game settings (maybe god mode?)
+	add music / more sfx
+	add another terminal type
 
 
 

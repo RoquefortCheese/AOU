@@ -127,8 +127,7 @@ func help():
 			terminalstring += tabbed("add [mod]:") + "Adds the requested modifier.\n"
 			terminalstring += tabbed("del [mod]:") + "Deletes the requested modifier.\n"
 		TerminalClass.END:
-			terminalstring += tabbed("cause:") + "Outputs the cause of the end of the run.\n"
-			terminalstring += tabbed("score:") + "Outputs your total final score.\n"
+			terminalstring += tabbed("summary:") + "Outputs your run summary.\n"
 			terminalstring += tabbed("restart:") + "Starts a new run.\n"
 	terminalstring += "\n"
 
@@ -247,11 +246,17 @@ func tingset(args: Array[String]):
 		_:
 			terminalstring += Global.settingnames[setting] + " " + {true: "enabled", false: "disabled"}[value] + "!\n\n"
 
-func cod():
-	terminalstring += Global.finishcause + "\n\n"
-
-func showscore():
-	terminalstring += str(Global.player.totalscore()) + "\n\n"
+func summary():
+	terminalstring += tabbed("Final score:") + str(Global.player.totalscore()) + "\n"
+	terminalstring += tabbed("Chamber:") + str(Global.chamberindex) + "\n"
+	terminalstring += tabbed("End reason:") + Global.finishcause + "\n"
+	terminalstring += tabbed("Settings:")
+	for setting in Global.Setting.values():
+		if Global.settings[setting]:
+			terminalstring += Global.settingnames[setting] + " "
+	terminalstring += "\n"
+	terminalstring += tabbed("Seed:") + str(Global.worldseed) + "\n"
+	terminalstring += "\n"
 
 func restart():
 	get_tree().current_scene.newgame()
@@ -349,12 +354,9 @@ func runinput():
 			"seed":
 				if argquant(args, 2) and classfilter([TerminalClass.START]):
 					setseed(args)
-			"cause":
+			"summary":
 				if argquant(args, 1) and classfilter([TerminalClass.END]):
-					cod()
-			"score":
-				if argquant(args, 1) and classfilter([TerminalClass.END]):
-					showscore()
+					summary()
 			"restart":
 				if argquant(args, 1) and classfilter([TerminalClass.END]):
 					restart()

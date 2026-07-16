@@ -101,7 +101,7 @@ func movementinput():
 		if is_on_floor() or invine():
 			jumpsleft = maxjumps()
 		if timesinceground >= coyotetime and not invine():
-			jumpsleft = min(maxjumps() - 1, jumpsleft)
+			jumpsleft = min(maxjumps() - Global.ifmod(1, 0, Global.Modifier.AIRJUMP), jumpsleft)
 		var finalacc = acc * Global.ifmod(1, 1.25, Global.Modifier.RUNNING) * Global.ifmod(1, 0.75, Global.Modifier.STROLLING)
 		if Global.hasmod(Global.Modifier.WALLRUN) and is_on_wall():
 			finalacc *= 2
@@ -187,7 +187,10 @@ func impacthealth(amount: int):
 				for anomaly in Global.chamber.anomalies:
 					if Global.dist(position, anomaly.position) <= 6:
 						anomaly.die($Camera3D.position, true)
-		health = min(health + amount, 6)
+		if amount > 0:
+			$HealingAudioPlayer.play()
+		if not Global.settings[Global.Setting.IMMORTALITY]:
+			health = min(health + amount, 6)
 		if health < 0:
 			die()
 

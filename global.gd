@@ -5,12 +5,10 @@ enum MeshType {AIR, CUBE, PLANT}
 @export var materials: Dictionary[Vox, Material]
 @export var meshtypes: Dictionary[Vox, MeshType]
 
-enum Modifier {DOORPLANT, PILLARVINE, MORESPACE, LESSSPACE, FASTANOMS, FLOATY, MOREANOMS, SQUASH, STRETCH, REGEN, RUNNING, DOUBLEJUMP, ISLANDS, MOREAMMO, ALERTANOMS, BADANOMS, TRIPLEJUMP, STROLLING, SNIPER, SILVERLINE, FULLHEAL, HIGHGRASS, DENSE, FALLDAMAGE, SQUISH, HYPERSPICE, WALLRUN, PLANTJUMP, CORALBLEACH, PHOTOFIELD, VENGEANCE}
+enum Modifier {DOORPLANT, PILLARVINE, FASTANOMS, FLOATY, MOREANOMS, SQUASH, STRETCH, REGEN, RUNNING, DOUBLEJUMP, ISLANDS, MOREAMMO, ALERTANOMS, BADANOMS, TRIPLEJUMP, STROLLING, SNIPER, SILVERLINE, FULLHEAL, HIGHGRASS, DENSE, FALLDAMAGE, SQUISH, HYPERSPICE, WALLRUN, PLANTJUMP, CORALBLEACH, PHOTOFIELD, VENGEANCE, COMBO, DARKNESS, AIRJUMP, TUNNELS}
 const modcosts: Dictionary[Modifier, int] = {
 	Modifier.DOORPLANT: -2,
 	Modifier.PILLARVINE: -4,
-	Modifier.MORESPACE: -2,
-	Modifier.LESSSPACE: 3,
 	Modifier.FASTANOMS: 3,
 	Modifier.FLOATY: -3,
 	Modifier.MOREANOMS: 4,
@@ -37,13 +35,15 @@ const modcosts: Dictionary[Modifier, int] = {
 	Modifier.PLANTJUMP: -2,
 	Modifier.CORALBLEACH: 4,
 	Modifier.PHOTOFIELD: 2,
-	Modifier.VENGEANCE: -3,
+	Modifier.VENGEANCE: -4,
+	Modifier.COMBO: -3,
+	Modifier.DARKNESS: 3,
+	Modifier.AIRJUMP: -3,
+	Modifier.TUNNELS: 2,
 }
 const modcolors: Dictionary[Modifier, Anomaly.AnomColor] = {
 	Modifier.DOORPLANT: Anomaly.AnomColor.BLUE,
 	Modifier.PILLARVINE: Anomaly.AnomColor.BLUE,
-	Modifier.MORESPACE: Anomaly.AnomColor.BLUE,
-	Modifier.LESSSPACE: Anomaly.AnomColor.BLUE,
 	Modifier.FASTANOMS: Anomaly.AnomColor.MAGENTA,
 	Modifier.FLOATY: Anomaly.AnomColor.CYAN,
 	Modifier.MOREANOMS: Anomaly.AnomColor.MAGENTA,
@@ -71,12 +71,14 @@ const modcolors: Dictionary[Modifier, Anomaly.AnomColor] = {
 	Modifier.CORALBLEACH: Anomaly.AnomColor.BLUE,
 	Modifier.PHOTOFIELD: Anomaly.AnomColor.CYAN,
 	Modifier.VENGEANCE: Anomaly.AnomColor.MAGENTA,
+	Modifier.COMBO: Anomaly.AnomColor.MAGENTA,
+	Modifier.DARKNESS: Anomaly.AnomColor.BLUE,
+	Modifier.AIRJUMP: Anomaly.AnomColor.CYAN,
+	Modifier.TUNNELS: Anomaly.AnomColor.BLUE,
 }
 var modnames: Dictionary[Modifier, String] = {
 	Modifier.DOORPLANT: "DoorPlant",
 	Modifier.PILLARVINE: "PillarVine",
-	Modifier.MORESPACE: "MoreSpace",
-	Modifier.LESSSPACE: "LessSpace",
 	Modifier.FASTANOMS: "FastAnoms",
 	Modifier.FLOATY: "Floaty",
 	Modifier.MOREANOMS: "MoreAnoms",
@@ -104,12 +106,14 @@ var modnames: Dictionary[Modifier, String] = {
 	Modifier.CORALBLEACH: "CoralBleach",
 	Modifier.PHOTOFIELD: "PhotoField",
 	Modifier.VENGEANCE: "Vengeance",
+	Modifier.COMBO: "Combo",
+	Modifier.DARKNESS: "Darkness",
+	Modifier.AIRJUMP: "AirJump",
+	Modifier.TUNNELS: "Tunnels",
 }
 var moddescs: Dictionary[Modifier, String] = {
 	Modifier.DOORPLANT: "Blue plants that grow next to doors.",
 	Modifier.PILLARVINE: "Tall vines that can be climbed.",
-	Modifier.MORESPACE: "More open caves.",
-	Modifier.LESSSPACE: "More constricted caves.",
 	Modifier.FASTANOMS: "Anomalies move faster.",
 	Modifier.FLOATY: "Less gravity.",
 	Modifier.MOREANOMS: "Significantly more anomalies.",
@@ -137,12 +141,16 @@ var moddescs: Dictionary[Modifier, String] = {
 	Modifier.CORALBLEACH: "Plants can bleach and hurt to touch.",
 	Modifier.PHOTOFIELD: "You are repelled from lights.",
 	Modifier.VENGEANCE: "Taking damage kills nearby anomalies.",
+	Modifier.COMBO: "Consecutive successful shots heal.",
+	Modifier.DARKNESS: "Lights illuminate less.",
+	Modifier.AIRJUMP: "Unlimited coyote time.",
+	Modifier.TUNNELS: "More tunnel-like terrain.",
 }
 var incompatibilities: Array[Vector2] = [
-	Vector2(Modifier.MORESPACE, Modifier.LESSSPACE),
 	Vector2(Modifier.SQUASH, Modifier.STRETCH),
 	Vector2(Modifier.RUNNING, Modifier.STROLLING),
-	Vector2(Modifier.FLOATY, Modifier.DENSE)
+	Vector2(Modifier.FLOATY, Modifier.DENSE),
+	Vector2(Modifier.ISLANDS, Modifier.TUNNELS),
 ]
 var prereqs: Dictionary[Modifier, Array] = {  # vals are Array[Array[Modifier]] but nested collection types are unsupported (why would they not be supported (this is silly (yes we do need triple-nested collections this is very necessary (but seriously why tho godot))))
 	Modifier.TRIPLEJUMP: [[Modifier.DOUBLEJUMP]],
@@ -151,16 +159,18 @@ var prereqs: Dictionary[Modifier, Array] = {  # vals are Array[Array[Modifier]] 
 	Modifier.CORALBLEACH: [[Modifier.DOORPLANT, Modifier.PILLARVINE, Modifier.HIGHGRASS]],
 }  # to get a key, at least one mod from each nested array in the value array must be present
 
-enum Setting {SEEDED, INFINITE, SIMPLE}
+enum Setting {SEEDED, INFINITE, SIMPLE, IMMORTALITY}
 const settingnames: Dictionary[Setting, String] = {
 	Setting.SEEDED: "Seeded",
 	Setting.INFINITE: "Infinite",
 	Setting.SIMPLE: "Simple",
+	Setting.IMMORTALITY: "Immortality",
 }
 const settingdescs: Dictionary[Setting, String] = {
 	Setting.SEEDED: "If enabled, a custom RNG seed has been set.",
 	Setting.INFINITE: "Unless enabled, the game ends after eight chambers.",
 	Setting.SIMPLE: "If enabled, no modifier terminals generate.",
+	Setting.IMMORTALITY: "If enabled, health cannot decrease.",
 }
 
 var worldseed: int

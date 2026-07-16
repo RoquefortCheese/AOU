@@ -64,6 +64,7 @@ func placelights():
 				light.position = point + Vector3.ONE / 2.
 				add_child(light)
 				setvox(point, Global.Vox.LIGHT)
+	Global.player.get_node("Camera3D/OmniLight3D").omni_range = 0
 
 func placeplayer():
 	doorcorner = int(Global.dice.randf() * 2)

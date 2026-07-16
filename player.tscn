@@ -6,6 +6,7 @@
 [ext_resource type="AudioStream" uid="uid://civ4fir4hvcel" path="res://reload.wav" id="5_2hs0m"]
 [ext_resource type="Texture2D" uid="uid://crnr8scc3dp5g" path="res://icon.svg" id="5_sweqy"]
 [ext_resource type="AudioStream" uid="uid://dscpr6tu2avtd" path="res://ouch.wav" id="6_2hs0m"]
+[ext_resource type="AudioStream" uid="uid://berw26wn46ltj" path="res://healing.wav" id="7_1jxqw"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_onrkg"]
 radius = 0.2
@@ -47,6 +48,10 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.4, -0.2, -0.5)
 [node name="CamVector" type="Node3D" parent="Camera3D" unique_id=1207163705]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1)
 
+[node name="OmniLight3D" type="OmniLight3D" parent="Camera3D" unique_id=1419536144]
+light_energy = 4.0
+omni_range = 16.0
+
 [node name="PostProcessing" type="ColorRect" parent="." unique_id=1485664400]
 material = SubResource("ShaderMaterial_i3pqv")
 anchors_preset = 15
@@ -66,3 +71,7 @@ stream = ExtResource("5_2hs0m")
 [node name="HitAudioPlayer" type="AudioStreamPlayer" parent="." unique_id=683763233]
 process_mode = 3
 stream = ExtResource("6_2hs0m")
+
+[node name="HealingAudioPlayer" type="AudioStreamPlayer" parent="." unique_id=589344284]
+process_mode = 3
+stream = ExtResource("7_1jxqw")
