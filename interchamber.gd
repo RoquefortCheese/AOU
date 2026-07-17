@@ -37,17 +37,20 @@ func terragen():
 				var point = Vector3.UP * y
 				point[axis] = anomroomsize
 				point[2 - axis] = line
-				setvox(point, Global.Vox.GLASS)
+				setvox(point, Global.Vox.DOUBLEGLASS)
 	for x in size:
 		for y in size:
 			for z in size:
 				var point = Vector3(x, y, z)
 				if min(x, y, z) == 0 or max(x, y, z) == size - 1:
 					setvox(point, Global.Vox.STONE)
-				elif point not in voxmap or voxmap[point] != Global.Vox.GLASS:
+				elif point not in voxmap or voxmap[point] != Global.Vox.DOUBLEGLASS:
 					setvox(point, Global.Vox.AIR)
 
-func featureterrain():
+func garden():
+	return
+
+func largescalestuff():
 	return
 
 func goodfloodfill():

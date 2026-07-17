@@ -176,6 +176,7 @@ func domath(delta: float):
 func belikelumi():
 	for i in get_slide_collision_count():
 		if get_slide_collision(i).get_collider() == Global.chamber.door:
+			$DoorAudioPlayer.play()
 			Global.world.enterdoor()
 			break
 

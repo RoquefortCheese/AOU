@@ -7,6 +7,7 @@
 [ext_resource type="Texture2D" uid="uid://crnr8scc3dp5g" path="res://icon.svg" id="5_sweqy"]
 [ext_resource type="AudioStream" uid="uid://dscpr6tu2avtd" path="res://ouch.wav" id="6_2hs0m"]
 [ext_resource type="AudioStream" uid="uid://berw26wn46ltj" path="res://healing.wav" id="7_1jxqw"]
+[ext_resource type="AudioStream" uid="uid://b5lc1es13ml18" path="res://doortouch.wav" id="8_dw050"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_onrkg"]
 radius = 0.2
@@ -75,3 +76,7 @@ stream = ExtResource("6_2hs0m")
 [node name="HealingAudioPlayer" type="AudioStreamPlayer" parent="." unique_id=589344284]
 process_mode = 3
 stream = ExtResource("7_1jxqw")
+
+[node name="DoorAudioPlayer" type="AudioStreamPlayer" parent="." unique_id=1081281675]
+process_mode = 3
+stream = ExtResource("8_dw050")

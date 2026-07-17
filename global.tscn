@@ -11,9 +11,8 @@ albedo_color = Color(1, 1, 0, 1)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ldnw4"]
 transparency = 1
-cull_mode = 2
-shading_mode = 0
-albedo_color = Color(0, 0, 0, 0.1882353)
+shading_mode = 2
+albedo_color = Color(1, 1, 1, 0.2509804)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_8tbuy"]
 transparency = 2
@@ -58,6 +57,12 @@ distance_fade_mode = 2
 distance_fade_min_distance = 1.5
 distance_fade_max_distance = 1.5
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ol57v"]
+transparency = 1
+cull_mode = 2
+shading_mode = 0
+albedo_color = Color(1, 1, 1, 0.1254902)
+
 [node name="Global" type="Node" unique_id=1677589215]
 script = ExtResource("1_6q3x5")
 materials = Dictionary[int, Material]({
@@ -67,7 +72,8 @@ materials = Dictionary[int, Material]({
 4: SubResource("StandardMaterial3D_8tbuy"),
 5: SubResource("StandardMaterial3D_2wtbm"),
 6: SubResource("StandardMaterial3D_hhif3"),
-7: SubResource("StandardMaterial3D_74nqk")
+7: SubResource("StandardMaterial3D_74nqk"),
+8: SubResource("StandardMaterial3D_ol57v")
 })
 meshtypes = Dictionary[int, int]({
 0: 0,
@@ -77,5 +83,17 @@ meshtypes = Dictionary[int, int]({
 4: 2,
 5: 2,
 6: 2,
-7: 2
+7: 2,
+8: 1
+})
+isglass = Dictionary[int, bool]({
+0: false,
+1: false,
+2: false,
+3: true,
+4: false,
+5: false,
+6: false,
+7: false,
+8: true
 })

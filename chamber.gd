@@ -155,12 +155,10 @@ func actualterragen():
 				if Global.hasmod(Global.Modifier.STRETCH):
 					sampley *= 0.5
 				var noiseval = noise.get_noise_3d(x + 0.5, sampley, z + 0.5)
-				if Global.hasmod(Global.Modifier.ISLANDS) or Global.hasmod(Global.Modifier.TUNNELS):
-					var expfactor
-					if Global.hasmod(Global.Modifier.ISLANDS):
-						expfactor = 1.
-					if Global.hasmod(Global.Modifier.TUNNELS):
-						expfactor = -4.
+				if Global.hasmod(Global.Modifier.ISLANDS):
+					noiseval = abs(noiseval) * -2 + 1
+				if Global.hasmod(Global.Modifier.TUNNELS):
+					var expfactor = -4.
 					noiseval = (2 ** (abs(noiseval) * expfactor) - 1) / (2 ** expfactor - 1) * -2 + 1
 				if rescale(noiseval, 0, 1) < spheubedist * 0.5 + 0.5 or (min(x, y, z) == 0 or max(x, y, z) == size - 1):
 					setvox(point, Global.Vox.STONE)
@@ -194,13 +192,14 @@ func placefeatures():
 	placeplayer()
 	placedoor()
 	placecomputers()
-	featureterrain()
+	garden()
+	largescalestuff()
 
 func placeplayer():
 	Global.player.position = spawnpoint()
 	entities.append(Global.player)
 
-func featureterrain():
+func garden():
 	var cuberadius = approxsidelen() * sqrt(3) / 4
 	if Global.hasmod(Global.Modifier.HIGHGRASS):
 		var grassnoise = noise.duplicate(true)
@@ -253,6 +252,12 @@ func featureterrain():
 		for point in voxmap:
 			if Global.meshtypes[voxmap[point]] == Global.MeshType.PLANT and coralnoise.get_noise_3d(point.x + 0.5, point.y + 0.5, point.z + 0.5) > 0.125:
 				setvox(point, Global.Vox.CORAL)
+
+func largescalestuff():
+	if Global.hasmod(Global.Modifier.GLASS):
+		for point in voxmap:
+			if voxmap[point] == Global.Vox.STONE:
+				setvox(point, Global.Vox.GLASS)
 
 func placedoor():
 	door = doorscene.instantiate()
@@ -388,8 +393,11 @@ func createmeshes():
 			if meshtype == Global.MeshType.CUBE:
 				for disp in cardinals:
 					var npoint = point + disp
-					if (not issolid(npoint) or (npoint in voxmap and voxmap[npoint] == Global.Vox.GLASS and voxtype != Global.Vox.GLASS)):
-						st.append_from(face, 0, Transform3D(bases[disp], point + disp / 2. + Vector3.ONE / 2.))
+					if (not issolid(npoint) or (npoint in voxmap and Global.isglass[voxmap[npoint]] and not Global.isglass[voxtype])):
+						var basis = bases[disp]
+						if randf() < 0.5:
+							basis = basis.rotated(disp, PI / 2)
+						st.append_from(face, 0, Transform3D(basis, point + disp / 2. + Vector3.ONE / 2.))
 			if meshtype == Global.MeshType.PLANT:
 				for basis in plantbases:
 					st.append_from(face, 0, Transform3D(basis, point + Vector3.ONE / 2.))
@@ -405,7 +413,12 @@ func createmeshes():
 
 func anomalize():
 	var colorder = Global.diceshuffle(Anomaly.AnomColor.values())
-	for i in int(floorarea() * 2 ** Global.ifmod(-8., -7., Global.Modifier.MOREANOMS)):
+	var exponent = -8.
+	if Global.hasmod(Global.Modifier.MOREANOMS):
+		exponent = -7.
+		if Global.hasmod(Global.Modifier.HYPERSPICE):
+			exponent = -6.
+	for i in int(floorarea() * 2 ** exponent):
 		var anomaly = anomscene.instantiate()
 		anomaly.create(colorder[i % 3])
 		anomaly.position = spawnpoint() + Vector3.UP

@@ -163,10 +163,7 @@ func maybetouch():
 	for i in get_slide_collision_count():
 		if get_slide_collision(i).get_collider() == Global.player:
 			die(Global.player.position, false)
-			var damage = 1
-			if Global.hasmod(Global.Modifier.BADANOMS):
-				damage = Global.ifmod(2, 3, Global.Modifier.HYPERSPICE)
-			Global.player.impacthealth(-damage)
+			Global.player.impacthealth(-1)
 			break
 
 func die(source: Vector3, shot: bool):

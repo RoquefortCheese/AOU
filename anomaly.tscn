@@ -8,7 +8,7 @@ shading_mode = 0
 
 [sub_resource type="BoxMesh" id="BoxMesh_knx40"]
 material = SubResource("StandardMaterial3D_c1slk")
-size = Vector3(0.55, 0.55, 0.55)
+size = Vector3(0.5, 0.5, 0.5)
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_c1slk"]
 radius = 0.45
@@ -20,7 +20,7 @@ albedo_color = Color(0, 1, 0, 1)
 [sub_resource type="SphereMesh" id="SphereMesh_c1slk"]
 material = SubResource("StandardMaterial3D_knx40")
 radius = 0.45
-height = 0.8
+height = 0.9
 
 [node name="Anomaly" type="CharacterBody3D" unique_id=1667139649]
 wall_min_slide_angle = 0.17453292
@@ -29,6 +29,7 @@ boxmesh = SubResource("BoxMesh_knx40")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=544735407]
 shape = SubResource("SphereShape3D_c1slk")
+debug_color = Color(1, 1, 1, 1)
 
 [node name="DebugHitboxVisual" type="MeshInstance3D" parent="." unique_id=1750258409]
 visible = false

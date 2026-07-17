@@ -1,11 +1,12 @@
 extends Node
 
-enum Vox {AIR, STONE, LIGHT, GLASS, PILLARVINE, DOORPLANT, HIGHGRASS, CORAL}
+enum Vox {AIR, STONE, LIGHT, GLASS, PILLARVINE, DOORPLANT, HIGHGRASS, CORAL, DOUBLEGLASS}
 enum MeshType {AIR, CUBE, PLANT}
 @export var materials: Dictionary[Vox, Material]
 @export var meshtypes: Dictionary[Vox, MeshType]
+@export var isglass: Dictionary[Vox, bool]
 
-enum Modifier {DOORPLANT, PILLARVINE, FASTANOMS, FLOATY, MOREANOMS, SQUASH, STRETCH, REGEN, RUNNING, DOUBLEJUMP, ISLANDS, MOREAMMO, ALERTANOMS, BADANOMS, TRIPLEJUMP, STROLLING, SNIPER, SILVERLINE, FULLHEAL, HIGHGRASS, DENSE, FALLDAMAGE, SQUISH, HYPERSPICE, WALLRUN, PLANTJUMP, CORALBLEACH, PHOTOFIELD, VENGEANCE, COMBO, DARKNESS, AIRJUMP, TUNNELS}
+enum Modifier {DOORPLANT, PILLARVINE, FASTANOMS, FLOATY, MOREANOMS, SQUASH, STRETCH, REGEN, RUNNING, DOUBLEJUMP, ISLANDS, MOREAMMO, ALERTANOMS, TRIPLEJUMP, STROLLING, SNIPER, SILVERLINE, FULLHEAL, HIGHGRASS, DENSE, FALLDAMAGE, SQUISH, HYPERSPICE, WALLRUN, PLANTJUMP, CORALBLEACH, PHOTOFIELD, VENGEANCE, COMBO, DARKNESS, AIRJUMP, TUNNELS, GLASS}
 const modcosts: Dictionary[Modifier, int] = {
 	Modifier.DOORPLANT: -2,
 	Modifier.PILLARVINE: -4,
@@ -20,7 +21,6 @@ const modcosts: Dictionary[Modifier, int] = {
 	Modifier.ISLANDS: -2,
 	Modifier.MOREAMMO: -4,
 	Modifier.ALERTANOMS: 2,
-	Modifier.BADANOMS: 4,
 	Modifier.TRIPLEJUMP: -3,
 	Modifier.STROLLING: 4,
 	Modifier.SNIPER: -2,
@@ -40,6 +40,7 @@ const modcosts: Dictionary[Modifier, int] = {
 	Modifier.DARKNESS: 3,
 	Modifier.AIRJUMP: -3,
 	Modifier.TUNNELS: 2,
+	Modifier.GLASS: -3,
 }
 const modcolors: Dictionary[Modifier, Anomaly.AnomColor] = {
 	Modifier.DOORPLANT: Anomaly.AnomColor.BLUE,
@@ -55,7 +56,6 @@ const modcolors: Dictionary[Modifier, Anomaly.AnomColor] = {
 	Modifier.ISLANDS: Anomaly.AnomColor.BLUE,
 	Modifier.MOREAMMO: Anomaly.AnomColor.MAGENTA,
 	Modifier.ALERTANOMS: Anomaly.AnomColor.MAGENTA,
-	Modifier.BADANOMS: Anomaly.AnomColor.MAGENTA,
 	Modifier.TRIPLEJUMP: Anomaly.AnomColor.CYAN,
 	Modifier.STROLLING: Anomaly.AnomColor.CYAN,
 	Modifier.SNIPER: Anomaly.AnomColor.MAGENTA,
@@ -75,6 +75,7 @@ const modcolors: Dictionary[Modifier, Anomaly.AnomColor] = {
 	Modifier.DARKNESS: Anomaly.AnomColor.BLUE,
 	Modifier.AIRJUMP: Anomaly.AnomColor.CYAN,
 	Modifier.TUNNELS: Anomaly.AnomColor.BLUE,
+	Modifier.GLASS: Anomaly.AnomColor.BLUE,
 }
 var modnames: Dictionary[Modifier, String] = {
 	Modifier.DOORPLANT: "DoorPlant",
@@ -90,7 +91,6 @@ var modnames: Dictionary[Modifier, String] = {
 	Modifier.ISLANDS: "Islands",
 	Modifier.MOREAMMO: "MoreAmmo",
 	Modifier.ALERTANOMS: "AlertAnoms",
-	Modifier.BADANOMS: "BadAnoms",
 	Modifier.TRIPLEJUMP: "TripleJump",
 	Modifier.STROLLING: "Strolling",
 	Modifier.SNIPER: "Sniper",
@@ -110,6 +110,7 @@ var modnames: Dictionary[Modifier, String] = {
 	Modifier.DARKNESS: "Darkness",
 	Modifier.AIRJUMP: "AirJump",
 	Modifier.TUNNELS: "Tunnels",
+	Modifier.GLASS: "Glass",
 }
 var moddescs: Dictionary[Modifier, String] = {
 	Modifier.DOORPLANT: "Blue plants that grow next to doors.",
@@ -125,7 +126,6 @@ var moddescs: Dictionary[Modifier, String] = {
 	Modifier.ISLANDS: "More floating terrain.",
 	Modifier.MOREAMMO: "More ammunition.",
 	Modifier.ALERTANOMS: "Anomalies sense you from farther away.",
-	Modifier.BADANOMS: "Anomalies deal more damage.",
 	Modifier.TRIPLEJUMP: "Airjump twice.",
 	Modifier.STROLLING: "Slower movement.",
 	Modifier.SNIPER: "Sniping while pursued restores health.",
@@ -145,6 +145,7 @@ var moddescs: Dictionary[Modifier, String] = {
 	Modifier.DARKNESS: "Lights illuminate less.",
 	Modifier.AIRJUMP: "Unlimited coyote time.",
 	Modifier.TUNNELS: "More tunnel-like terrain.",
+	Modifier.GLASS: "Stone is replaced with glass.",
 }
 var incompatibilities: Array[Vector2] = [
 	Vector2(Modifier.SQUASH, Modifier.STRETCH),
@@ -155,7 +156,7 @@ var incompatibilities: Array[Vector2] = [
 var prereqs: Dictionary[Modifier, Array] = {  # vals are Array[Array[Modifier]] but nested collection types are unsupported (why would they not be supported (this is silly (yes we do need triple-nested collections this is very necessary (but seriously why tho godot))))
 	Modifier.TRIPLEJUMP: [[Modifier.DOUBLEJUMP]],
 	Modifier.SQUISH: [[Modifier.SQUASH]],
-	Modifier.HYPERSPICE: [[Modifier.FASTANOMS, Modifier.ALERTANOMS, Modifier.BADANOMS]],
+	Modifier.HYPERSPICE: [[Modifier.FASTANOMS, Modifier.ALERTANOMS, Modifier.MOREANOMS]],
 	Modifier.CORALBLEACH: [[Modifier.DOORPLANT, Modifier.PILLARVINE, Modifier.HIGHGRASS]],
 }  # to get a key, at least one mod from each nested array in the value array must be present
 
