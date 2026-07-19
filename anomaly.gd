@@ -2,7 +2,7 @@ extends CharacterBody3D
 class_name Anomaly
 
 enum AnomColor {BLUE, CYAN, MAGENTA}
-const colname: Dictionary[AnomColor, String] = {AnomColor.BLUE: "Blue", AnomColor.CYAN: "Cyan", AnomColor.MAGENTA: "Magenta"}
+const colnames: Dictionary[AnomColor, String] = {AnomColor.BLUE: "Blue", AnomColor.CYAN: "Cyan", AnomColor.MAGENTA: "Magenta"}
 const actualcolor = {
 	AnomColor.BLUE: Color.BLUE,
 	AnomColor.CYAN: Color.CYAN,

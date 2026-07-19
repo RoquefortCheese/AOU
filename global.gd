@@ -6,7 +6,7 @@ enum MeshType {AIR, CUBE, PLANT}
 @export var meshtypes: Dictionary[Vox, MeshType]
 @export var isglass: Dictionary[Vox, bool]
 
-enum Modifier {DOORPLANT, PILLARVINE, FASTANOMS, FLOATY, MOREANOMS, SQUASH, STRETCH, REGEN, RUNNING, DOUBLEJUMP, ISLANDS, MOREAMMO, ALERTANOMS, TRIPLEJUMP, STROLLING, SNIPER, SILVERLINE, FULLHEAL, HIGHGRASS, DENSE, FALLDAMAGE, SQUISH, HYPERSPICE, WALLRUN, PLANTJUMP, CORALBLEACH, PHOTOFIELD, VENGEANCE, COMBO, DARKNESS, AIRJUMP, TUNNELS, GLASS}
+enum Modifier {DOORPLANT, PILLARVINE, FASTANOMS, FLOATY, MOREANOMS, SQUASH, STRETCH, REGEN, RUNNING, DOUBLEJUMP, ISLANDS, MOREAMMO, ALERTANOMS, TRIPLEJUMP, STROLLING, SNIPER, SILVERLINE, FULLHEAL, HIGHGRASS, DENSE, FALLDAMAGE, SQUISH, HYPERSPICE, WALLRUN, PLANTJUMP, CORALBLEACH, PHOTOFIELD, VENGEANCE, COMBO, DARKNESS, AIRJUMP, TUNNELS, GLASS, BOXCAVE, RUBBER}
 const modcosts: Dictionary[Modifier, int] = {
 	Modifier.DOORPLANT: -2,
 	Modifier.PILLARVINE: -4,
@@ -41,6 +41,8 @@ const modcosts: Dictionary[Modifier, int] = {
 	Modifier.AIRJUMP: -3,
 	Modifier.TUNNELS: 2,
 	Modifier.GLASS: -3,
+	Modifier.BOXCAVE: 2,
+	Modifier.RUBBER: 3,
 }
 const modcolors: Dictionary[Modifier, Anomaly.AnomColor] = {
 	Modifier.DOORPLANT: Anomaly.AnomColor.BLUE,
@@ -76,6 +78,8 @@ const modcolors: Dictionary[Modifier, Anomaly.AnomColor] = {
 	Modifier.AIRJUMP: Anomaly.AnomColor.CYAN,
 	Modifier.TUNNELS: Anomaly.AnomColor.BLUE,
 	Modifier.GLASS: Anomaly.AnomColor.BLUE,
+	Modifier.BOXCAVE: Anomaly.AnomColor.BLUE,
+	Modifier.RUBBER: Anomaly.AnomColor.CYAN,
 }
 var modnames: Dictionary[Modifier, String] = {
 	Modifier.DOORPLANT: "DoorPlant",
@@ -111,6 +115,8 @@ var modnames: Dictionary[Modifier, String] = {
 	Modifier.AIRJUMP: "AirJump",
 	Modifier.TUNNELS: "Tunnels",
 	Modifier.GLASS: "Glass",
+	Modifier.BOXCAVE: "BoxCave",
+	Modifier.RUBBER: "Rubber",
 }
 var moddescs: Dictionary[Modifier, String] = {
 	Modifier.DOORPLANT: "Blue plants that grow next to doors.",
@@ -138,7 +144,7 @@ var moddescs: Dictionary[Modifier, String] = {
 	Modifier.HYPERSPICE: "_Anom mods are stronger.",
 	Modifier.WALLRUN: "Movement along walls is faster.",
 	Modifier.PLANTJUMP: "Jump higher when standing in plants.",
-	Modifier.CORALBLEACH: "Plants can bleach and hurt to touch.",
+	Modifier.CORALBLEACH: "Some plants matter is dead.",
 	Modifier.PHOTOFIELD: "You are repelled from lights.",
 	Modifier.VENGEANCE: "Taking damage kills nearby anomalies.",
 	Modifier.COMBO: "Consecutive successful shots heal.",
@@ -146,6 +152,45 @@ var moddescs: Dictionary[Modifier, String] = {
 	Modifier.AIRJUMP: "Unlimited coyote time.",
 	Modifier.TUNNELS: "More tunnel-like terrain.",
 	Modifier.GLASS: "Stone is replaced with glass.",
+	Modifier.BOXCAVE: "Noise tapering is not applied.",
+	Modifier.RUBBER: "Bounciness occurs."
+}
+var modflavors: Dictionary[Modifier, String] = {
+	Modifier.DOORPLANT: "",
+	Modifier.PILLARVINE: "",
+	Modifier.FASTANOMS: "",
+	Modifier.FLOATY: "",
+	Modifier.MOREANOMS: "",
+	Modifier.SQUASH: "",
+	Modifier.STRETCH: "",
+	Modifier.REGEN: "",
+	Modifier.RUNNING: "",
+	Modifier.DOUBLEJUMP: "Two jumps for the price of one!",
+	Modifier.ISLANDS: "How are those chunks of stone levitating? Science, of course.",
+	Modifier.MOREAMMO: "",
+	Modifier.ALERTANOMS: "",
+	Modifier.TRIPLEJUMP: "",
+	Modifier.STROLLING: "",
+	Modifier.SNIPER: "",
+	Modifier.SILVERLINE: "",
+	Modifier.FULLHEAL: "",
+	Modifier.HIGHGRASS: "",
+	Modifier.DENSE: "",
+	Modifier.FALLDAMAGE: "Realism in gaming.",
+	Modifier.SQUISH: "",
+	Modifier.HYPERSPICE: "",
+	Modifier.WALLRUN: "This would make more sense with flat walls.",
+	Modifier.PLANTJUMP: "Become one with nature.",
+	Modifier.CORALBLEACH: "Ocean acidification is a serious issue.",
+	Modifier.PHOTOFIELD: "Did you know photons and electrons are the same thing?",
+	Modifier.VENGEANCE: "",
+	Modifier.COMBO: "",
+	Modifier.DARKNESS: "",
+	Modifier.AIRJUMP: "",
+	Modifier.TUNNELS: "",
+	Modifier.GLASS: "",
+	Modifier.BOXCAVE: "",
+	Modifier.RUBBER: "",
 }
 var incompatibilities: Array[Vector2] = [
 	Vector2(Modifier.SQUASH, Modifier.STRETCH),
@@ -169,7 +214,7 @@ const settingnames: Dictionary[Setting, String] = {
 }
 const settingdescs: Dictionary[Setting, String] = {
 	Setting.SEEDED: "If enabled, a custom RNG seed has been set.",
-	Setting.INFINITE: "Unless enabled, the game ends after eight chambers.",
+	Setting.INFINITE: "Unless enabled, the game ends after six chambers.",
 	Setting.SIMPLE: "If enabled, no modifier terminals generate.",
 	Setting.IMMORTALITY: "If enabled, health cannot decrease.",
 }
@@ -201,6 +246,12 @@ func diceshuffle(array: Array):
 		var index = floor(dice.randf() * len(copy))
 		newarray.append(copy.pop_at(index))
 	return newarray
+
+static func antidict(dict: Dictionary):
+	var output = {}
+	for key in dict:
+		output[dict[key]] = key
+	return output
 
 static func dist(point1: Vector3, point2: Vector3):
 	return (point2 - point1).length()

@@ -14,11 +14,11 @@ var timesinceground: float
 var timesinceempty: float
 var terminalinuse: Computer
 var jumpsleft: int
-var fallvel: float
+var deltavel: Vector3
 var compassindex: int
 
 var score: Dictionary[Anomaly.AnomColor, int]
-var modifiers: Array[Global.Modifier]
+var modifiers: Dictionary[Global.Modifier, bool]
 var alive: bool
 var balance: int
 var health: int
@@ -65,7 +65,7 @@ func _ready():
 	Global.player = self
 	$Camera3D/RayCast3D.add_exception(self)
 	score = {Anomaly.AnomColor.BLUE: 0, Anomaly.AnomColor.CYAN: 0, Anomaly.AnomColor.MAGENTA: 0}
-	modifiers = []
+	modifiers = {}
 	alive = true
 	balance = 0
 	health = 6
@@ -73,7 +73,7 @@ func _ready():
 	timesinceground = 0
 	terminalinuse = null
 	jumpsleft = 0
-	fallvel = 0
+	deltavel = Vector3.ZERO
 	compassindex = 0
 
 func _physics_process(delta: float):
@@ -147,8 +147,8 @@ func considerfocusing():
 func otherphysics(delta: float):
 	if is_on_floor():
 		timesinceground = 0
-		if Global.hasmod(Global.Modifier.FALLDAMAGE):
-			impacthealth(min(0, floor((fallvel + 16) / 8)))
+	if Global.hasmod(Global.Modifier.FALLDAMAGE):
+		impacthealth(min(0, floor((-deltavel.y + 16) / 8)))
 	else:
 		var gravity = 12
 		if Global.hasmod(Global.Modifier.FLOATY):
@@ -161,8 +161,6 @@ func otherphysics(delta: float):
 		for light in Global.chamber.lights:
 			var diff = position - light.position
 			acceleration += diff.normalized() * diff.length() ** -2 * 2 ** 9
-	fallvel = velocity.y
-	move_and_slide()
 
 func domath(delta: float):
 	if invine():
@@ -172,6 +170,13 @@ func domath(delta: float):
 		for axis in [0, 2]:
 			velocity[axis] *= exp(friction) ** delta
 	velocity += acceleration * delta
+	var lastvel = velocity
+	move_and_slide()
+	deltavel = velocity - lastvel
+	if Global.hasmod(Global.Modifier.RUBBER):
+		var bounce = deltavel * 0.75
+		if bounce.length() >= 8:
+			velocity += bounce
 
 func belikelumi():
 	for i in get_slide_collision_count():

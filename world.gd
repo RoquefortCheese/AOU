@@ -4,7 +4,7 @@ class_name World
 @export var chamberscene: PackedScene
 @export var interchamberscene: PackedScene
 
-const finitelimit = 8
+const finitelimit = 6
 
 func setseed(seed: int):
 	Global.worldseed = seed

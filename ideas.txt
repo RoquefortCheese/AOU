@@ -1,7 +1,10 @@
 todo:
 	add / balance modifiers
-	add music / more sfx
-	add another terminal type
+	add music
+	add / improve sfx
+	another terminal type
+	a tutorial
+	more optimization?
 
 
 

@@ -58,12 +58,10 @@ func existentsetting(setting: String):
 
 func infoname(mod: Global.Modifier):
 	var output = ""
-	output += tabbed(Anomaly.colname[Global.modcolors[mod]], 8) + "| "
+	output += tabbed(Anomaly.colnames[Global.modcolors[mod]], 8) + "| "
 	output += Global.padnumstring(Global.modcosts[mod], 1, 0, true) + " | "
 	output += Global.modnames[mod]
 	return output
-
-
 
 func incompats(mod: Global.Modifier, others: Array[Global.Modifier]):
 	for playermod in others:
@@ -90,7 +88,7 @@ func create(termclass: TerminalClass):
 			otherstuff[OtherStuff.MODS] = []
 			var shuffledmods = Global.diceshuffle(Global.Modifier.values())
 			for mod in shuffledmods:
-				if not Global.hasmod(mod) and incompats(mod, Global.player.modifiers) == null:
+				if not Global.hasmod(mod) and incompats(mod, Global.player.modifiers.keys()) == null:
 					otherstuff[OtherStuff.MODS].append(mod)
 					if len(otherstuff[OtherStuff.MODS]) == 3:
 						break
@@ -116,6 +114,7 @@ func help():
 		TerminalClass.RESTORATION:
 			terminalstring += tabbed("restore:") + "Restores some health. Usable once.\n"
 		TerminalClass.MOD:
+			terminalstring += tabbed("mods [col]:") + "Outputs all mods of the given color.\n"
 			terminalstring += tabbed("modlist:") + "Outputs available modifiers.\n"
 			terminalstring += tabbed("about [mod]:") + "Outputs the modifier description.\n"
 			terminalstring += tabbed("add [mod]:") + "Adds the requested modifier.\n"
@@ -123,6 +122,7 @@ func help():
 		TerminalClass.START:
 			terminalstring += tabbed("set [x] [bool]:") + "Enables or disables a game setting.\n"
 			terminalstring += tabbed("seed [int]:") + "Sets the world seed to the given number.\n"
+			terminalstring += tabbed("mods [col]:") + "Outputs all mods of the given color.\n"
 			terminalstring += tabbed("about [mod]:") + "Outputs the modifier description.\n"
 			terminalstring += tabbed("add [mod]:") + "Adds the requested modifier.\n"
 			terminalstring += tabbed("del [mod]:") + "Deletes the requested modifier.\n"
@@ -155,6 +155,17 @@ func restore():
 	otherstuff[OtherStuff.SPENT] = true
 	terminalstring += "Your health has been restored!\n\n"
 
+func mods(args: Array[String]):
+	var color = args[1].capitalize()
+	if color not in Anomaly.colnames.values():
+		terminalstring += "Nonexistent color.\n\n"
+		return
+	color = Global.antidict(Anomaly.colnames)[color]
+	for mod in Global.Modifier.values():
+		if Global.modcolors[mod] == color:
+			terminalstring += Global.modnames[mod] + "\n"
+	terminalstring += "\n"
+
 func modlist():
 	for mod in otherstuff[OtherStuff.MODS]:
 		terminalstring += infoname(mod) + "\n"
@@ -164,8 +175,9 @@ func about(args: Array[String]):
 	var mod = existentmod(args[1])
 	if mod == null:
 		return
-	terminalstring += infoname(mod) + ": "
-	terminalstring += Global.moddescs[mod] + "\n\n"
+	terminalstring += infoname(mod) + ": " + Global.moddescs[mod] + "\n"
+	terminalstring += "\"" + Global.modflavors[mod] + "\"\n"
+	terminalstring += "\n"
 
 func add(args: Array[String]):
 	var mod = existentmod(args[1])
@@ -180,34 +192,34 @@ func add(args: Array[String]):
 	if Global.hasmod(mod):
 		terminalstring += "This modifier has already been added.\n\n"
 		return
-	var issue = incompats(mod, Global.player.modifiers)
+	var issue = incompats(mod, Global.player.modifiers.keys())
 	if issue != null:
 		terminalstring += issue + "\n\n"
 		return
 	if termclass == TerminalClass.MOD and abs(Global.player.balance + Global.modcosts[mod]) > 4:
 		terminalstring += "Balance cannot exceed ±4.\n\n"
 		return
-	Global.player.modifiers.append(mod)
+	Global.player.modifiers[mod] = true
 	Global.player.balance += Global.modcosts[mod]
 	terminalstring += Global.modnames[mod] + " added!\n\n"
 
 func del(args: Array[String]):
 	var mod = existentmod(args[1])
-	var changedlist = Global.player.modifiers.duplicate()
-	changedlist.erase(mod)
+	var changedmods = Global.player.modifiers.duplicate()
+	changedmods.erase(mod)
 	if mod == null:
 		return
 	if mod not in Global.player.modifiers:
 		terminalstring += "You do not have this modifier.\n\n"
 		return
 	for othermod in Global.player.modifiers:
-		if incompats(othermod, changedlist) != null:
+		if incompats(othermod, changedmods.keys()) != null:
 			terminalstring += "To delete this modifier you must delete " + Global.modnames[othermod] + ".\n\n"
 			return
 	if abs(Global.player.balance - Global.modcosts[mod]) > 4:
 		terminalstring += "Balance cannot exceed ±4.\n\n"
 		return
-	Global.player.modifiers = changedlist
+	Global.player.modifiers = changedmods
 	Global.player.balance -= Global.modcosts[mod]
 	terminalstring += Global.modnames[mod] + " deleted!\n\n"
 
@@ -238,7 +250,8 @@ func tingset(args: Array[String]):
 			return
 		Global.world.setseed(randi())
 	if setting == Global.Setting.SIMPLE:
-		Global.player.modifiers = []
+		print(Global.player.modifiers)
+		Global.player.modifiers.clear()
 	Global.settings[setting] = value
 	match setting:
 		Global.Setting.SEEDED:
@@ -336,6 +349,9 @@ func runinput():
 			"restore":
 				if argquant(args, 1) and classfilter([TerminalClass.RESTORATION]):
 					restore()
+			"mods":
+				if argquant(args, 2) and classfilter([TerminalClass.MOD, TerminalClass.START]):
+					mods(args)
 			"modlist":
 				if argquant(args, 1) and classfilter([TerminalClass.MOD]):
 					modlist()

@@ -145,8 +145,9 @@ func actualterragen():
 			for z in size:
 				var point = Vector3(x, y, z)
 				var spheubedist = 0
-				for axis in 3:
-					spheubedist += ((point[axis] + 0.5) * 2 / size - 1) ** 4
+				if not Global.hasmod(Global.Modifier.BOXCAVE):
+					for axis in 3:
+						spheubedist += ((point[axis] + 0.5) * 2 / size - 1) ** 4
 				var sampley = y + 0.5
 				if Global.hasmod(Global.Modifier.SQUASH):
 					sampley *= 2
