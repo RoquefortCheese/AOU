@@ -90,7 +90,7 @@ func placecomputers():
 	add_child(computer)
 	incorner(computer, Vector3(3, 3, 2.5), true, 1 - doorcorner)
 	entities.append(computer)
-	computers.append(computer)
+	computers[computer.termclass] = computer
 
 func anomalize():
 	for i in 2:
@@ -110,5 +110,5 @@ func anomalize():
 
 func spinplayer():
 	var camera = Global.player.get_node("Camera3D")
-	camera.look_at(computers[0].position)
+	camera.look_at(computers.values()[0].position)
 	Global.player.pan = camera.rotation

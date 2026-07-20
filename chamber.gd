@@ -24,11 +24,12 @@ var surfacetools: Dictionary[Global.Vox, SurfaceTool]
 var entities: Array[Node3D]
 var anomalies: Array[Anomaly]
 var lights: Array[OmniLight3D]
-var computers: Array[Computer]
+var computers: Dictionary[Computer.TerminalClass, Computer]
 var deltascore: Dictionary[Anomaly.AnomColor, int]
 var door: StaticBody3D
 var doorpos: Vector3
 var time: float
+var debugtime: float
 
 func rescale(value: float, minval: float, maxval: float):
 	return value * (maxval - minval) / 2 + (maxval + minval) / 2
@@ -84,26 +85,31 @@ func getvox(point: Vector3):
 		return null
 	return voxmap[voxel]
 
+func newtime():
+	var t = Time.get_ticks_msec()
+	var d = t - debugtime
+	debugtime = t
+	return d
+
 func create():
-	print("starting!")
+	newtime()
 	Global.chamber = self
 	resetvars()
 	terragen()
-	#print("terra genned!")
+	print("terra genned! ", newtime())
 	if not goodfloodfill():
 		print("regenerating...")
 		create()
 		return
 	placefeatures()
-	#print("features placed!")
-	#print("cave aquifered!")
+	print("features placed! ", newtime())
 	createmeshes()
-	#print("meshes created!")
+	print("meshes created! ", newtime())
 	anomalize()
-	#print("anomalies materialized!")
+	print("anomalies materialized! ", newtime())
 	welcomeplayer()
-	#print("player welcomed!")
-	#print("done!")
+	print("player welcomed! ", newtime())
+	print("done!")
 	print("sidelen: ", approxsidelen())
 	print("air: ", len(air))
 	print("floorarea: ", floorarea())
@@ -117,7 +123,7 @@ func resetvars():
 	surfacetools = {}
 	entities = []
 	anomalies = []
-	computers = []
+	computers = {}
 	deltascore = {Anomaly.AnomColor.BLUE: 0, Anomaly.AnomColor.CYAN: 0, Anomaly.AnomColor.MAGENTA: 0}
 	door = null
 	doorpos = Vector3.ZERO
@@ -296,7 +302,7 @@ func placecomputers():
 		computer.position = pos + Vector3.UP * 2
 		computer.rotation.y = spin
 		entities.append(computer)
-		computers.append(computer)
+		computers[termclass] = computer
 		add_child(computer)
 
 func placelights():
@@ -514,7 +520,7 @@ func updatecompass():
 		1:
 			thingname = "Comp"
 			var closest = INF
-			for computer in computers:
+			for computer in computers.values():
 				var distance = Global.dist(computer.position, camera.global_position)
 				if distance < closest:
 					closest = distance
@@ -523,7 +529,7 @@ func updatecompass():
 			thingname = "Anom"
 			var closest = INF
 			for anomaly in anomalies:
-				if anomaly.alive and not anomaly.undead:
+				if anomaly.scoreable():
 					var distance = Global.dist(anomaly.position, camera.global_position)
 					if distance < closest:
 						closest = distance

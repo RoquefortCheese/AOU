@@ -72,6 +72,9 @@ func flying():
 	var diff = Global.player.position - position
 	return Global.flatten(diff).length() <= 3 and diff.y >= 0
 
+func scoreable():
+	return alive and not undead
+
 func spinboxes(delta: float):
 	for box in boxes:
 		for axis in 3:
@@ -173,7 +176,7 @@ func die(source: Vector3, shot: bool):
 	if alive:
 		alive = false
 		timedead = 0
-		if following and (shot or Global.hasmod(Global.Modifier.SILVERLINE)) and not undead:
+		if following and (shot or Global.hasmod(Global.Modifier.SILVERLINE)) and scoreable():
 			Global.player.score[color] += 1
 			Global.chamber.deltascore[color] += 1
 		if Global.hasmod(Global.Modifier.SNIPER):

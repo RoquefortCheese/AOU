@@ -3,21 +3,45 @@ class_name Computer
 
 const charsperline = 63
 const maxlines = 35
-enum TerminalClass {RESTORATION, MOD, START, END}
+enum TerminalClass {RESTORATION, MOD, BLINK, START, END}
 const classnames: Dictionary[TerminalClass, String] = {
 	TerminalClass.RESTORATION: "restoration",
 	TerminalClass.MOD: "mod",
+	TerminalClass.BLINK: "blink",
 	TerminalClass.START: "start",
 	TerminalClass.END: "end",
 }
-const normalclasses: Array[TerminalClass] = [TerminalClass.RESTORATION, TerminalClass.MOD]
+const normalclasses: Array[TerminalClass] = [TerminalClass.RESTORATION, TerminalClass.MOD, TerminalClass.BLINK]
+
+enum Destination {DOOR, COMP, ANOM, SAFETY, RANDOM}
+const destnames: Dictionary[Destination, String] = {
+	Destination.DOOR: "door",
+	Destination.COMP: "comp",
+	Destination.ANOM: "anom",
+	Destination.SAFETY: "safety",
+	Destination.RANDOM: "random",
+}
+const destdescs: Dictionary[Destination, String] = {
+	Destination.DOOR: "Somewhere near the door.",
+	Destination.COMP: "Somewhere near the computer of the requested class.",
+	Destination.ANOM: "Somewhere near a scoreable anomaly.",
+	Destination.SAFETY: "Somewhere away from anomalies.",
+	Destination.RANDOM: "Somewhere fully random.",
+}
+const destcosts: Dictionary[Destination, int] = {
+	Destination.DOOR: 7,
+	Destination.COMP: 5,
+	Destination.ANOM: 3,
+	Destination.SAFETY: 3,
+	Destination.RANDOM: 2,
+}
 
 @export var allowedchars: Array[Key]
 var terminalstring: String
 var inputhistory: Array[String]
 var historyscroll: int
 var currentinput: String
-enum OtherStuff {SPENT, MODS}
+enum OtherStuff {SPENT, MODS, CHARGE}
 var otherstuff: Dictionary[OtherStuff, Variant]
 var termclass: TerminalClass
 
@@ -48,6 +72,13 @@ func existentmod(modname: String):
 		terminalstring += "Nonexistent modifier.\n\n"
 		return null
 	return Global.Modifier[modname]
+
+func existentdest(dest: String):
+	dest = dest.to_upper()
+	if dest not in Destination:
+		terminalstring += "Nonexistent destination.\n\n"
+		return null
+	return Destination[dest]
 
 func existentsetting(setting: String):
 	setting = setting.to_upper()
@@ -92,6 +123,8 @@ func create(termclass: TerminalClass):
 					otherstuff[OtherStuff.MODS].append(mod)
 					if len(otherstuff[OtherStuff.MODS]) == 3:
 						break
+		TerminalClass.BLINK:
+			otherstuff[OtherStuff.CHARGE] = 12
 	clear()
 	newcommand()
 
@@ -119,6 +152,11 @@ func help():
 			terminalstring += tabbed("about [mod]:") + "Outputs the modifier description.\n"
 			terminalstring += tabbed("add [mod]:") + "Adds the requested modifier.\n"
 			terminalstring += tabbed("del [mod]:") + "Deletes the requested modifier.\n"
+		TerminalClass.BLINK:
+			terminalstring += tabbed("blink [dest]:") + "Teleports to the requested destination.\n"
+			terminalstring += tabbed("blinkst:") + "Outputs all valid destination arguments.\n"
+			terminalstring += tabbed("desc [dest]:") + "Outputs the destination description.\n"
+			terminalstring += tabbed("charge:") + "Outputs remaining charge.\n"
 		TerminalClass.START:
 			terminalstring += tabbed("set [x] [bool]:") + "Enables or disables a game setting.\n"
 			terminalstring += tabbed("seed [int]:") + "Sets the world seed to the given number.\n"
@@ -154,6 +192,83 @@ func restore():
 	Global.player.impacthealth(Global.ifmod(3, 256, Global.Modifier.FULLHEAL))
 	otherstuff[OtherStuff.SPENT] = true
 	terminalstring += "Your health has been restored!\n\n"
+
+func blink(args: Array[String]):  # i swear most of this class's code is just input validation
+	if len(args) < 2:
+		terminalstring += "Not enough arguments.\n\n"
+		return
+	var dest = existentdest(args[1])
+	if dest == null:
+		return
+	if not argquant(args, 3 if dest == Destination.COMP else 2):
+		return
+	var destterm
+	if dest == Destination.COMP:
+		destterm = args[2].to_upper()
+		if destterm not in TerminalClass:
+			terminalstring += "Nonexistent terminal class.\n\n"
+			return
+		destterm = TerminalClass[destterm]
+		if destterm not in Global.chamber.computers:
+			terminalstring += "This terminal class is not present in this chamber.\n\n"
+			return
+		if destterm == TerminalClass.BLINK:
+			terminalstring += "You are already at this terminal.\n\n"
+			return
+		destterm = Global.chamber.computers[destterm]
+	if otherstuff[OtherStuff.CHARGE] - destcosts[dest] < 0:
+		terminalstring += "Insufficient charge remaining.\n\n"
+		return
+	var bestscore = -INF
+	var bestpoint
+	for i in 64:
+		var point = Global.chamber.spawnpoint()
+		var score
+		match dest:
+			Destination.DOOR:
+				score = -Global.dist(point, Global.chamber.door.position)
+			Destination.COMP:
+				score = -Global.dist(point, destterm.position)
+			Destination.ANOM:
+				score = -INF
+				for anomaly in Global.chamber.anomalies:
+					if anomaly.scoreable():
+						var antidist = -Global.dist(point, anomaly.position)
+						if antidist > score:
+							score = antidist
+			Destination.SAFETY:
+				score = INF
+				for anomaly in Global.chamber.anomalies:
+					if anomaly.alive:
+						var dist = Global.dist(point, anomaly.position)
+						if dist < score:
+							score = dist
+			Destination.RANDOM:
+				score = 0
+		if score > bestscore:
+			bestscore = score
+			bestpoint = point
+	Global.player.stopusingterminal()
+	Global.player.position = bestpoint
+	otherstuff[OtherStuff.CHARGE] -= destcosts[dest]
+	terminalstring += "Happy travels!\n\n"
+
+func blinkst():
+	terminalstring += "\nValid destinations:\n"
+	for dest in Destination.values():
+		terminalstring += destnames[dest] + "\n"
+	terminalstring += "\n"
+
+func desc(args: Array[String]):
+	var dest = existentdest(args[1])
+	if dest == null:
+		return
+	terminalstring += destdescs[dest] + "\n"
+	terminalstring += "Costs " + str(destcosts[dest]) + " charge.\n"
+	terminalstring += "\n"
+
+func charge():
+	terminalstring += "This terminal currently has " + str(otherstuff[OtherStuff.CHARGE]) + " charge.\n\n"
 
 func mods(args: Array[String]):
 	var color = args[1].capitalize()
@@ -250,7 +365,6 @@ func tingset(args: Array[String]):
 			return
 		Global.world.setseed(randi())
 	if setting == Global.Setting.SIMPLE:
-		print(Global.player.modifiers)
 		Global.player.modifiers.clear()
 	Global.settings[setting] = value
 	match setting:
@@ -349,6 +463,18 @@ func runinput():
 			"restore":
 				if argquant(args, 1) and classfilter([TerminalClass.RESTORATION]):
 					restore()
+			"blink":
+				if classfilter([TerminalClass.BLINK]):
+					blink(args)
+			"blinkst":
+				if argquant(args, 1) and classfilter([TerminalClass.BLINK]):
+					blinkst()
+			"desc":
+				if argquant(args, 2) and classfilter([TerminalClass.BLINK]):
+					desc(args)
+			"charge":
+				if argquant(args, 1) and classfilter([TerminalClass.BLINK]):
+					charge()
 			"mods":
 				if argquant(args, 2) and classfilter([TerminalClass.MOD, TerminalClass.START]):
 					mods(args)

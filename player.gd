@@ -33,7 +33,11 @@ func getfollowers():
 	return following
 
 func maxammo():
-	return Global.ifmod(12, 24, Global.Modifier.MOREAMMO)
+	if Global.hasmod(Global.Modifier.MOREAMMO):
+		return 24
+	if Global.hasmod(Global.Modifier.LESSAMMO):
+		return 6
+	return 12
 
 func maxjumps():
 	if Global.hasmod(Global.Modifier.TRIPLEJUMP):

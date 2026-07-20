@@ -14,7 +14,6 @@ func setglobals():
 	Global.dice = RandomNumberGenerator.new()
 	setseed(randi())
 	for setting in Global.Setting.values():
-		print(setting)
 		Global.settings[setting] = false
 	Global.finishcause = ""
 	Global.player = $Player

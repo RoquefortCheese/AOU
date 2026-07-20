@@ -6,43 +6,44 @@ enum MeshType {AIR, CUBE, PLANT}
 @export var meshtypes: Dictionary[Vox, MeshType]
 @export var isglass: Dictionary[Vox, bool]
 
-enum Modifier {DOORPLANT, PILLARVINE, FASTANOMS, FLOATY, MOREANOMS, SQUASH, STRETCH, REGEN, RUNNING, DOUBLEJUMP, ISLANDS, MOREAMMO, ALERTANOMS, TRIPLEJUMP, STROLLING, SNIPER, SILVERLINE, FULLHEAL, HIGHGRASS, DENSE, FALLDAMAGE, SQUISH, HYPERSPICE, WALLRUN, PLANTJUMP, CORALBLEACH, PHOTOFIELD, VENGEANCE, COMBO, DARKNESS, AIRJUMP, TUNNELS, GLASS, BOXCAVE, RUBBER}
+enum Modifier {DOORPLANT, PILLARVINE, FASTANOMS, FLOATY, MOREANOMS, SQUASH, STRETCH, REGEN, RUNNING, DOUBLEJUMP, ISLANDS, MOREAMMO, ALERTANOMS, TRIPLEJUMP, STROLLING, SNIPER, SILVERLINE, FULLHEAL, HIGHGRASS, DENSE, FALLDAMAGE, SQUISH, HYPERSPICE, WALLRUN, PLANTJUMP, CORALBLEACH, PHOTOFIELD, VENGEANCE, COMBO, DARKNESS, AIRJUMP, TUNNELS, GLASS, BOXCAVE, RUBBER, LESSAMMO}
 const modcosts: Dictionary[Modifier, int] = {
 	Modifier.DOORPLANT: -2,
 	Modifier.PILLARVINE: -4,
 	Modifier.FASTANOMS: 3,
-	Modifier.FLOATY: -3,
-	Modifier.MOREANOMS: 4,
-	Modifier.SQUASH: -2,
+	Modifier.FLOATY: -2,
+	Modifier.MOREANOMS: 2,
+	Modifier.SQUASH: -3,
 	Modifier.STRETCH: 3,
 	Modifier.REGEN: 4,
 	Modifier.RUNNING: -4,
 	Modifier.DOUBLEJUMP: -4,
-	Modifier.ISLANDS: -2,
+	Modifier.ISLANDS: -3,
 	Modifier.MOREAMMO: -4,
 	Modifier.ALERTANOMS: 2,
-	Modifier.TRIPLEJUMP: -3,
+	Modifier.TRIPLEJUMP: -2,
 	Modifier.STROLLING: 4,
 	Modifier.SNIPER: -2,
 	Modifier.SILVERLINE: -2,
 	Modifier.FULLHEAL: -4,
 	Modifier.HIGHGRASS: -3,
 	Modifier.DENSE: 4,
-	Modifier.FALLDAMAGE: 3,
-	Modifier.SQUISH: 2,
+	Modifier.FALLDAMAGE: 4,
+	Modifier.SQUISH: 3,
 	Modifier.HYPERSPICE: 4,
-	Modifier.WALLRUN: -3,
+	Modifier.WALLRUN: -2,
 	Modifier.PLANTJUMP: -2,
-	Modifier.CORALBLEACH: 4,
+	Modifier.CORALBLEACH: 3,
 	Modifier.PHOTOFIELD: 2,
 	Modifier.VENGEANCE: -4,
-	Modifier.COMBO: -3,
+	Modifier.COMBO: -2,
 	Modifier.DARKNESS: 3,
-	Modifier.AIRJUMP: -3,
-	Modifier.TUNNELS: 2,
+	Modifier.AIRJUMP: -2,
+	Modifier.TUNNELS: 3,
 	Modifier.GLASS: -3,
-	Modifier.BOXCAVE: 2,
-	Modifier.RUBBER: 3,
+	Modifier.BOXCAVE: 3,
+	Modifier.RUBBER: 4,
+	Modifier.LESSAMMO: 3,
 }
 const modcolors: Dictionary[Modifier, Anomaly.AnomColor] = {
 	Modifier.DOORPLANT: Anomaly.AnomColor.BLUE,
@@ -80,6 +81,7 @@ const modcolors: Dictionary[Modifier, Anomaly.AnomColor] = {
 	Modifier.GLASS: Anomaly.AnomColor.BLUE,
 	Modifier.BOXCAVE: Anomaly.AnomColor.BLUE,
 	Modifier.RUBBER: Anomaly.AnomColor.CYAN,
+	Modifier.LESSAMMO: Anomaly.AnomColor.MAGENTA,
 }
 var modnames: Dictionary[Modifier, String] = {
 	Modifier.DOORPLANT: "DoorPlant",
@@ -117,6 +119,7 @@ var modnames: Dictionary[Modifier, String] = {
 	Modifier.GLASS: "Glass",
 	Modifier.BOXCAVE: "BoxCave",
 	Modifier.RUBBER: "Rubber",
+	Modifier.LESSAMMO: "LessAmmo",
 }
 var moddescs: Dictionary[Modifier, String] = {
 	Modifier.DOORPLANT: "Blue plants that grow next to doors.",
@@ -153,7 +156,8 @@ var moddescs: Dictionary[Modifier, String] = {
 	Modifier.TUNNELS: "More tunnel-like terrain.",
 	Modifier.GLASS: "Stone is replaced with glass.",
 	Modifier.BOXCAVE: "Noise tapering is not applied.",
-	Modifier.RUBBER: "Bounciness occurs."
+	Modifier.RUBBER: "Bounciness occurs.",
+	Modifier.LESSAMMO: "Less ammunition.",
 }
 var modflavors: Dictionary[Modifier, String] = {
 	Modifier.DOORPLANT: "",
@@ -191,12 +195,14 @@ var modflavors: Dictionary[Modifier, String] = {
 	Modifier.GLASS: "",
 	Modifier.BOXCAVE: "",
 	Modifier.RUBBER: "",
+	Modifier.LESSAMMO: "",
 }
 var incompatibilities: Array[Vector2] = [
 	Vector2(Modifier.SQUASH, Modifier.STRETCH),
 	Vector2(Modifier.RUNNING, Modifier.STROLLING),
 	Vector2(Modifier.FLOATY, Modifier.DENSE),
 	Vector2(Modifier.ISLANDS, Modifier.TUNNELS),
+	Vector2(Modifier.MOREAMMO, Modifier.LESSAMMO),
 ]
 var prereqs: Dictionary[Modifier, Array] = {  # vals are Array[Array[Modifier]] but nested collection types are unsupported (why would they not be supported (this is silly (yes we do need triple-nested collections this is very necessary (but seriously why tho godot))))
 	Modifier.TRIPLEJUMP: [[Modifier.DOUBLEJUMP]],
