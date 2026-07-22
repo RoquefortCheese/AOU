@@ -141,6 +141,7 @@ func help():
 	terminalstring += tabbed("help:") + "Displays this dialog.\n"
 	terminalstring += tabbed("clear:") + "Clears the terminal.\n"
 	terminalstring += tabbed("exit:") + "Exits the terminal.\n"
+	terminalstring += tabbed("sound:") + "Configures sound volume.\n"
 	terminalstring += tabbed("settings:") + "Displays game settings.\n"
 	terminalstring += tabbed("info [setting]:") + "Outputs the setting description.\n"
 	match termclass:
@@ -168,6 +169,39 @@ func help():
 			terminalstring += tabbed("summary:") + "Outputs your run summary.\n"
 			terminalstring += tabbed("restart:") + "Starts a new run.\n"
 	terminalstring += "\n"
+
+func sound(args: Array[String]):
+	if len(args) == 1:
+		terminalstring += "This command takes two parameters: [bus] and [vol].\n"
+		terminalstring += "[bus] can be master, sfx, or music.\n"
+		terminalstring += "[vol] can be off, low, or high.\n"
+		terminalstring += "\n"
+	if not argquant(args, 3):
+		return
+	var bus
+	match args[1].to_lower():
+		"master":
+			bus = AudioServer.get_bus_index("Master")
+		"sfx":
+			bus = AudioServer.get_bus_index("SFX")
+		"music":
+			bus = AudioServer.get_bus_index("Music")
+		_:
+			terminalstring += "Nonexistent bus.\n\n"
+			return
+	var vol
+	match args[2].to_lower():
+		"off":
+			vol = -256
+		"low":
+			vol = -10
+		"high":
+			vol = 0
+		_:
+			terminalstring += "Nonexistent volume setting.\n\n"
+			return
+	AudioServer.set_bus_volume_db(bus, vol)
+	terminalstring += "Audio volume set!\n\n"
 
 func showsettings():
 	terminalstring += "\n"
@@ -454,6 +488,8 @@ func runinput():
 			"exit":
 				if argquant(args, 1):
 					Global.player.stopusingterminal()
+			"sound":
+				sound(args)
 			"settings":
 				if argquant(args, 1):
 					showsettings()

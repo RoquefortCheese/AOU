@@ -2,7 +2,14 @@
 
 [ext_resource type="Script" uid="uid://17ar57jauaif" path="res://main.gd" id="1_0xm2m"]
 [ext_resource type="PackedScene" uid="uid://c3d7c00pygmfk" path="res://world.tscn" id="1_ig7tw"]
+[ext_resource type="AudioStream" uid="uid://7qk4mpf74ppq" path="res://Clockwork Life.mp3" id="3_h2yge"]
 
 [node name="Main" type="Node" unique_id=837627659]
 script = ExtResource("1_0xm2m")
 worldscene = ExtResource("1_ig7tw")
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="." unique_id=880151287]
+stream = ExtResource("3_h2yge")
+autoplay = true
+bus = &"Music"
+parameters/looping = true

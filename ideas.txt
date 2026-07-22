@@ -1,11 +1,9 @@
 todo:
-	add / balance modifiers (done?!)
 	add music
-	add / improve sfx
-	another terminal type
 	a tutorial
-	finish flavor text
+	add / improve sfx
 	more controls
-	more optimization?
+	add / balance modifiers (done?!)
+	finish flavor text
 
 lock in

@@ -17,8 +17,10 @@ mesh = ExtResource("2_bttkv")
 process_mode = 3
 stream = ExtResource("3_6e3nq")
 volume_db = 2.0
+bus = &"SFX"
 
 [node name="MissedShotAudioPlayer" type="AudioStreamPlayer" parent="." unique_id=1598484702]
 process_mode = 3
 stream = ExtResource("4_646vd")
 volume_db = 2.0
+bus = &"SFX"

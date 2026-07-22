@@ -68,15 +68,19 @@ mesh = SubResource("CapsuleMesh_hqtel")
 [node name="ReloadAudioPlayer" type="AudioStreamPlayer" parent="." unique_id=1441300152]
 process_mode = 3
 stream = ExtResource("5_2hs0m")
+bus = &"SFX"
 
 [node name="HitAudioPlayer" type="AudioStreamPlayer" parent="." unique_id=683763233]
 process_mode = 3
 stream = ExtResource("6_2hs0m")
+bus = &"SFX"
 
 [node name="HealingAudioPlayer" type="AudioStreamPlayer" parent="." unique_id=589344284]
 process_mode = 3
 stream = ExtResource("7_1jxqw")
+bus = &"SFX"
 
 [node name="DoorAudioPlayer" type="AudioStreamPlayer" parent="." unique_id=1081281675]
 process_mode = 3
 stream = ExtResource("8_dw050")
+bus = &"SFX"
