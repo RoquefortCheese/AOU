@@ -1,5 +1,4 @@
 todo:
-	a tutorial
 	finish flavor text
 	improve pistol visuals
 	playtest
@@ -9,6 +8,8 @@ done:
 	add music
 	finish modifiers
 	add sound settings
+	add/improve sfx
+	a tutorial
 
 lock in
 silksong TOMORROW

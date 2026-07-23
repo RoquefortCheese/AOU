@@ -139,11 +139,18 @@ func clear():
 func help():
 	terminalstring += "\nCrowderOS commands:\n"
 	terminalstring += tabbed("help:") + "Displays this dialog.\n"
+	terminalstring += tabbed("classhelp:") + "Displays class-specific help.\n"
 	terminalstring += tabbed("clear:") + "Clears the terminal.\n"
 	terminalstring += tabbed("exit:") + "Exits the terminal.\n"
-	terminalstring += tabbed("sound:") + "Configures sound volume.\n"
 	terminalstring += tabbed("settings:") + "Displays game settings.\n"
 	terminalstring += tabbed("info [setting]:") + "Outputs the setting description.\n"
+	terminalstring += tabbed("sound:") + "Configures sound volume.\n"
+	terminalstring += tabbed("tt [topic]:") + "Outputs tutorial text on the requested topic.\n"
+	terminalstring += tabbed("ttlist:") + "Outputs all valid topic arguments.\n"
+	terminalstring += "\n"
+
+func classhelp():
+	terminalstring += "\n" + classnames[termclass].capitalize() + "-class commands:\n"
 	match termclass:
 		TerminalClass.RESTORATION:
 			terminalstring += tabbed("restore:") + "Restores some health. Usable once.\n"
@@ -159,7 +166,7 @@ func help():
 			terminalstring += tabbed("desc [dest]:") + "Outputs the destination description.\n"
 			terminalstring += tabbed("charge:") + "Outputs remaining charge.\n"
 		TerminalClass.START:
-			terminalstring += tabbed("set [x] [bool]:") + "Enables or disables a game setting.\n"
+			terminalstring += tabbed("set [s] [bool]:") + "Enables or disables a game setting.\n"
 			terminalstring += tabbed("seed [int]:") + "Sets the world seed to the given number.\n"
 			terminalstring += tabbed("mods [col]:") + "Outputs all mods of the given color.\n"
 			terminalstring += tabbed("about [mod]:") + "Outputs the modifier description.\n"
@@ -218,6 +225,105 @@ func info(args: Array[String]):
 	if setting == null:
 		return
 	terminalstring += Global.settingdescs[setting] + "\n\n"
+
+func tt(args: Array[String]):
+	match args[1].to_lower():
+		"controls":
+			terminalstring += "\n"
+			terminalstring += tabbed("[Esc]:") + "unfocus game\n"
+			terminalstring += tabbed("[Click]:") + "focus game / shoot / use/quit terminal\n"
+			terminalstring += tabbed("[Mouse]:") + "move camera\n"
+			terminalstring += tabbed("[WASD / Arrow]:") + "move\n"
+			terminalstring += tabbed("[Space]:") + "jump\n"
+			terminalstring += tabbed("[Shift]:") + "modulate compass\n"
+			terminalstring += tabbed("[1234]:") + "toggle infoboxes\n"
+			terminalstring += tabbed("[P]:") + "pause / unpause game\n"
+			terminalstring += tabbed("[I]:") + "reroll current chamber\n"
+			terminalstring += tabbed("[Y]:") + "force-end game\n"
+			terminalstring += "\n"
+		"infoboxes":
+			terminalstring += "\n"
+			terminalstring += "Top Left:\n"
+			terminalstring += tabbed("Health:") + "Going below zero points is fatal.\n"
+			terminalstring += tabbed("Ammo:") + "Proportional to remaining pistol ammunition.\n"
+			terminalstring += tabbed("Compass:") + "Points to closest of selected target set.\n"
+			terminalstring += tabbed("Sonar:") + "Each point represents a following anomaly.\n"
+			terminalstring += "\n"
+			terminalstring += "Top Right:\n"
+			terminalstring += "Your score. For more info, see the [goal] topic.\n"
+			terminalstring += "\n"
+			terminalstring += "Bottom Left:\n"
+			terminalstring += "The list of your currently active modifiers.\n"
+			terminalstring += "\n"
+			terminalstring += "Bottom Right:\n"
+			terminalstring += "Your modifier balance and the current chamber index.\n"
+			terminalstring += "\n"
+		"combat":  # this must be what it feels like to write for the simple english wikipedia
+			terminalstring += "\n"  # for any potential readers, my line length here is limited to 63 characters
+			terminalstring += "Anomalies are melee enemies.\n"  # i could write sentences across lines, but i don't want to
+			terminalstring += "Touching a living anomaly kills it and costs a hitpoint.\n"  # i hate this though
+			terminalstring += "Touching dead anomalies is okay.\n"
+			terminalstring += "Anomalies will follow you when you get close enough to them.\n"
+			terminalstring += "To kill an anomaly, simply shoot at it.\n"
+			terminalstring += "Shooting costs one unit of ammo, which is capped at 12.\n"
+			terminalstring += "Once out of ammo, wait a few seconds to reload.\n"
+			terminalstring += "Not being followed by any anomalies also triggers a reload.\n"
+			terminalstring += "Shooting non-following anomalies, or sniping, is possible.\n"
+			terminalstring += "However, it does not contribute to score.\n"
+			terminalstring += "Shooting an anomaly, even when dead, also pushes it slightly.\n"
+			terminalstring += "This is useful if you have a dead anomaly on your head.\n"
+			terminalstring += "\n"
+		"mods":
+			terminalstring += "\n"
+			terminalstring += "Modifiers are items which affect the game in multiple ways.\n"
+			terminalstring += "Firstly, each mod directly affects gameplay uniquely.\n"
+			terminalstring += "In general, the type of effect a mod has depends on its color.\n"
+			terminalstring += "Blue mods affect level generation.\n"
+			terminalstring += "Cyan mods affect your movement.\n"
+			terminalstring += "Magenta mods affect combat.\n"
+			terminalstring += "Mods can be either beneficial or detrimental.\n"
+			terminalstring += "Some mods are also more impactful than others.\n"
+			terminalstring += "These two properties are represented by each modifier's cost.\n"
+			terminalstring += "Negative-cost mods are beneficial, and vice versa.\n"
+			terminalstring += "Purchasing a mod adds its cost to your balance.\n"
+			terminalstring += "Your balance starts at zero and can never exceed ±four.\n"
+			terminalstring += "Mods also affect your score, as described in [goal].\n"
+			terminalstring += "A few mods are incompatible with others, or have prereqs.\n"
+			terminalstring += "Mods can be purchased or removed at mod-class terminals.\n"
+			terminalstring += "These terminals each offer three mods.\n"
+			terminalstring += "You can take any combination of these three, within rules.\n"
+			terminalstring += "With [Simple] enabled, mods can instead be added at the start.\n"
+			terminalstring += "\n"
+		"goal":
+			terminalstring += "\n"
+			terminalstring += "Maximize your score before the end of the game.\n"
+			terminalstring += "The game ends upon death or upon finishing six chambers.\n"
+			terminalstring += "Your score is the sum of its three color components.\n"
+			terminalstring += "Each component is the product of two factors: kills and mods.\n"
+			terminalstring += "Shooting a following anomaly counts as a kill for its color.\n"
+			terminalstring += "Shooting a passive anomaly and getting hit do not count.\n"
+			terminalstring += "The mod factor is determined by your modifiers of that color.\n"
+			terminalstring += "Positive-cost mods increase the multiplier, and vice versa.\n"
+			terminalstring += "Higher-magnitude-cost mods have larger effects on the mult.\n"
+			terminalstring += "Rerolling a chamber decreases your score, so don't abuse it.\n"
+			terminalstring += "It is, however, occasionally necessary when levelgen fails.\n"
+			terminalstring += "Your score is always accessible in the top right infobox.\n"
+			terminalstring += "You can also see your score in the summary at the end terminal.\n"
+			terminalstring += "Good luck!"
+			terminalstring += "\n"
+		"lore":
+			terminalstring += "\n"
+			terminalstring += "There is no official lore.\n"
+			terminalstring += "The player character may be referred to as John Godot.\n"
+			terminalstring += "That is not canon, however.\n"
+			terminalstring += "The canon is whatever you imagine it to be.\n"
+			terminalstring += "Have fun.\n"
+			terminalstring += "\n"
+		_:
+			terminalstring += "Nonexistent topic.\n\n"
+
+func ttlist():
+	terminalstring += "controls | infoboxes | combat | mods | goal | lore\n\n"
 
 func restore():
 	if otherstuff[OtherStuff.SPENT]:
@@ -441,7 +547,7 @@ func writeoutput():
 			nextline = ""
 		else:
 			nextline += ch
-			if len(nextline) == charsperline:
+			if len(nextline) > charsperline:
 				lines.append(nextline)
 				nextline = ""
 	lines.append(nextline)
@@ -482,6 +588,9 @@ func runinput():
 			"help":
 				if argquant(args, 1):
 					help()
+			"classhelp":
+				if argquant(args, 1):
+					classhelp()
 			"clear":
 				if argquant(args, 1):
 					clear()
@@ -496,6 +605,12 @@ func runinput():
 			"info":
 				if argquant(args, 2):
 					info(args)
+			"tt":
+				if argquant(args, 2):
+					tt(args)
+			"ttlist":
+				if argquant(args, 1):
+					ttlist()
 			"restore":
 				if argquant(args, 1) and classfilter([TerminalClass.RESTORATION]):
 					restore()
