@@ -114,8 +114,10 @@ func follow():
 		actualnoticeradius *= 1.5
 		if Global.hasmod(Global.Modifier.HYPERSPICE):
 			actualnoticeradius = INF
-	if distance <= actualnoticeradius:
+	if distance <= actualnoticeradius and not following:
 		following = true
+		if not tamed and Global.player.getfollowers() == 1:
+			$BlipAudioPlayer.play()
 	if distance > actualnoticeradius * followbuffer or  Global.chamber.getvox(Global.player.position + Vector3.UP) == Global.Vox.HIGHGRASS:
 		following = false
 	if following:
@@ -184,3 +186,4 @@ func die(source: Vector3, shot: bool):
 				Global.player.impacthealth(1)
 		for box in boxes:
 			box.mesh.material.albedo_color *= 0.25
+		following = false

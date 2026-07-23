@@ -2,8 +2,9 @@
 
 [ext_resource type="Script" uid="uid://dum7hxs2t1hc0" path="res://pistol.gd" id="1_08c3m"]
 [ext_resource type="ArrayMesh" uid="uid://mnci0qcyga8d" path="res://pistol.glb" id="2_bttkv"]
-[ext_resource type="AudioStream" uid="uid://c5lr4ubpn742t" path="res://noammo.wav" id="3_6e3nq"]
+[ext_resource type="AudioStream" uid="uid://dnuom3fkpd7ik" path="res://noammo.wav" id="3_6e3nq"]
 [ext_resource type="AudioStream" uid="uid://b4wqqh1ku17v" path="res://awdangit.wav" id="4_646vd"]
+[ext_resource type="AudioStream" uid="uid://bki8qnsr24kqd" path="res://ammospent.wav" id="5_78vgs"]
 
 [node name="Pistol" type="Node3D" unique_id=778629940]
 script = ExtResource("1_08c3m")
@@ -13,14 +14,19 @@ transform = Transform3D(-2.7538174e-09, 0, -0.063, 0, 0.063, 0, 0.063, 0, -2.753
 cast_shadow = 0
 mesh = ExtResource("2_bttkv")
 
-[node name="NoAmmoAudioPlayer" type="AudioStreamPlayer" parent="." unique_id=1224213118]
-process_mode = 3
-stream = ExtResource("3_6e3nq")
-volume_db = 2.0
-bus = &"SFX"
-
 [node name="MissedShotAudioPlayer" type="AudioStreamPlayer" parent="." unique_id=1598484702]
 process_mode = 3
 stream = ExtResource("4_646vd")
-volume_db = 2.0
+volume_db = 6.0
+bus = &"SFX"
+
+[node name="NoAmmoAudioPlayer" type="AudioStreamPlayer" parent="." unique_id=1224213118]
+process_mode = 3
+stream = ExtResource("3_6e3nq")
+volume_db = -4.0
+bus = &"SFX"
+
+[node name="AmmoSpentAudioPlayer" type="AudioStreamPlayer" parent="." unique_id=1581187754]
+stream = ExtResource("5_78vgs")
+volume_db = 8.0
 bus = &"SFX"

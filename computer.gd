@@ -124,7 +124,7 @@ func create(termclass: TerminalClass):
 					if len(otherstuff[OtherStuff.MODS]) == 3:
 						break
 		TerminalClass.BLINK:
-			otherstuff[OtherStuff.CHARGE] = 12
+			otherstuff[OtherStuff.CHARGE] = Global.ifmod(12, 6, Global.Modifier.LESSCHARGE)
 	clear()
 	newcommand()
 

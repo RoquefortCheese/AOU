@@ -161,10 +161,6 @@ func otherphysics(delta: float):
 			gravity += 3
 		acceleration.y -= gravity
 		timesinceground += delta
-	if Global.hasmod(Global.Modifier.PHOTOFIELD):
-		for light in Global.chamber.lights:
-			var diff = position - light.position
-			acceleration += diff.normalized() * diff.length() ** -2 * 2 ** 9
 
 func domath(delta: float):
 	if invine():
@@ -185,7 +181,6 @@ func domath(delta: float):
 func belikelumi():
 	for i in get_slide_collision_count():
 		if get_slide_collision(i).get_collider() == Global.chamber.door:
-			$DoorAudioPlayer.play()
 			Global.world.enterdoor()
 			break
 

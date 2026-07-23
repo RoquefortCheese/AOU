@@ -2,13 +2,13 @@
 
 importer="wav"
 type="AudioStreamWAV"
-uid="uid://berw26wn46ltj"
-path="res://.godot/imported/healing.wav-4b015358a2d1ae79b4c3b83fab689699.sample"
+uid="uid://bki8qnsr24kqd"
+path="res://.godot/imported/ammospent.wav-db5aaa1e5d278b3487577aefc854c996.sample"
 
 [deps]
 
-source_file="res://healing.wav"
-dest_files=["res://.godot/imported/healing.wav-4b015358a2d1ae79b4c3b83fab689699.sample"]
+source_file="res://ammospent.wav"
+dest_files=["res://.godot/imported/ammospent.wav-db5aaa1e5d278b3487577aefc854c996.sample"]
 
 [params]
 

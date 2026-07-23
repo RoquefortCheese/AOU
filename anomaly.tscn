@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://6ckuifqjy0ne"]
 
 [ext_resource type="Script" uid="uid://c3olph35n8pip" path="res://anomaly.gd" id="1_c1slk"]
+[ext_resource type="AudioStream" uid="uid://b6lh7s4sotpf3" path="res://blipadetected.mp3" id="3_542fw"]
 [ext_resource type="AudioStream" uid="uid://p46fcp81ebv2" path="res://anomshot.wav" id="3_f85fg"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_c1slk"]
@@ -41,3 +42,9 @@ stream = ExtResource("3_f85fg")
 volume_db = 2.0
 unit_size = 8.0
 max_db = 4.0
+bus = &"SFX"
+
+[node name="BlipAudioPlayer" type="AudioStreamPlayer" parent="." unique_id=1243380854]
+stream = ExtResource("3_542fw")
+volume_db = -10.0
+bus = &"SFX"

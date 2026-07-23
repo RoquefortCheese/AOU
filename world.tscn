@@ -5,6 +5,10 @@
 [ext_resource type="PackedScene" uid="uid://bekyfp1cdcb2n" path="res://interchamber.tscn" id="3_036b0"]
 [ext_resource type="PackedScene" uid="uid://c8d565cr28pwx" path="res://player.tscn" id="3_tlwt5"]
 [ext_resource type="Shader" uid="uid://d0snqeiv81mua" path="res://ambient.gdshader" id="4_aqk2v"]
+[ext_resource type="AudioStream" uid="uid://bypru7xsru7kq" path="res://enterdoor.mp3" id="6_dwbse"]
+[ext_resource type="FontFile" uid="uid://4tvrxsh3fis4" path="res://JetBrainsMonoNL-ExtraBold.ttf" id="6_ioo17"]
+[ext_resource type="AudioStream" uid="uid://rfbuykgt0lwv" path="res://phasewarp.mp3" id="7_pkg7o"]
+[ext_resource type="AudioStream" uid="uid://c84l6ripavgmk" path="res://finish.mp3" id="8_gbfbk"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_fj7yv"]
 sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
@@ -26,6 +30,14 @@ reflected_light_source = 1
 shader = ExtResource("4_aqk2v")
 shader_parameter/displacement = 0.0
 
+[sub_resource type="LabelSettings" id="LabelSettings_wse8f"]
+line_spacing = 0.0
+font = ExtResource("6_ioo17")
+font_size = 64
+outline_size = 32
+outline_color = Color(0, 0, 0, 1)
+shadow_size = 0
+
 [node name="World" type="Node" unique_id=784559713]
 script = ExtResource("1_f3sb7")
 chamberscene = ExtResource("2_fj7yv")
@@ -37,9 +49,40 @@ environment = SubResource("Environment_aqk2v")
 [node name="Player" parent="." unique_id=1234066966 instance=ExtResource("3_tlwt5")]
 
 [node name="AmbientLoadingShader" type="ColorRect" parent="." unique_id=822503856]
+visible = false
+z_index = 1
 material = SubResource("ShaderMaterial_tlwt5")
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+
+[node name="AmbientLoadingShaderLabel" type="Label" parent="." unique_id=613203637]
+z_index = 2
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 36.0
+offset_top = -164.0
+offset_right = 164.0
+offset_bottom = -36.0
+grow_vertical = 0
+label_settings = SubResource("LabelSettings_wse8f")
+vertical_alignment = 2
+
+[node name="DoorAudioPlayer" type="AudioStreamPlayer" parent="." unique_id=1817502535]
+process_mode = 3
+stream = ExtResource("6_dwbse")
+volume_db = -8.0
+bus = &"SFX"
+
+[node name="PhaseWarpAudioPlayer" type="AudioStreamPlayer" parent="." unique_id=247326375]
+stream = ExtResource("7_pkg7o")
+volume_db = -8.0
+bus = &"SFX"
+
+[node name="FinishAudioPlayer" type="AudioStreamPlayer" parent="." unique_id=238505155]
+stream = ExtResource("8_gbfbk")
+volume_db = -6.0
+bus = &"SFX"

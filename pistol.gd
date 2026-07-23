@@ -7,10 +7,12 @@ func fire():
 		$NoAmmoAudioPlayer.play()
 		return
 	Global.player.ammo -= 1
+	if Global.player.ammo == 0:
+		$AmmoSpentAudioPlayer.play()
 	var ray = Global.player.get_node("Camera3D/RayCast3D")
 	var target = ray.get_collider()
 	if target is Anomaly:
-		if target.following and target.alive:
+		if target.alive and target.following:
 			combo += 1
 			if combo == 6:
 				if Global.hasmod(Global.Modifier.COMBO):

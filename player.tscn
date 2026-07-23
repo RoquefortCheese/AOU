@@ -6,8 +6,7 @@
 [ext_resource type="AudioStream" uid="uid://civ4fir4hvcel" path="res://reload.wav" id="5_2hs0m"]
 [ext_resource type="Texture2D" uid="uid://crnr8scc3dp5g" path="res://icon.svg" id="5_sweqy"]
 [ext_resource type="AudioStream" uid="uid://dscpr6tu2avtd" path="res://ouch.wav" id="6_2hs0m"]
-[ext_resource type="AudioStream" uid="uid://berw26wn46ltj" path="res://healing.wav" id="7_1jxqw"]
-[ext_resource type="AudioStream" uid="uid://b5lc1es13ml18" path="res://doortouch.wav" id="8_dw050"]
+[ext_resource type="AudioStream" uid="uid://cthyqyx33d2lq" path="res://healing.mp3" id="7_dw050"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_onrkg"]
 radius = 0.2
@@ -68,6 +67,7 @@ mesh = SubResource("CapsuleMesh_hqtel")
 [node name="ReloadAudioPlayer" type="AudioStreamPlayer" parent="." unique_id=1441300152]
 process_mode = 3
 stream = ExtResource("5_2hs0m")
+volume_db = 4.0
 bus = &"SFX"
 
 [node name="HitAudioPlayer" type="AudioStreamPlayer" parent="." unique_id=683763233]
@@ -77,10 +77,6 @@ bus = &"SFX"
 
 [node name="HealingAudioPlayer" type="AudioStreamPlayer" parent="." unique_id=589344284]
 process_mode = 3
-stream = ExtResource("7_1jxqw")
-bus = &"SFX"
-
-[node name="DoorAudioPlayer" type="AudioStreamPlayer" parent="." unique_id=1081281675]
-process_mode = 3
-stream = ExtResource("8_dw050")
+stream = ExtResource("7_dw050")
+volume_db = -4.0
 bus = &"SFX"

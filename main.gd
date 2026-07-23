@@ -49,8 +49,10 @@ func _input(event: InputEvent):
 	if event.is_action_pressed("pause"):
 		if world != null and Global.player.terminalinuse == null:
 			if world.process_mode == Node.PROCESS_MODE_DISABLED:
+				world.hideshader()
 				world.process_mode = Node.PROCESS_MODE_INHERIT
 			else:
+				world.showshader("PAUSED")
 				world.process_mode = Node.PROCESS_MODE_DISABLED
 	if event.is_action_pressed("forceend") and Global.player.terminalinuse == null:
 		if world != null:

@@ -1,9 +1,14 @@
 todo:
-	add music
 	a tutorial
-	add / improve sfx
-	more controls
-	add / balance modifiers (done?!)
 	finish flavor text
+	improve pistol visuals
+	playtest
+	release!!!!!!!
+
+done:
+	add music
+	finish modifiers
+	add sound settings
 
 lock in
+silksong TOMORROW

@@ -488,6 +488,8 @@ func updatemodlabel():
 	$ModLabel.text = ""
 	for mod in Global.player.modifiers:  # line breaks before the start of the line for bottom-up labels
 		$ModLabel.text += "\n" + Global.modnames[mod]
+	if Global.player.modifiers == {}:
+		$ModLabel.text = "[No Mods]"
 
 func updatemetalabel():
 	$MetaLabel.text = ""

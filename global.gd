@@ -6,7 +6,7 @@ enum MeshType {AIR, CUBE, PLANT}
 @export var meshtypes: Dictionary[Vox, MeshType]
 @export var isglass: Dictionary[Vox, bool]
 
-enum Modifier {DOORPLANT, PILLARVINE, FASTANOMS, FLOATY, MOREANOMS, SQUASH, STRETCH, REGEN, RUNNING, DOUBLEJUMP, ISLANDS, MOREAMMO, ALERTANOMS, TRIPLEJUMP, STROLLING, SNIPER, SILVERLINE, FULLHEAL, HIGHGRASS, DENSE, FALLDAMAGE, SQUISH, HYPERSPICE, WALLRUN, PLANTJUMP, CORALBLEACH, PHOTOFIELD, VENGEANCE, COMBO, DARKNESS, AIRJUMP, TUNNELS, GLASS, BOXCAVE, RUBBER, LESSAMMO}
+enum Modifier {DOORPLANT, PILLARVINE, FASTANOMS, FLOATY, MOREANOMS, SQUASH, STRETCH, REGEN, RUNNING, DOUBLEJUMP, ISLANDS, MOREAMMO, ALERTANOMS, TRIPLEJUMP, STROLLING, SNIPER, SILVERLINE, FULLHEAL, HIGHGRASS, DENSE, FALLDAMAGE, SQUISH, HYPERSPICE, WALLRUN, PLANTJUMP, CORALBLEACH, LESSCHARGE, VENGEANCE, COMBO, DARKNESS, AIRJUMP, TUNNELS, GLASS, BOXCAVE, RUBBER, LESSAMMO}
 const modcosts: Dictionary[Modifier, int] = {
 	Modifier.DOORPLANT: -2,
 	Modifier.PILLARVINE: -4,
@@ -34,7 +34,7 @@ const modcosts: Dictionary[Modifier, int] = {
 	Modifier.WALLRUN: -2,
 	Modifier.PLANTJUMP: -2,
 	Modifier.CORALBLEACH: 3,
-	Modifier.PHOTOFIELD: 2,
+	Modifier.LESSCHARGE: 2,
 	Modifier.VENGEANCE: -4,
 	Modifier.COMBO: -2,
 	Modifier.DARKNESS: 3,
@@ -72,7 +72,7 @@ const modcolors: Dictionary[Modifier, Anomaly.AnomColor] = {
 	Modifier.WALLRUN: Anomaly.AnomColor.CYAN,
 	Modifier.PLANTJUMP: Anomaly.AnomColor.CYAN,
 	Modifier.CORALBLEACH: Anomaly.AnomColor.BLUE,
-	Modifier.PHOTOFIELD: Anomaly.AnomColor.CYAN,
+	Modifier.LESSCHARGE: Anomaly.AnomColor.CYAN,
 	Modifier.VENGEANCE: Anomaly.AnomColor.MAGENTA,
 	Modifier.COMBO: Anomaly.AnomColor.MAGENTA,
 	Modifier.DARKNESS: Anomaly.AnomColor.BLUE,
@@ -110,7 +110,7 @@ var modnames: Dictionary[Modifier, String] = {
 	Modifier.WALLRUN: "WallRun",
 	Modifier.PLANTJUMP: "PlantJump",
 	Modifier.CORALBLEACH: "CoralBleach",
-	Modifier.PHOTOFIELD: "PhotoField",
+	Modifier.LESSCHARGE: "LessCharge",
 	Modifier.VENGEANCE: "Vengeance",
 	Modifier.COMBO: "Combo",
 	Modifier.DARKNESS: "Darkness",
@@ -148,7 +148,7 @@ var moddescs: Dictionary[Modifier, String] = {
 	Modifier.WALLRUN: "Movement along walls is faster.",
 	Modifier.PLANTJUMP: "Jump higher when standing in plants.",
 	Modifier.CORALBLEACH: "Some plants matter is dead.",
-	Modifier.PHOTOFIELD: "You are repelled from lights.",
+	Modifier.LESSCHARGE: "Blink-class terminals store less charge.",
 	Modifier.VENGEANCE: "Taking damage kills nearby anomalies.",
 	Modifier.COMBO: "Consecutive successful shots heal.",
 	Modifier.DARKNESS: "Lights illuminate less.",
@@ -186,7 +186,7 @@ var modflavors: Dictionary[Modifier, String] = {
 	Modifier.WALLRUN: "This would make more sense with flat walls.",
 	Modifier.PLANTJUMP: "Become one with nature.",
 	Modifier.CORALBLEACH: "Ocean acidification is a serious issue.",
-	Modifier.PHOTOFIELD: "Did you know photons and electrons are the same thing?",
+	Modifier.LESSCHARGE: "",
 	Modifier.VENGEANCE: "",
 	Modifier.COMBO: "",
 	Modifier.DARKNESS: "",
