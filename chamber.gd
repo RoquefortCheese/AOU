@@ -320,7 +320,7 @@ func placelights():
 				isnook = false
 		if isnook:
 			nooks.append(point)
-	var lightquant = min(30, ceil(approxsidelen() * Global.ifmod(0.5, 0.25, Global.Modifier.DARKNESS)))
+	var lightquant = min(28, ceil(approxsidelen() * Global.ifmod(0.5, 0.25, Global.Modifier.DARKNESS)))
 	var bestlighting = -INF
 	var besttry
 	for attempt in 32:

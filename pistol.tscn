@@ -30,3 +30,8 @@ bus = &"SFX"
 stream = ExtResource("5_78vgs")
 volume_db = 8.0
 bus = &"SFX"
+
+[node name="ShotFlareLight" type="OmniLight3D" parent="." unique_id=30298853]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.1, 0.12, -0.2)
+light_energy = 0.0
+omni_range = 1.0

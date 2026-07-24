@@ -184,6 +184,8 @@ func die(source: Vector3, shot: bool):
 		if Global.hasmod(Global.Modifier.SNIPER):
 			if not following and Global.player.getfollowers() != 0:
 				Global.player.impacthealth(1)
+		if not undead:
+			Global.player.kills += 1
 		for box in boxes:
 			box.mesh.material.albedo_color *= 0.25
 		following = false

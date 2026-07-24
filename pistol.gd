@@ -9,6 +9,7 @@ func fire():
 	Global.player.ammo -= 1
 	if Global.player.ammo == 0:
 		$AmmoSpentAudioPlayer.play()
+	$ShotFlareLight.light_energy = 4
 	var ray = Global.player.get_node("Camera3D/RayCast3D")
 	var target = ray.get_collider()
 	if target is Anomaly:
@@ -26,3 +27,4 @@ func fire():
 func _process(delta: float):
 	var time = Global.chamber.time
 	position = Vector3(sin(time), sin(time * sqrt(2)), 0) * 0.0625
+	$ShotFlareLight.light_energy = max(0, $ShotFlareLight.light_energy - 40 * delta)

@@ -515,12 +515,15 @@ func tingset(args: Array[String]):
 
 func summary():
 	terminalstring += tabbed("Final score:") + str(Global.player.totalscore()) + "\n"
+	terminalstring += tabbed("Total kills:") + str(Global.player.kills) + "\n"
 	terminalstring += tabbed("Chamber:") + str(Global.chamberindex) + "\n"
 	terminalstring += tabbed("End reason:") + Global.finishcause + "\n"
 	terminalstring += tabbed("Settings:")
 	for setting in Global.Setting.values():
 		if Global.settings[setting]:
 			terminalstring += Global.settingnames[setting] + " "
+	if true not in Global.settings.values():
+		terminalstring += "None"
 	terminalstring += "\n"
 	terminalstring += tabbed("Seed:") + str(Global.worldseed) + "\n"
 	terminalstring += "\n"

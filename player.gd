@@ -21,6 +21,7 @@ var score: Dictionary[Anomaly.AnomColor, int]
 var modifiers: Dictionary[Global.Modifier, bool]
 var alive: bool
 var balance: int
+var kills: int
 var health: int
 var ammo: int
 var acceleration: Vector3
@@ -72,6 +73,7 @@ func _ready():
 	modifiers = {}
 	alive = true
 	balance = 0
+	kills = 0
 	health = 6
 	ammo = maxammo()
 	timesinceground = 0
